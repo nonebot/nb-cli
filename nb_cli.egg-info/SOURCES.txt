@@ -1,0 +1,8 @@
+README.md
+setup.py
+nb_cli/__init__.py
+nb_cli.egg-info/PKG-INFO
+nb_cli.egg-info/SOURCES.txt
+nb_cli.egg-info/dependency_links.txt
+nb_cli.egg-info/requires.txt
+nb_cli.egg-info/top_level.txt
