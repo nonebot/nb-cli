@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nb-cli"
+version = "0.1.0"
+description = "CLI for nonebot2"
+authors = ["yanyongyu <yanyongyu_1@126.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyinquirer = "^1.0.3"
+click = "^7.1.2"
+pyfiglet = "^0.8.post1"
+
+[tool.poetry.dev-dependencies]
+yapf = "^0.30.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
