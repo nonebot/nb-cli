@@ -138,7 +138,8 @@ type = "legacy"
 url = "https://mirrors.aliyun.com/pypi/simple"
 
 [metadata]
-content-hash = "14176adaf93b00611acb8b39e4081c4954d4dce912f90ee13d21df216fe25fce"
+content-hash = "e395dbf2f6da4b7e8566ff862280554f94e6e70ac4b397dac3b2e7b4f3b0e286"
+lock-version = "1.0"
 python-versions = "^3.7"
 
 [metadata.files]

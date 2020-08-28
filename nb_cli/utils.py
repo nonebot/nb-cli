@@ -16,7 +16,6 @@ list_style = style_from_dict({
 
 
 class ClickAliasedGroup(click.Group):
-
     def __init__(self, *args, **kwargs):
         super(ClickAliasedGroup, self).__init__(*args, **kwargs)
         self._commands = {}

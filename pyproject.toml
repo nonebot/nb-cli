@@ -10,8 +10,8 @@ python = "^3.7"
 pyinquirer = "^1.0.3"
 click = "^7.1.2"
 pyfiglet = "^0.8.post1"
-six = "^1.15.0"
 colorama = "^0.4.3"
+# nonebot = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
