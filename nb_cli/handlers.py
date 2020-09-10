@@ -18,14 +18,14 @@ def draw_logo():
                 bold=True)
 
 
-def run_bot():
-    if not os.path.isfile("bot.py"):
-        click.secho("Cannot find a bot.py file in current folder!", fg="red")
+def run_bot(file="bot.py", app="app"):
+    if not os.path.isfile(file):
+        click.secho(f"Cannot find {file} in current folder!", fg="red")
         return
 
     module = importlib.import_module("bot")
-    app = getattr(module, "app")
-    if not app:
+    _app = getattr(module, app)
+    if not _app:
         click.secho(
             "Cannot find an asgi server. Add `app = nonebot.get_asgi()` to enable reload mode."
         )

@@ -30,9 +30,19 @@ def init():
 
 
 @main.command(aliases=["start"])
-def run():
+@click.option("-f",
+              "--file",
+              default="bot.py",
+              show_default=True,
+              help="Entry file of your bot")
+@click.option("-a",
+              "--app",
+              default="app",
+              show_default=True,
+              help="ASGI application of your bot")
+def run(file, app):
     """Run the Bot in Current Folder"""
-    run_bot()
+    run_bot(file, app)
 
 
 if __name__ == "__main__":
