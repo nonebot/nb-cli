@@ -15,3 +15,10 @@ nb --help
 ```shell
 nb
 ```
+
+### CookieCutter usage
+
+```shell
+pip install cookiecutter
+cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli"
+```

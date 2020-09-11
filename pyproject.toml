@@ -13,6 +13,7 @@ pyfiglet = "^0.8.post1"
 colorama = "^0.4.3"
 # nonebot = "^2.0.0"
 
+cookiecutter = "^1.7.2"
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
 

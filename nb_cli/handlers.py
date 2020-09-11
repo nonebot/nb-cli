@@ -3,9 +3,11 @@
 
 import os
 import importlib
+from pathlib import Path
 
 import click
 import nonebot
+from cookiecutter.main import cookiecutter
 from PyInquirer import prompt
 from pyfiglet import figlet_format
 
@@ -35,7 +37,9 @@ def run_bot(file="bot.py", app="app"):
 
 
 def create_project():
-    pass
+    cookiecutter(str(Path(__file__).parent.resolve()),
+                 no_input=True,
+                 extra_context={})
 
 
 def handle_no_subcommand():
