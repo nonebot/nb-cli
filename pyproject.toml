@@ -8,12 +8,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-pyinquirer = "=1.0.3"
 click = "^7.1.2"
-pyfiglet = "^0.8.post1"
 colorama = "^0.4.3"
+pyinquirer = "=1.0.3"
+pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
-# nonebot = "^2.0.0"
+# nonebot2 = "^2.0.0.a1"
 
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
