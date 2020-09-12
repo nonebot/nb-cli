@@ -4,7 +4,7 @@
 import nonebot
 
 
-nonebot.init(){% if cookiecutter.load_builtin %}
+nonebot.init(){% if cookiecutter.load_builtin == "True" %}
 nonebot.load_builtin_plugins(){% endif %}
 nonebot.load_plugins("{{ cookiecutter.source_dir }}/plugins")
 
