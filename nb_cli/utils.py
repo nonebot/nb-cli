@@ -6,7 +6,7 @@ from PyInquirer import style_from_dict, Token
 
 list_style = style_from_dict({
     Token.Separator: "#6C6C6C",
-    Token.QuestionMark: "#FF9D00 bold",
+    Token.QuestionMark: "#673AB7 bold",
     Token.Selected: "#5F819D",
     Token.Pointer: "#FF9D00 bold",
     Token.Instruction: "",
@@ -16,6 +16,7 @@ list_style = style_from_dict({
 
 
 class ClickAliasedGroup(click.Group):
+
     def __init__(self, *args, **kwargs):
         super(ClickAliasedGroup, self).__init__(*args, **kwargs)
         self._commands = {}

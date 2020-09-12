@@ -37,9 +37,49 @@ def run_bot(file="bot.py", app="app"):
 
 
 def create_project():
+    question = [{
+        "type": "input",
+        "name": "project_name",
+        "message": "Project Name:",
+        "validate": lambda x: len(x) > 0
+    }, {
+        "type": "list",
+        "name": "license",
+        "message": "License:",
+        "choices": [
+            "MIT", "Apache-2.0", "GPL-3.0-only", "BSD-3-Clause",
+            "Create Your Self"
+        ],
+        "filter": lambda x: "" if x == "Create Your Self" else x
+    }, {
+        "type":
+            "list",
+        "name":
+            "use_src",
+        "message":
+            "Where to store the plugin?",
+        "choices":
+            lambda ctx: [
+                f"1) In a \"{ctx['project_name'].lower().replace(' ', '-').replace('-', '_')}\" folder",
+                "2) In a \"src\" folder"
+            ],
+        "filter":
+            lambda x: x.startswith("2")
+    }, {
+        "type": "confirm",
+        "name": "load_builtin",
+        "message": "Load NoneBot Builtin Plugin?",
+        "default": False
+    }]
+    keys = set(map(lambda x: x["name"], question))
+    answers = prompt(question, qmark="[?]", style=list_style)
+    if keys != set(answers.keys()):
+        click.secho(f"Error Input! Missing {list(keys - set(answers.keys()))}",
+                    fg="red")
+        return
     cookiecutter(str(Path(__file__).parent.resolve()),
                  no_input=True,
-                 extra_context={})
+                 extra_context=answers)
 
 
 def handle_no_subcommand():
@@ -61,5 +101,6 @@ def handle_no_subcommand():
     }]
     answers = prompt(question, style=list_style)
     if "subcommand" not in answers or not answers["subcommand"]:
+        click.secho("Error Input!", fg="red")
         return
     answers["subcommand"]()
