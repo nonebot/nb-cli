@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "{{ cookiecutter.project_name }}"
+version = "0.1.0"
+description = "{{ cookiecutter.project_desc }}"
+authors = []{%- if cookiecutter.license -%}
+license = "{{ cookiecutter.license }}"{% endif %}
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+nonebot = "^2.0.0"
+nb_cli = "^0.1.0"
+
+[tool.poetry.dev-dependencies]
+nonebot_test = "^0.1.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

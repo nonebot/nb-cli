@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -11,9 +12,9 @@ pyinquirer = "=1.0.3"
 click = "^7.1.2"
 pyfiglet = "^0.8.post1"
 colorama = "^0.4.3"
+cookiecutter = "^1.7.2"
 # nonebot = "^2.0.0"
 
-cookiecutter = "^1.7.2"
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
 
