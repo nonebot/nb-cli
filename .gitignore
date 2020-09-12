@@ -1,4 +1,3 @@
-
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode
 
@@ -151,3 +150,5 @@ dmypy.json
 .history
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
+
+!nb_cli/{{cookiecutter.project_slug}}/.env
