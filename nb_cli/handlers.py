@@ -2,14 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
+import logging
 import importlib
 from pathlib import Path
+from typing import Iterable
+from functools import partial
 
 import click
 import nonebot
-from cookiecutter.main import cookiecutter
 from PyInquirer import prompt
 from pyfiglet import figlet_format
+from cookiecutter.main import cookiecutter
+from compose.cli.main import TopLevelCommand, DocoptDispatcher, project_from_options, perform_command
+from compose.cli.main import setup_console_handler, setup_parallel_logger, set_no_color_if_clicolor
 
 from nb_cli.utils import list_style
 
@@ -20,7 +26,7 @@ def draw_logo():
                 bold=True)
 
 
-def run_bot(file="bot.py", app="app"):
+def run_bot(file: str = "bot.py", app: str = "app"):
     if not os.path.isfile(file):
         click.secho(f"Cannot find {file} in current folder!", fg="red")
         return
@@ -79,9 +85,18 @@ def handle_no_subcommand():
     click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
 
     choices = {
-        "Show Logo": draw_logo,
-        "Create a New Project": create_project,
-        "Run the Bot in Current Folder": run_bot
+        "Show Logo":
+            draw_logo,
+        "Create a New Project":
+            create_project,
+        "Run the Bot in Current Folder":
+            run_bot,
+        "Build Docker Image for the Bot":
+            partial(_call_docker_compose, "build", []),
+        "Deploy the Bot to Docker":
+            partial(_call_docker_compose, "up", ["-d"]),
+        "Stop the Bot Container in Docker":
+            partial(_call_docker_compose, "down")
     }
     question = [{
         "type": "list",
@@ -95,3 +110,16 @@ def handle_no_subcommand():
         click.secho("Error Input!", fg="red")
         return
     answers["subcommand"]()
+
+
+def _call_docker_compose(command: str, args: Iterable[str]):
+    dispatcher = DocoptDispatcher(TopLevelCommand, {"options_first": True})
+    options, handler, command_options = dispatcher.parse([command, *args])
+    setup_console_handler(logging.StreamHandler(sys.stderr),
+                          options.get('--verbose'),
+                          set_no_color_if_clicolor(options.get('--no-ansi')),
+                          options.get("--log-level"))
+    setup_parallel_logger(set_no_color_if_clicolor(options.get('--no-ansi')))
+    if options.get('--no-ansi'):
+        command_options['--no-color'] = True
+    return perform_command(options, handler, command_options)
