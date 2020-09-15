@@ -2,7 +2,6 @@
   "project_name": "AwesomeBot",
   "project_slug": "{{ cookiecutter.project_name|replace(' ', '-') }}",
   "project_desc": "{{ cookiecutter.project_name }}",
-  "license": "",
   "use_src": false,
   "source_dir": "{{ 'src' if cookiecutter.use_src == 'True' else cookiecutter.project_slug|lower|replace('-', '_') }}",
   "load_builtin": false

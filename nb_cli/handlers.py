@@ -43,15 +43,6 @@ def create_project():
         "message": "Project Name:",
         "validate": lambda x: len(x) > 0
     }, {
-        "type": "list",
-        "name": "license",
-        "message": "License:",
-        "choices": [
-            "MIT", "Apache-2.0", "GPL-3.0-only", "BSD-3-Clause",
-            "Create Your Self"
-        ],
-        "filter": lambda x: "" if x == "Create Your Self" else x
-    }, {
         "type":
             "list",
         "name":
