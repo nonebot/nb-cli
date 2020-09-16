@@ -2,6 +2,12 @@
 
 CLI for nonebot2
 
+Features:
+
+- Create A NoneBot Project
+- Run NoneBot
+- Deploy NoneBot to Docker
+
 ## How to use
 
 ### Command-line usage
