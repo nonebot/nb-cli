@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Iterable
 from functools import partial
 
+try:
+    from pip._internal.cli.main import main as pipmain
+except ImportError:
+    from pip import main as pipmain
+
 import click
 import nonebot
 from PyInquirer import prompt
@@ -31,7 +36,8 @@ def run_bot(file: str = "bot.py", app: str = "app"):
         click.secho(f"Cannot find {file} in current folder!", fg="red")
         return
 
-    module = importlib.import_module("bot")
+    module_name, _ = os.path.splitext(file)
+    module = importlib.import_module(module_name)
     _app = getattr(module, app)
     if not _app:
         click.secho(
@@ -39,7 +45,7 @@ def run_bot(file: str = "bot.py", app: str = "app"):
         )
         nonebot.run()
     else:
-        nonebot.run(app="bot:app")
+        nonebot.run(app=f"{module_name}:{app}")
 
 
 def create_project():
@@ -123,3 +129,7 @@ def _call_docker_compose(command: str, args: Iterable[str]):
     if options.get('--no-ansi'):
         command_options['--no-color'] = True
     return perform_command(options, handler, command_options)
+
+
+def _call_pip(command: str, *args: str):
+    return pipmain([command, *args])
