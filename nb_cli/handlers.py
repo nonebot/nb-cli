@@ -8,21 +8,17 @@ import importlib
 from pathlib import Path
 from typing import Iterable
 from functools import partial
-
-try:
-    from pip._internal.cli.main import main as pipmain
-except ImportError:
-    from pip import main as pipmain
+from xmlrpc.client import ServerProxy
 
 import click
 import nonebot
 from PyInquirer import prompt
 from pyfiglet import figlet_format
 from cookiecutter.main import cookiecutter
-from compose.cli.main import TopLevelCommand, DocoptDispatcher, project_from_options, perform_command
+from compose.cli.main import TopLevelCommand, DocoptDispatcher, perform_command
 from compose.cli.main import setup_console_handler, setup_parallel_logger, set_no_color_if_clicolor
 
-from nb_cli.utils import list_style
+from nb_cli.utils import list_style, print_package_results
 
 
 def draw_logo():
@@ -131,5 +127,7 @@ def _call_docker_compose(command: str, args: Iterable[str]):
     return perform_command(options, handler, command_options)
 
 
-def _call_pip(command: str, *args: str):
-    return pipmain([command, *args])
+def _call_pip_search(package, index="https://pypi.org/pypi"):
+    pypi = ServerProxy(index)
+    hits = pypi.search({"name": f"nonebot_plugin_{package}"})
+    print_package_results(hits)

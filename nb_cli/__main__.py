@@ -7,7 +7,8 @@ import sys
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import run_bot, create_project, _call_docker_compose, handle_no_subcommand
+from nb_cli.handlers import _call_docker_compose, _call_pip_search
+from nb_cli.handlers import run_bot, create_project, handle_no_subcommand
 
 sys.path.insert(0, ".")
 
@@ -25,7 +26,7 @@ def main(ctx):
 
 @main.command(aliases=["create"])
 def init():
-    """Create A NoneBot Project"""
+    """Create A NoneBot Project."""
     create_project()
 
 
@@ -41,7 +42,7 @@ def init():
               show_default=True,
               help="ASGI application of your bot")
 def run(file, app):
-    """Run the Bot in Current Folder"""
+    """Run the Bot in Current Folder."""
     run_bot(file, app)
 
 
@@ -59,7 +60,8 @@ def build(args):
 @main.command(aliases=["up"], context_settings={"ignore_unknown_options": True})
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def deploy(args):
-    """Builds, (Re)Creates, Starts Containers for Bot in Current Folder.
+    """Build, Create, Start Containers for Bot in Current Folder.
+    
     The same as docker-compose up -d.
     
     Options see: https://docs.docker.com/compose/reference/up/
@@ -73,11 +75,21 @@ def deploy(args):
               context_settings={"ignore_unknown_options": True})
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 def exit(args):
-    """Stops Containers and Removes Containers, Networks, Volumes and Images for Bot in Current Folder.
+    """Stop and Remove Containers for Bot in Current Folder.
+    
     The same as docker-compose down.
     
-    Options see: https://docs.docker.com/compose/reference/down/"""
+    Options see: https://docs.docker.com/compose/reference/down/
+    """
     _call_docker_compose("down", args)
+
+
+@main.command()
+@click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.argument("name", nargs=1)
+def search(name):
+    """Search for nonebot plugin published on pypi."""
+    _call_pip_search(name)
 
 
 if __name__ == "__main__":
