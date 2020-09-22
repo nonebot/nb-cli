@@ -7,7 +7,9 @@ Features:
 - Create A NoneBot Project
 - Run NoneBot
 - Deploy NoneBot to Docker
-- Search for NoneBot Plugin on pypi
+- Plugin Management
+  - Search for NoneBot Plugin on Pypi
+  - Create new plugins
 
 ## How to use
 
