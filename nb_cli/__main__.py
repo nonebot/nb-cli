@@ -112,7 +112,7 @@ def search(name, index):
               "--plugin-dir",
               type=click.Path(exists=True, file_okay=False, writable=True))
 def new(name, plugin_dir):
-    """Search for nonebot plugin published on pypi."""
+    """Create a new nonebot plugin."""
     create_plugin(name, plugin_dir)
 
 
