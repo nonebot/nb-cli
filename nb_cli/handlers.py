@@ -6,9 +6,9 @@ import sys
 import logging
 import importlib
 from pathlib import Path
-from typing import Iterable
 from functools import partial
 from xmlrpc.client import ServerProxy
+from typing import Iterable, Optional
 
 import click
 import nonebot
@@ -76,9 +76,71 @@ def create_project():
         click.secho(f"Error Input! Missing {list(keys - set(answers.keys()))}",
                     fg="red")
         return
-    cookiecutter(str(Path(__file__).parent.resolve()),
+    cookiecutter(str((Path(__file__).parent / "project").resolve()),
                  no_input=True,
                  extra_context=answers)
+
+
+def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
+    if not name:
+        question = [{
+            "type": "input",
+            "name": "plugin_name",
+            "message": "Plugin Name:",
+            "validate": lambda x: len(x) > 0
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if "plugin_name" not in answers:
+            click.secho(f"Error Input!", fg="red")
+            return
+        name = answers["plugin_name"]
+
+    if not plugin_dir:
+        detected = [
+            *filter(lambda x: x.is_dir(),
+                    Path(".").glob("**/plugins/")), "Other"
+        ]
+        question = [{
+            "type": "list",
+            "name": "plugin_dir",
+            "message": "Where to store the plugin?",
+            "choices": list(map(str, detected)),
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if "plugin_dir" not in answers:
+            click.secho(f"Error Input!", fg="red")
+            return
+        plugin_dir = answers["plugin_dir"]
+        if plugin_dir == "Other":
+            question = [{
+                "type": "input",
+                "name": "plugin_dir",
+                "message": "Plugin Dir:",
+                "validate": lambda x: len(x) > 0 and Path(x).is_dir()
+            }]
+            answers = prompt(question, qmark="[?]", style=list_style)
+            if "plugin_dir" not in answers:
+                click.secho(f"Error Input!", fg="red")
+                return
+            plugin_dir = answers["plugin_dir"]
+    elif not Path(plugin_dir).is_dir():
+        click.secho(f"Plugin Dir is not a directory!", fg="yellow")
+        question = [{
+            "type": "input",
+            "name": "plugin_dir",
+            "message": "Plugin Dir:",
+            "validate": lambda x: len(x) > 0 and Path(x).is_dir()
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if "plugin_dir" not in answers:
+            click.secho(f"Error Input!", fg="red")
+            return
+        plugin_dir = answers["plugin_dir"]
+
+    cookiecutter(str((Path(__file__).parent / "plugin").resolve()),
+                 no_input=True,
+                 output_dir=plugin_dir,
+                 extra_context={"plugin_name": name})
 
 
 def handle_no_subcommand():
@@ -127,7 +189,11 @@ def _call_docker_compose(command: str, args: Iterable[str]):
     return perform_command(options, handler, command_options)
 
 
-def _call_pip_search(package, index="https://pypi.org/pypi"):
+def _call_pip_search(package: str, index: str = "https://pypi.org/pypi"):
     pypi = ServerProxy(index)
     hits = pypi.search({"name": f"nonebot_plugin_{package}"})
     print_package_results(hits)
+
+
+def _call_pip_install(package: str):
+    pass

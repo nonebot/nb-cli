@@ -27,5 +27,5 @@ nb
 
 ```shell
 pip install cookiecutter
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli"
+cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/project"
 ```

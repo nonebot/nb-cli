@@ -1,0 +1,4 @@
+{
+  "plugin_name": "AwesomeBot",
+  "plugin_slug": "{{ cookiecutter.plugin_name|replace(' ', '-') }}"
+}
