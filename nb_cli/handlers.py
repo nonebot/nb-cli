@@ -10,6 +10,11 @@ from functools import partial
 from xmlrpc.client import ServerProxy
 from typing import Iterable, Optional
 
+try:
+    from pip._internal.cli.main import main as pipmain
+except ImportError:
+    from pip import main as pipmainS
+
 import click
 import nonebot
 from PyInquirer import prompt
@@ -81,6 +86,54 @@ def create_project():
                  extra_context=answers)
 
 
+def handle_no_subcommand():
+    draw_logo()
+    click.echo("\n\b")
+    click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
+
+    choices = {
+        "Show Logo":
+            draw_logo,
+        "Create a New Project":
+            create_project,
+        "Run the Bot in Current Folder":
+            run_bot,
+        "Build Docker Image for the Bot":
+            partial(_call_docker_compose, "build", []),
+        "Deploy the Bot to Docker":
+            partial(_call_docker_compose, "up", ["-d"]),
+        "Stop the Bot Container in Docker":
+            partial(_call_docker_compose, "down"),
+        "Create a New NoneBot Plugin":
+            create_plugin,
+    }
+    question = [{
+        "type": "list",
+        "name": "subcommand",
+        "message": "What do you want to do?",
+        "choices": choices.keys(),
+        "filter": lambda x: choices[x]
+    }]
+    answers = prompt(question, style=list_style)
+    if "subcommand" not in answers or not answers["subcommand"]:
+        click.secho("Error Input!", fg="red")
+        return
+    answers["subcommand"]()
+
+
+def _call_docker_compose(command: str, args: Iterable[str]):
+    dispatcher = DocoptDispatcher(TopLevelCommand, {"options_first": True})
+    options, handler, command_options = dispatcher.parse([command, *args])
+    setup_console_handler(logging.StreamHandler(sys.stderr),
+                          options.get('--verbose'),
+                          set_no_color_if_clicolor(options.get('--no-ansi')),
+                          options.get("--log-level"))
+    setup_parallel_logger(set_no_color_if_clicolor(options.get('--no-ansi')))
+    if options.get('--no-ansi'):
+        command_options['--no-color'] = True
+    return perform_command(options, handler, command_options)
+
+
 def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
     if not name:
         question = [{
@@ -143,57 +196,21 @@ def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
                  extra_context={"plugin_name": name})
 
 
-def handle_no_subcommand():
-    draw_logo()
-    click.echo("\n\b")
-    click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
-
-    choices = {
-        "Show Logo":
-            draw_logo,
-        "Create a New Project":
-            create_project,
-        "Run the Bot in Current Folder":
-            run_bot,
-        "Build Docker Image for the Bot":
-            partial(_call_docker_compose, "build", []),
-        "Deploy the Bot to Docker":
-            partial(_call_docker_compose, "up", ["-d"]),
-        "Stop the Bot Container in Docker":
-            partial(_call_docker_compose, "down")
-    }
-    question = [{
-        "type": "list",
-        "name": "subcommand",
-        "message": "What do you want to do?",
-        "choices": choices.keys(),
-        "filter": lambda x: choices[x]
-    }]
-    answers = prompt(question, style=list_style)
-    if "subcommand" not in answers or not answers["subcommand"]:
-        click.secho("Error Input!", fg="red")
-        return
-    answers["subcommand"]()
+def search_plugin(package: str, index: str = "https://pypi.org/pypi"):
+    _call_pip_search(f"nonebot_plugin_{package}", index)
 
 
-def _call_docker_compose(command: str, args: Iterable[str]):
-    dispatcher = DocoptDispatcher(TopLevelCommand, {"options_first": True})
-    options, handler, command_options = dispatcher.parse([command, *args])
-    setup_console_handler(logging.StreamHandler(sys.stderr),
-                          options.get('--verbose'),
-                          set_no_color_if_clicolor(options.get('--no-ansi')),
-                          options.get("--log-level"))
-    setup_parallel_logger(set_no_color_if_clicolor(options.get('--no-ansi')))
-    if options.get('--no-ansi'):
-        command_options['--no-color'] = True
-    return perform_command(options, handler, command_options)
+def install_plugin(package: str, index: str = "https://pypi.org/pypi"):
+    status = _call_pip_install(f"nonebot_plugin_{package}", index)
+    if status == 0:  # SUCCESS
+        pass
 
 
 def _call_pip_search(package: str, index: str = "https://pypi.org/pypi"):
     pypi = ServerProxy(index)
-    hits = pypi.search({"name": f"nonebot_plugin_{package}"})
+    hits = pypi.search({"name": package})
     print_package_results(hits)
 
 
-def _call_pip_install(package: str):
-    pass
+def _call_pip_install(package: str, index: str = "https://pypi.org/pypi"):
+    return pipmain(["install", "-i", index, package])

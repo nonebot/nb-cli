@@ -7,8 +7,8 @@ import sys
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import _call_docker_compose, _call_pip_search
-from nb_cli.handlers import run_bot, create_project, create_plugin, handle_no_subcommand
+from nb_cli.handlers import run_bot, create_project, handle_no_subcommand
+from nb_cli.handlers import _call_docker_compose, search_plugin, create_plugin, install_plugin
 
 sys.path.insert(0, ".")
 
@@ -89,7 +89,15 @@ def exit(args):
 @click.argument("name", nargs=1)
 def search(name, index):
     """Search for nonebot plugin published on pypi."""
-    _call_pip_search(name, index)
+    search_plugin(name, index)
+
+
+@main.command()
+@click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.argument("name", nargs=1)
+def install(name, index):
+    """Install nonebot plugin published on pypi."""
+    install_plugin(name, index)
 
 
 @main.group(cls=ClickAliasedGroup)
@@ -103,7 +111,15 @@ def plugin():
 @click.argument("name", nargs=1)
 def search(name, index):
     """Search for nonebot plugin published on pypi."""
-    _call_pip_search(name, index)
+    search_plugin(name, index)
+
+
+@plugin.command()
+@click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.argument("name", nargs=1)
+def install(name, index):
+    """Install nonebot plugin published on pypi."""
+    install_plugin(name, index)
 
 
 @plugin.command(aliases=["create"])
