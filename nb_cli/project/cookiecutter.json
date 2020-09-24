@@ -1,4 +1,5 @@
 {
+  "py": "py",
   "project_name": "AwesomeBot",
   "project_slug": "{{ cookiecutter.project_name|replace(' ', '-') }}",
   "project_desc": "{{ cookiecutter.project_name }}",
