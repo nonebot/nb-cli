@@ -5,6 +5,17 @@ description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/yanyongyu/nb-cli"
+repository = "https://github.com/yanyongyu/nb-cli"
+keywords = ["bot", "qq", "nonebot"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: Robot Framework",
+  "Framework :: Robot Framework :: Library",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3"
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
