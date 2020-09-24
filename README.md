@@ -9,6 +9,7 @@ Features:
 - Deploy NoneBot to Docker
 - Plugin Management
   - Search for NoneBot Plugin on Pypi
+  - Install NoneBot Plugin on Pypi
   - Create new plugins
 
 ## How to use
