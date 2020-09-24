@@ -94,10 +94,15 @@ def search(name, index):
 
 @main.command()
 @click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.option("-f",
+              "--file",
+              default="bot.py",
+              show_default=True,
+              help="Entry file of your bot")
 @click.argument("name", nargs=1)
-def install(name, index):
+def install(name, file, index):
     """Install nonebot plugin published on pypi."""
-    install_plugin(name, index)
+    install_plugin(name, file, index)
 
 
 @main.group(cls=ClickAliasedGroup)
@@ -116,10 +121,15 @@ def search(name, index):
 
 @plugin.command()
 @click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.option("-f",
+              "--file",
+              default="bot.py",
+              show_default=True,
+              help="Entry file of your bot")
 @click.argument("name", nargs=1)
-def install(name, index):
+def install(name, file, index):
     """Install nonebot plugin published on pypi."""
-    install_plugin(name, index)
+    install_plugin(name, file, index)
 
 
 @plugin.command(aliases=["create"])

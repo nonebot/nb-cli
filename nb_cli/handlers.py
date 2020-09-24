@@ -200,10 +200,23 @@ def search_plugin(package: str, index: str = "https://pypi.org/pypi"):
     _call_pip_search(f"nonebot_plugin_{package}", index)
 
 
-def install_plugin(package: str, index: str = "https://pypi.org/pypi"):
+def install_plugin(package: str,
+                   file: str = "bot.py",
+                   index: str = "https://pypi.org/pypi"):
     status = _call_pip_install(f"nonebot_plugin_{package}", index)
-    if status == 0:  # SUCCESS
-        pass
+    if status == 0 and os.path.isfile(file):  # SUCCESS
+        with open(file, "r") as f:
+            lines = f.readlines()
+        insert_index = len(lines) - list(
+            map(
+                lambda x: x.startswith("nonebot.load") or x.startswith(
+                    "nonebot.init"), lines[::-1])).index(True)
+        lines.insert(insert_index,
+                     f"nonebot.load_plugin(\"nonebot_plugin_{package}\")\n")
+        with open(file, "w") as f:
+            f.writelines(lines)
+    elif status == 0:
+        click.secho(f"Cannot find {file} in current folder!", fg="red")
 
 
 def _call_pip_search(package: str, index: str = "https://pypi.org/pypi"):
