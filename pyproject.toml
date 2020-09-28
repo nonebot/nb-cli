@@ -26,6 +26,7 @@ pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
 docker-compose = "^1.27.2"
 nonebot2 = "^2.0.0-alpha.1"
+# pyinquirer = { git = "https://github.com/CITGuru/PyInquirer.git", rev = "7485a1f" }
 
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
