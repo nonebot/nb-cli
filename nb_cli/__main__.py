@@ -84,6 +84,7 @@ def exit(args):
     _call_docker_compose("down", args)
 
 
+# ! Shortcuts for plugins
 @main.command()
 @click.option("-i", "--index", default="https://pypi.org/pypi")
 @click.argument("name", nargs=1)
@@ -109,6 +110,13 @@ def install(name, file, index):
 def plugin():
     """Manage Bot Plugin."""
     pass
+
+
+@plugin.command()
+@click.option("-i", "--index", default="https://pypi.org/pypi")
+def list(index):
+    """List nonebot plugin published on pypi."""
+    search_plugin("", index)
 
 
 @plugin.command()
