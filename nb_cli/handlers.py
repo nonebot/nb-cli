@@ -13,7 +13,7 @@ from typing import Iterable, Optional
 try:
     from pip._internal.cli.main import main as pipmain
 except ImportError:
-    from pip import main as pipmainS
+    from pip import main as pipmain
 
 import click
 import nonebot
