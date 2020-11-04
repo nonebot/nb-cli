@@ -84,28 +84,6 @@ def exit(args):
     _call_docker_compose("down", args)
 
 
-# ! Shortcuts for plugins
-@main.command()
-@click.option("-i", "--index", default="https://pypi.org/pypi")
-@click.argument("name", nargs=1)
-def search(name, index):
-    """Search for nonebot plugin published on pypi."""
-    search_plugin(name, index)
-
-
-@main.command()
-@click.option("-i", "--index", default="https://pypi.org/pypi")
-@click.option("-f",
-              "--file",
-              default="bot.py",
-              show_default=True,
-              help="Entry file of your bot")
-@click.argument("name", nargs=1)
-def install(name, file, index):
-    """Install nonebot plugin published on pypi."""
-    install_plugin(name, file, index)
-
-
 @main.group(cls=ClickAliasedGroup)
 def plugin():
     """Manage Bot Plugin."""
@@ -113,18 +91,16 @@ def plugin():
 
 
 @plugin.command()
-@click.option("-i", "--index", default="https://pypi.org/pypi")
-def list(index):
+def list():
     """List nonebot plugin published on pypi."""
-    search_plugin("", index)
+    search_plugin("")
 
 
 @plugin.command()
-@click.option("-i", "--index", default="https://pypi.org/pypi")
 @click.argument("name", nargs=1)
-def search(name, index):
+def search(name):
     """Search for nonebot plugin published on pypi."""
-    search_plugin(name, index)
+    search_plugin(name)
 
 
 @plugin.command()

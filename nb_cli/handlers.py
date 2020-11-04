@@ -7,8 +7,7 @@ import logging
 import importlib
 from pathlib import Path
 from functools import partial
-from xmlrpc.client import ServerProxy
-from typing import Iterable, Optional
+from typing import List, Iterable, Optional
 
 try:
     from pip._internal.cli.main import main as pipmain
@@ -16,6 +15,7 @@ except ImportError:
     from pip import main as pipmain
 
 import click
+import httpx
 import nonebot
 from PyInquirer import prompt
 from pyfiglet import figlet_format
@@ -23,7 +23,7 @@ from cookiecutter.main import cookiecutter
 from compose.cli.main import TopLevelCommand, DocoptDispatcher, perform_command
 from compose.cli.main import setup_console_handler, setup_parallel_logger, set_no_color_if_clicolor
 
-from nb_cli.utils import list_style, print_package_results
+from nb_cli.utils import Plugin, list_style, print_package_results
 
 
 def draw_logo():
@@ -196,14 +196,34 @@ def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
                  extra_context={"plugin_name": name})
 
 
-def search_plugin(package: str, index: str = "https://pypi.org/pypi"):
-    _call_pip_search(f"nonebot_plugin_{package}", index)
+def search_plugin(package: str):
+    plugins = _get_plugins()
+    plugins = list(
+        filter(lambda x: any(package in value for value in x.dict().values()),
+               plugins))
+    print_package_results(plugins)
 
 
 def install_plugin(package: str,
                    file: str = "bot.py",
                    index: str = "https://pypi.org/pypi"):
-    status = _call_pip_install(f"nonebot_plugin_{package}", index)
+    plugins = _get_plugins()
+    plugin_exact = list(
+        filter(lambda x: package == x.id or package == x.name, plugins))
+    if not plugin_exact:
+        plugin = list(
+            filter(lambda x: package in x.id or package in x.name, plugins))
+        if len(plugin) > 1:
+            print_package_results(plugin)
+            return
+        elif len(plugin) != 1:
+            click.secho("Package not found!", fg="red")
+            return
+        else:
+            plugin = plugin[0]
+    else:
+        plugin = plugin_exact[0]
+    status = _call_pip_install(plugin.link, index)
     if status == 0 and os.path.isfile(file):  # SUCCESS
         with open(file, "r") as f:
             lines = f.readlines()
@@ -211,18 +231,17 @@ def install_plugin(package: str,
             map(
                 lambda x: x.startswith("nonebot.load") or x.startswith(
                     "nonebot.init"), lines[::-1])).index(True)
-        lines.insert(insert_index,
-                     f"nonebot.load_plugin(\"nonebot_plugin_{package}\")\n")
+        lines.insert(insert_index, f"nonebot.load_plugin(\"{plugin.id}\")\n")
         with open(file, "w") as f:
             f.writelines(lines)
     elif status == 0:
         click.secho(f"Cannot find {file} in current folder!", fg="red")
 
 
-def _call_pip_search(package: str, index: str = "https://pypi.org/pypi"):
-    pypi = ServerProxy(index)
-    hits = pypi.search({"name": package})
-    print_package_results(hits)
+def _get_plugins() -> List[Plugin]:
+    res = httpx.get("https://v2.nonebot.dev/plugins.json")
+    plugins = res.json()
+    return list(map(lambda x: Plugin(**x), plugins))
 
 
 def _call_pip_install(package: str, index: str = "https://pypi.org/pypi"):

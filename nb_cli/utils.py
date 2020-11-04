@@ -3,10 +3,10 @@
 
 import shutil
 import textwrap
-import pkg_resources
-from typing import Optional
+from typing import List, Optional
 
 import click
+from pydantic import BaseModel
 from PyInquirer import style_from_dict, Token
 
 list_style = style_from_dict({
@@ -95,39 +95,38 @@ class ClickAliasedGroup(click.Group):
                 formatter.write_dl(rows)
 
 
-def print_package_results(hits,
+class Plugin(BaseModel):
+    id: str
+    link: str
+    name: str
+    desc: str
+    author: str
+    repo: str
+
+
+def print_package_results(hits: List[Plugin],
                           name_column_width: Optional[int] = None,
                           terminal_width: Optional[int] = None):
     if not hits:
         return
 
     if name_column_width is None:
-        name_column_width = max([
-            len(hit["name"]) + len(hit.get("version", "-")) for hit in hits
-        ]) + 4
+        name_column_width = max([len(f"{hit.name} ({hit.id})") for hit in hits
+                                ]) + 4
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
-    installed_packages = {p.project_name: p for p in pkg_resources.working_set}
     for hit in hits:
-        name = hit["name"]
-        summary = hit["summary"] or ""
-        latest = hit.get("version", "-")
+        name = f"{hit.name} ({hit.id})"
+        summary = hit.desc
         target_width = terminal_width - name_column_width - 5
         if target_width > 10:
             # wrap and indent summary to fit terminal
             summary_lines = textwrap.wrap(summary, target_width)
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
 
-        line = f"{f'{name} ({latest})':{name_column_width}} - {summary}"
+        line = f"{name:{name_column_width}} - {summary}"
         try:
             print(line)
-            if name in installed_packages:
-                dist = installed_packages[name]
-                if dist.version == latest:
-                    print(f"  INSTALLED: {dist.version} (latest)")
-                else:
-                    print(f"  INSTALLED: {dist.version}")
-                    print(f"  LATEST:    {latest}")
         except UnicodeEncodeError:
             pass
