@@ -3,8 +3,8 @@ import click
 import pkg_resources
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import run_bot, create_project, handle_no_subcommand
-from nb_cli.handlers import _call_docker_compose, search_plugin, create_plugin, install_plugin
+from nb_cli.handlers import search_plugin, create_plugin, update_plugin, install_plugin
+from nb_cli.handlers import run_bot, create_project, handle_no_subcommand, _call_docker_compose
 
 sys.path.insert(0, ".")
 
@@ -112,8 +112,16 @@ def search(name):
               help="Entry file of your bot")
 @click.argument("name", nargs=1)
 def install(name, file, index):
-    """Install nonebot plugin published on pypi."""
+    """Install nonebot plugin."""
     install_plugin(name, file, index)
+
+
+@plugin.command()
+@click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.argument("name", nargs=1)
+def update(name, index):
+    """Update nonebot plugin."""
+    update_plugin(name, index)
 
 
 @plugin.command(aliases=["create"])

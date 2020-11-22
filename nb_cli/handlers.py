@@ -235,6 +235,26 @@ def install_plugin(package: str,
         click.secho(f"Cannot find {file} in current folder!", fg="red")
 
 
+def update_plugin(package: str, index: str = "https://pypi.org/pypi"):
+    plugins = _get_plugins()
+    plugin_exact = list(
+        filter(lambda x: package == x.id or package == x.name, plugins))
+    if not plugin_exact:
+        plugin = list(
+            filter(lambda x: package in x.id or package in x.name, plugins))
+        if len(plugin) > 1:
+            print_package_results(plugin)
+            return
+        elif len(plugin) != 1:
+            click.secho("Package not found!", fg="red")
+            return
+        else:
+            plugin = plugin[0]
+    else:
+        plugin = plugin_exact[0]
+    return _call_pip_update(plugin.link, index)
+
+
 def _get_plugins() -> List[Plugin]:
     res = httpx.get("https://v2.nonebot.dev/plugins.json")
     plugins = res.json()
@@ -243,3 +263,7 @@ def _get_plugins() -> List[Plugin]:
 
 def _call_pip_install(package: str, index: str = "https://pypi.org/pypi"):
     return pipmain(["install", "-i", index, package])
+
+
+def _call_pip_update(package: str, index: str = "https://pypi.org/pypi"):
+    return pipmain(["install", "--upgrade", "-i", index, package])
