@@ -5,8 +5,8 @@ description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/yanyongyu/nb-cli"
-repository = "https://github.com/yanyongyu/nb-cli"
+homepage = "https://github.com/nonebot/nb-cli"
+repository = "https://github.com/nonebot/nb-cli"
 keywords = ["bot", "qq", "nonebot"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -25,7 +25,7 @@ pyinquirer = "=1.0.3"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
 docker-compose = "^1.27.2"
-nonebot2 = "^2.0.0-alpha.4"
+nonebot2 = "^2.0.0-alpha.6"
 # pyinquirer = { git = "https://github.com/CITGuru/PyInquirer.git", rev = "7485a1f" }
 
 [tool.poetry.dev-dependencies]
