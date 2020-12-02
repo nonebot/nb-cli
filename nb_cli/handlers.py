@@ -14,6 +14,7 @@ except ImportError:
 import click
 import httpx
 import nonebot
+import nonebot.adapters
 from PyInquirer import prompt
 from pyfiglet import figlet_format
 from cookiecutter.main import cookiecutter
@@ -47,6 +48,11 @@ def run_bot(file: str = "bot.py", app: str = "app"):
 
 
 def create_project():
+    adapters = [{
+        "name": x.name
+    }
+                for x in Path(nonebot.adapters.__path__[0]).iterdir()
+                if x.is_dir() and not x.name.startswith("_")]
     question = [{
         "type": "input",
         "name": "project_name",
@@ -67,6 +73,11 @@ def create_project():
         "filter":
             lambda x: x.startswith("2")
     }, {
+        "type": "checkbox",
+        "name": "adapters",
+        "message": "Which adapter(s) would you like to use?",
+        "choices": adapters
+    }, {
         "type": "confirm",
         "name": "load_builtin",
         "message": "Load NoneBot Builtin Plugin?",
@@ -78,6 +89,8 @@ def create_project():
         click.secho(f"Error Input! Missing {list(keys - set(answers.keys()))}",
                     fg="red")
         return
+    answers["adapters"] = {"builtin": answers["adapters"]}
+    print(answers)
     cookiecutter(str((Path(__file__).parent / "project").resolve()),
                  no_input=True,
                  extra_context=answers)

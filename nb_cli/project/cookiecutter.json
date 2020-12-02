@@ -5,5 +5,8 @@
   "project_desc": "{{ cookiecutter.project_name }}",
   "use_src": false,
   "source_dir": "{{ 'src' if cookiecutter.use_src == 'True' else cookiecutter.project_slug|lower|replace('-', '_') }}",
+  "adapters": {
+    "builtin": []
+  },
   "load_builtin": false
 }

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import nonebot
+import nonebot{% for adapter in cookiecutter.adapters.builtin %}
+from nonebot.adapters.{{ adapter }} import Bot as {{ adapter|upper }}Bot
+{% endfor %}
 
 # Custom your logger
 # 
@@ -15,13 +17,17 @@ import nonebot
 # You can pass some keyword args config to init function
 nonebot.init()
 app = nonebot.get_asgi()
+
+driver = nonebot.get_driver(){% for adapter in cookiecutter.adapters.builtin %}
+driver.register_adapter("{{ adapter }}", {{ adapter|upper }}Bot)
+{% endfor %}
 {% if cookiecutter.load_builtin == "True" %}
 nonebot.load_builtin_plugins(){% endif %}
 nonebot.load_plugins("{{ cookiecutter.source_dir }}/plugins")
 
 # Modify some config / config depends on loaded configs
 # 
-# config = nonebot.get_driver().config
+# config = driver.config
 # do something...
 
 
