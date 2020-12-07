@@ -90,7 +90,6 @@ def create_project():
                     fg="red")
         return
     answers["adapters"] = {"builtin": answers["adapters"]}
-    print(answers)
     cookiecutter(str((Path(__file__).parent / "project").resolve()),
                  no_input=True,
                  extra_context=answers)
