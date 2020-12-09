@@ -73,11 +73,6 @@ def create_project():
         "filter":
             lambda x: x.startswith("2")
     }, {
-        "type": "checkbox",
-        "name": "adapters",
-        "message": "Which adapter(s) would you like to use?",
-        "choices": adapters
-    }, {
         "type": "confirm",
         "name": "load_builtin",
         "message": "Load NoneBot Builtin Plugin?",
@@ -89,7 +84,26 @@ def create_project():
         click.secho(f"Error Input! Missing {list(keys - set(answers.keys()))}",
                     fg="red")
         return
-    answers["adapters"] = {"builtin": answers["adapters"]}
+    question2 = [{
+        "type": "checkbox",
+        "name": "adapters",
+        "message": "Which adapter(s) would you like to use?",
+        "choices": adapters
+    }, {
+        "type": "confirm",
+        "name": "confirm",
+        "message": "You haven't chosen any adapter. Please confirm.",
+        "default": False,
+        "when": lambda x: not bool(x["adapters"])
+    }]
+    while True:
+        answers2 = prompt(question2, qmark="[?]", style=list_style)
+        if "adapters" not in answers2:
+            click.secho(f"Error Input! Missing 'adapters'", fg="red")
+            return
+        if answers2["adapters"] or answers2["confirm"]:
+            break
+    answers["adapters"] = {"builtin": answers2["adapters"]}
     cookiecutter(str((Path(__file__).parent / "project").resolve()),
                  no_input=True,
                  extra_context=answers)
