@@ -1,5 +1,6 @@
 {
   "py": "py",
   "plugin_name": "AwesomeBot",
-  "plugin_slug": "{{ cookiecutter.plugin_name|replace(' ', '-') }}"
+  "plugin_slug": "{{ cookiecutter.plugin_name|replace(' ', '-') }}",
+  "sub_plugin": false
 }

@@ -213,10 +213,23 @@ def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
             return
         plugin_dir = answers["plugin_dir"]
 
+    question = [{
+        "type": "confirm",
+        "name": "sub_plugin",
+        "message": "Do you want to load sub plugins in current plugin?",
+        "default": False
+    }]
+    answers = prompt(question, qmark="[?]", style=list_style)
+    if not answers or "sub_plugin" not in answers:
+        click.secho(f"Error Input! Missing 'sub_plugin'", fg="red")
+        return
     cookiecutter(str((Path(__file__).parent / "plugin").resolve()),
                  no_input=True,
                  output_dir=plugin_dir,
-                 extra_context={"plugin_name": name})
+                 extra_context={
+                     "plugin_name": name,
+                     "sub_plugin": answers["sub_plugin"]
+                 })
 
 
 def search_plugin(package: str):

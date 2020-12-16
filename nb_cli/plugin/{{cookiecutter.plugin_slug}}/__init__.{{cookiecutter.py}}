@@ -1,7 +1,14 @@
-from nonebot import get_driver
+{% if cookiecutter.sub_plugin == "True" %}from pathlib import Path
+
+{% endif %}from nonebot import get_driver
 
 from .config import Config
 
 global_config = get_driver().config
 config = Config(**global_config.dict())
-
+{% if cookiecutter.sub_plugin == "True" %}
+_sub_plugins = set()
+_sub_plugins |= nonebot.load_plugins(
+    str((Path(__file__).parent / "plugins").
+    resolve()))
+{% endif %}
