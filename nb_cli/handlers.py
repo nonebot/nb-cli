@@ -242,23 +242,51 @@ def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
                  })
 
 
-def search_plugin(package: str):
+def search_plugin(package: Optional[str] = None):
+    _package: str
+    if package is None:
+        question = [{
+            "type": "input",
+            "name": "package",
+            "message": "Plugin name you want to search?"
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if not answers or "package" not in answers:
+            click.secho("Error Input! Missing 'package'", fg="red")
+            return
+        _package = answers["package"]
+    else:
+        _package = package
     plugins = _get_plugins()
     plugins = list(
-        filter(lambda x: any(package in value for value in x.dict().values()),
+        filter(lambda x: any(_package in value for value in x.dict().values()),
                plugins))
     print_package_results(plugins)
 
 
-def install_plugin(package: str,
+def install_plugin(package: Optional[str] = None,
                    file: str = "bot.py",
                    index: Optional[str] = None):
+    _package: str
+    if package is None:
+        question = [{
+            "type": "input",
+            "name": "package",
+            "message": "Plugin name you want to search?"
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if not answers or "package" not in answers:
+            click.secho("Error Input! Missing 'package'", fg="red")
+            return
+        _package = answers["package"]
+    else:
+        _package = package
     plugins = _get_plugins()
     plugin_exact = list(
-        filter(lambda x: package == x.id or package == x.name, plugins))
+        filter(lambda x: _package == x.id or _package == x.name, plugins))
     if not plugin_exact:
         plugin = list(
-            filter(lambda x: package in x.id or package in x.name, plugins))
+            filter(lambda x: _package in x.id or _package in x.name, plugins))
         if len(plugin) > 1:
             print_package_results(plugin)
             return
@@ -284,7 +312,21 @@ def install_plugin(package: str,
         click.secho(f"Cannot find {file} in current folder!", fg="red")
 
 
-def update_plugin(package: str, index: Optional[str] = None):
+def update_plugin(package: Optional[str] = None, index: Optional[str] = None):
+    _package: str
+    if package is None:
+        question = [{
+            "type": "input",
+            "name": "package",
+            "message": "Plugin name you want to search?"
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if not answers or "package" not in answers:
+            click.secho("Error Input! Missing 'package'", fg="red")
+            return
+        _package = answers["package"]
+    else:
+        _package = package
     plugins = _get_plugins()
     plugin_exact = list(
         filter(lambda x: package == x.id or package == x.name, plugins))
