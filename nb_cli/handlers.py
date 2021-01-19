@@ -134,6 +134,14 @@ def handle_no_subcommand():
             partial(_call_docker_compose, "down"),
         "Create a New NoneBot Plugin":
             create_plugin,
+        "List All Published Plugins":
+            partial(search_plugin, ""),
+        "Search for Published Plugin":
+            search_plugin,
+        "Install a Published Plugin":
+            install_plugin,
+        "Update a Published Plugin":
+            update_plugin,
     }
     question = [{
         "type": "list",
@@ -329,10 +337,10 @@ def update_plugin(package: Optional[str] = None, index: Optional[str] = None):
         _package = package
     plugins = _get_plugins()
     plugin_exact = list(
-        filter(lambda x: package == x.id or package == x.name, plugins))
+        filter(lambda x: _package == x.id or _package == x.name, plugins))
     if not plugin_exact:
         plugin = list(
-            filter(lambda x: package in x.id or package in x.name, plugins))
+            filter(lambda x: _package in x.id or _package in x.name, plugins))
         if len(plugin) > 1:
             print_package_results(plugin)
             return
