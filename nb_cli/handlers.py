@@ -18,8 +18,13 @@ import nonebot.adapters
 from PyInquirer import prompt
 from pyfiglet import figlet_format
 from cookiecutter.main import cookiecutter
-from compose.cli.main import TopLevelCommand, DocoptDispatcher, perform_command
-from compose.cli.main import setup_console_handler, setup_parallel_logger, set_no_color_if_clicolor
+
+try:
+    from compose.cli.main import TopLevelCommand, DocoptDispatcher, perform_command
+    from compose.cli.main import setup_console_handler, setup_parallel_logger, set_no_color_if_clicolor
+    COMPOSE_INSTALLED = True
+except ImportError:
+    COMPOSE_INSTALLED = False
 
 from nb_cli.utils import Plugin, list_style, print_package_results
 
@@ -145,6 +150,11 @@ def handle_no_subcommand():
 
 
 def _call_docker_compose(command: str, args: Iterable[str]):
+    if not COMPOSE_INSTALLED:
+        click.secho(
+            "docker-compose not found! install it by using `pip install nb-cli[deploy]`",
+            fg="red")
+        return
     dispatcher = DocoptDispatcher(TopLevelCommand, {"options_first": True})
     options, handler, command_options = dispatcher.parse([command, *args])
     setup_console_handler(logging.StreamHandler(sys.stderr),
@@ -242,7 +252,7 @@ def search_plugin(package: str):
 
 def install_plugin(package: str,
                    file: str = "bot.py",
-                   index: str = "https://pypi.org/pypi"):
+                   index: Optional[str] = None):
     plugins = _get_plugins()
     plugin_exact = list(
         filter(lambda x: package == x.id or package == x.name, plugins))
@@ -274,7 +284,7 @@ def install_plugin(package: str,
         click.secho(f"Cannot find {file} in current folder!", fg="red")
 
 
-def update_plugin(package: str, index: str = "https://pypi.org/pypi"):
+def update_plugin(package: str, index: Optional[str] = None):
     plugins = _get_plugins()
     plugin_exact = list(
         filter(lambda x: package == x.id or package == x.name, plugins))
@@ -300,9 +310,15 @@ def _get_plugins() -> List[Plugin]:
     return list(map(lambda x: Plugin(**x), plugins))
 
 
-def _call_pip_install(package: str, index: str = "https://pypi.org/pypi"):
-    return pipmain(["install", "-i", index, package])
+def _call_pip_install(package: str, index: Optional[str] = None):
+    if index:
+        return pipmain(["install", "-i", index, package])
+    else:
+        return pipmain(["install", package])
 
 
-def _call_pip_update(package: str, index: str = "https://pypi.org/pypi"):
-    return pipmain(["install", "--upgrade", "-i", index, package])
+def _call_pip_update(package: str, index: Optional[str] = None):
+    if index:
+        return pipmain(["install", "--upgrade", "-i", index, package])
+    else:
+        return pipmain(["install", "--upgrade", package])

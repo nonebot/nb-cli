@@ -241,7 +241,7 @@ name = "docker-compose"
 version = "1.27.4"
 description = "Multi-container orchestration for Docker"
 category = "main"
-optional = false
+optional = true
 python-versions = ">=3.4"
 
 [package.dependencies]

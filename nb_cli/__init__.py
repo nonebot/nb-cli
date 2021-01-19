@@ -104,7 +104,7 @@ def search(name):
 
 
 @plugin.command()
-@click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.option("-i", "--index", default=None)
 @click.option("-f",
               "--file",
               default="bot.py",
@@ -117,7 +117,7 @@ def install(name, file, index):
 
 
 @plugin.command()
-@click.option("-i", "--index", default="https://pypi.org/pypi")
+@click.option("-i", "--index", default=None)
 @click.argument("name", nargs=1)
 def update(name, index):
     """Update nonebot plugin."""
