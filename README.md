@@ -8,11 +8,23 @@ Features:
 - Run NoneBot
 - Deploy NoneBot to Docker
 - Plugin Management
-  - Search for NoneBot Plugin on Pypi
-  - Install NoneBot Plugin on Pypi
   - Create new plugins
+  - Search for NoneBot Plugins Published on Official Store
+  - Install NoneBot Plugin Published on Official Store
 
 ## How to use
+
+### Installation
+
+```shell
+pip install nb-cli
+```
+
+or, with optional `deploy` dependency
+
+```shell
+pip install nb-cli[deploy]
+```
 
 ### Command-line usage
 
@@ -27,6 +39,8 @@ nb
 ```
 
 ### CookieCutter usage
+
+Creating a project
 
 ```shell
 pip install cookiecutter
