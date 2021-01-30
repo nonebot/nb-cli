@@ -20,8 +20,8 @@ from pyfiglet import figlet_format
 from cookiecutter.main import cookiecutter
 
 try:
-    from compose.cli.main import TopLevelCommand, DocoptDispatcher, perform_command
-    from compose.cli.main import setup_console_handler, setup_parallel_logger, set_no_color_if_clicolor
+    from compose.cli.main import TopLevelCommand, DocoptDispatcher, AnsiMode
+    from compose.cli.main import setup_console_handler, setup_parallel_logger, perform_command
     COMPOSE_INSTALLED = True
 except ImportError:
     COMPOSE_INSTALLED = False
@@ -163,14 +163,17 @@ def _call_docker_compose(command: str, args: Iterable[str]):
             "docker-compose not found! install it by using `pip install nb-cli[deploy]`",
             fg="red")
         return
+    console_stream = sys.stderr
+    console_handler = logging.StreamHandler(console_stream)
     dispatcher = DocoptDispatcher(TopLevelCommand, {"options_first": True})
     options, handler, command_options = dispatcher.parse([command, *args])
+    ansi_mode = AnsiMode.AUTO
     setup_console_handler(logging.StreamHandler(sys.stderr),
                           options.get('--verbose'),
-                          set_no_color_if_clicolor(options.get('--no-ansi')),
+                          ansi_mode.use_ansi_codes(console_handler.stream),
                           options.get("--log-level"))
-    setup_parallel_logger(set_no_color_if_clicolor(options.get('--no-ansi')))
-    if options.get('--no-ansi'):
+    setup_parallel_logger(ansi_mode)
+    if ansi_mode is AnsiMode.NEVER:
         command_options['--no-color'] = True
     return perform_command(options, handler, command_options)
 
