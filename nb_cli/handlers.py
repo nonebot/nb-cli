@@ -26,7 +26,7 @@ try:
 except ImportError:
     COMPOSE_INSTALLED = False
 
-from nb_cli.utils import Plugin, list_style, print_package_results
+from nb_cli.utils import Plugin, Adapter, list_style, print_package_results
 
 
 def draw_logo():
@@ -176,6 +176,33 @@ def _call_docker_compose(command: str, args: Iterable[str]):
     if ansi_mode is AnsiMode.NEVER:
         command_options['--no-color'] = True
     return perform_command(options, handler, command_options)
+
+
+def create_adapter(name: Optional[str] = None,
+                   adapter_dir: Optional[str] = None):
+    pass
+
+
+def search_adapter(package: Optional[str] = None):
+    _package: str
+    if package is None:
+        question = [{
+            "type": "input",
+            "name": "package",
+            "message": "Adapter name you want to search?"
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if not answers or "package" not in answers:
+            click.secho("Error Input! Missing 'package'", fg="red")
+            return
+        _package = answers["package"]
+    else:
+        _package = package
+    adapters = _get_adapters()
+    adapters = list(
+        filter(lambda x: any(_package in value for value in x.dict().values()),
+               adapters))
+    print_package_results(adapters)
 
 
 def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
@@ -355,6 +382,12 @@ def update_plugin(package: Optional[str] = None, index: Optional[str] = None):
     else:
         plugin = plugin_exact[0]
     return _call_pip_update(plugin.link, index)
+
+
+def _get_adapters() -> List[Adapter]:
+    res = httpx.get("https://v2.nonebot.dev/adapters.json")
+    adapters = res.json()
+    return list(map(lambda x: Adapter(**x), adapters))
 
 
 def _get_plugins() -> List[Plugin]:

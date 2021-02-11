@@ -1,6 +1,6 @@
 import shutil
 import textwrap
-from typing import List, Optional
+from typing import List, Union, Optional
 
 import click
 from pydantic import BaseModel
@@ -92,6 +92,15 @@ class ClickAliasedGroup(click.Group):
                 formatter.write_dl(rows)
 
 
+class Adapter(BaseModel):
+    id: str
+    link: str
+    name: str
+    desc: str
+    author: str
+    repo: str
+
+
 class Plugin(BaseModel):
     id: str
     link: str
@@ -101,7 +110,7 @@ class Plugin(BaseModel):
     repo: str
 
 
-def print_package_results(hits: List[Plugin],
+def print_package_results(hits: Union[List[Plugin], List[Adapter]],
                           name_column_width: Optional[int] = None,
                           terminal_width: Optional[int] = None):
     if not hits:

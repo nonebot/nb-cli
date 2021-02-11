@@ -3,6 +3,7 @@ import click
 import pkg_resources
 
 from nb_cli.utils import ClickAliasedGroup
+from nb_cli.handlers import search_adapter, create_adapter
 from nb_cli.handlers import search_plugin, create_plugin, update_plugin, install_plugin
 from nb_cli.handlers import run_bot, create_project, handle_no_subcommand, _call_docker_compose
 
@@ -85,6 +86,35 @@ def exit(args):
 
 
 @main.group(cls=ClickAliasedGroup)
+def adapter():
+    """Manage Bot Adapter."""
+    pass
+
+
+@adapter.command()
+def list():
+    """List nonebot adapters published on nonebot homepage."""
+    search_adapter("")
+
+
+@adapter.command()
+@click.argument("name", nargs=1)
+def search(name):
+    """Search for nonebot adapter published on nonebot homepage."""
+    search_adapter(name)
+
+
+@adapter.command(aliases=["create"])
+@click.argument("name", required=False)
+@click.option("-d",
+              "--adapter-dir",
+              type=click.Path(exists=True, file_okay=False, writable=True))
+def new(name, adapter_dir):
+    """Create a custom nonebot adapter."""
+    create_adapter(name, adapter_dir)
+
+
+@main.group(cls=ClickAliasedGroup)
 def plugin():
     """Manage Bot Plugin."""
     pass
@@ -92,14 +122,14 @@ def plugin():
 
 @plugin.command()
 def list():
-    """List nonebot plugin published on pypi."""
+    """List nonebot plugins published on nonebot homepage."""
     search_plugin("")
 
 
 @plugin.command()
 @click.argument("name", nargs=1)
 def search(name):
-    """Search for nonebot plugin published on pypi."""
+    """Search for nonebot plugin published on nonebot homepage."""
     search_plugin(name)
 
 
