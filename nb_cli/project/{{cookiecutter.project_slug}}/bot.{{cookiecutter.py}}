@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import nonebot{% for adapter in cookiecutter.adapters.builtin %}
-from nonebot.adapters.{{ adapter }} import Bot as {{ adapter|upper }}Bot
+from {{ adapter.id }} import Bot as {{ adapter.name|upper }}Bot
 {% endfor %}
 
 # Custom your logger
@@ -19,7 +19,7 @@ nonebot.init()
 app = nonebot.get_asgi()
 
 driver = nonebot.get_driver(){% for adapter in cookiecutter.adapters.builtin %}
-driver.register_adapter("{{ adapter }}", {{ adapter|upper }}Bot)
+driver.register_adapter("{{ adapter.name }}", {{ adapter.name|upper }}Bot)
 {% endfor %}
 {% if cookiecutter.load_builtin == "True" %}
 nonebot.load_builtin_plugins(){% endif %}

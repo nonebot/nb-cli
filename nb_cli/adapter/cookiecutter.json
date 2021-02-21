@@ -1,0 +1,5 @@
+{
+  "py": "py",
+  "adapter_name": "myadapter",
+  "adapter_slug": "{{ cookiecutter.adapter_name|lower|replace(' ', '-')|replace('-', '_') }}"
+}

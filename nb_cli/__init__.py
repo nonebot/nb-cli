@@ -5,7 +5,8 @@ import pkg_resources
 from nb_cli.utils import ClickAliasedGroup
 from nb_cli.handlers import search_adapter, create_adapter
 from nb_cli.handlers import search_plugin, create_plugin, update_plugin, install_plugin
-from nb_cli.handlers import run_bot, create_project, handle_no_subcommand, _call_docker_compose
+from nb_cli.handlers import run_bot, create_project, handle_no_subcommand
+from nb_cli.handlers import build_docker_image, run_docker_image, exit_docker_image
 
 sys.path.insert(0, ".")
 
@@ -55,7 +56,7 @@ def build(args):
     
     Options see: https://docs.docker.com/compose/reference/build/
     """
-    _call_docker_compose("build", args)
+    build_docker_image(args)
 
 
 @main.command(aliases=["up"], context_settings={"ignore_unknown_options": True})
@@ -69,7 +70,7 @@ def deploy(args):
     """
     if "-d" not in args:
         args = ["-d", *args]
-    _call_docker_compose("up", args)
+    run_docker_image(args)
 
 
 @main.command(aliases=["down"],
@@ -82,7 +83,7 @@ def exit(args):
     
     Options see: https://docs.docker.com/compose/reference/down/
     """
-    _call_docker_compose("down", args)
+    exit_docker_image(args)
 
 
 @main.group(cls=ClickAliasedGroup)
