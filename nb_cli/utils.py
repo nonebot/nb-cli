@@ -117,13 +117,13 @@ def print_package_results(hits: Union[List[Plugin], List[Adapter]],
         return
 
     if name_column_width is None:
-        name_column_width = max([len(f"{hit.name} ({hit.id})") for hit in hits
-                                ]) + 4
+        name_column_width = max(
+            [len(f"{hit.name} ({hit.link})") for hit in hits]) + 4
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
     for hit in hits:
-        name = f"{hit.name} ({hit.id})"
+        name = f"{hit.name} ({hit.link})"
         summary = hit.desc
         target_width = terminal_width - name_column_width - 5
         if target_width > 10:

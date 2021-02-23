@@ -46,7 +46,9 @@ def create_project():
         "type": "checkbox",
         "name": "adapters",
         "message": "Which adapter(s) would you like to use?",
-        "choices": list(adapters.keys())
+        "choices": [{
+            "name": name
+        } for name in adapters.keys()]
     }, {
         "type": "confirm",
         "name": "confirm",
