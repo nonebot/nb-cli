@@ -28,6 +28,7 @@ nonebot2 = "^2.0.0-alpha.7"
 docker-compose = { version = "~1.28.2", optional = true }
 # pyinquirer = { git = "https://github.com/CITGuru/PyInquirer.git", rev = "7485a1f" }
 
+tomlkit = "^0.7.0"
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
 

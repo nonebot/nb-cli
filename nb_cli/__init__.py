@@ -138,9 +138,9 @@ def search(name):
 @click.option("-i", "--index", default=None)
 @click.option("-f",
               "--file",
-              default="bot.py",
+              default="pyproject.toml",
               show_default=True,
-              help="Entry file of your bot")
+              help="Plugin loading file of your bot")
 @click.argument("name", nargs=1)
 def install(name, file, index):
     """Install nonebot plugin."""

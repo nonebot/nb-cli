@@ -4,7 +4,9 @@ from typing import List, Optional
 
 import httpx
 import click
+import tomlkit
 from PyInquirer import prompt
+from tomlkit.items import Table, Array
 from cookiecutter.main import cookiecutter
 
 from ._pip import _call_pip_install, _call_pip_update
@@ -109,7 +111,7 @@ def search_plugin(package: Optional[str] = None):
 
 
 def install_plugin(package: Optional[str] = None,
-                   file: str = "bot.py",
+                   file: str = "pyproject.toml",
                    index: Optional[str] = None):
     _package: str
     if package is None:
@@ -143,15 +145,21 @@ def install_plugin(package: Optional[str] = None,
         plugin = plugin_exact[0]
     status = _call_pip_install(plugin.link, index)
     if status == 0 and os.path.isfile(file):  # SUCCESS
-        with open(file, "r") as f:
-            lines = f.readlines()
-        insert_index = len(lines) - list(
-            map(
-                lambda x: x.startswith("nonebot.load") or x.startswith(
-                    "nonebot.init"), lines[::-1])).index(True)
-        lines.insert(insert_index, f"nonebot.load_plugin(\"{plugin.id}\")\n")
-        with open(file, "w") as f:
-            f.writelines(lines)
+        with open(file, "r", encoding="utf-8") as f:
+            data = tomlkit.parse(f.read())
+        nonebot_data = data.setdefault("nonebot", tomlkit.table())
+        if not isinstance(nonebot_data, Table):
+            raise ValueError("'nonebot' in toml file is not a Table!")
+        plugin_data = nonebot_data.setdefault("plugins", tomlkit.table())
+        if not isinstance(plugin_data, Table):
+            raise ValueError("'nonebot.plugins' in toml file is not a Table!")
+        plugins = plugin_data["plugins"]
+        if not isinstance(plugins, Array):
+            raise ValueError(
+                "'nonebot.plugins.plugins' in toml file is not a Array!")
+        plugins.append(plugin.id)
+        with open(file, "w", encoding="utf-8") as f:
+            f.write(tomlkit.dumps(data))
     elif status == 0:
         click.secho(f"Cannot find {file} in current folder!", fg="red")
 
