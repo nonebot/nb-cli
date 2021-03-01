@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nb-cli"
-version = "0.3.2"
+version = "0.4.0"
 description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
@@ -18,8 +18,10 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.3"
 click = "^7.1.2"
+httpx = "^0.17.0"
+tomlkit = "^0.7.0"
 colorama = "^0.4.3"
 pyinquirer = "=1.0.3"
 pyfiglet = "^0.8.post1"
@@ -28,9 +30,10 @@ nonebot2 = "^2.0.0-alpha.7"
 docker-compose = { version = "~1.28.2", optional = true }
 # pyinquirer = { git = "https://github.com/CITGuru/PyInquirer.git", rev = "7485a1f" }
 
-tomlkit = "^0.7.0"
 [tool.poetry.dev-dependencies]
 yapf = "^0.30.0"
+nonebot2 = { path = "../nonebot2", develop = true }
+nonebot-adapter-cqhttp = { path = "../nonebot2/packages/nonebot-adapter-cqhttp", develop = true }
 
 [tool.poetry.extras]
 deploy = ["docker-compose"]

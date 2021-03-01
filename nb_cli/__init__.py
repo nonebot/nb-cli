@@ -134,7 +134,7 @@ def search(name):
     search_plugin(name)
 
 
-@plugin.command()
+@plugin.command(aliases=["add"])
 @click.option("-i", "--index", default=None)
 @click.option("-f",
               "--file",

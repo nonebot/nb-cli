@@ -10,7 +10,9 @@ from nb_cli.utils import list_style
 
 
 def create_project():
+    click.secho("Loading adapters...")
     adapters = {x.name: x for x in _get_adapters()}
+    click.clear()
     question = [{
         "type": "input",
         "name": "project_name",
@@ -64,11 +66,11 @@ def create_project():
         if answers2["adapters"] or answers2["confirm"]:
             break
     answers["adapters"] = {
-        "builtin": [adapters[name] for name in answers2["adapters"]]
+        "builtin": [adapters[name].dict() for name in answers2["adapters"]]
     }
     cookiecutter(str((Path(__file__).parent.parent / "project").resolve()),
                  no_input=True,
                  extra_context=answers)
 
     for adapter in answers["adapters"]["builtin"]:
-        _call_pip_install(adapter.link)
+        _call_pip_install(adapter["link"])
