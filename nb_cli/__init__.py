@@ -4,9 +4,9 @@ import pkg_resources
 
 from nb_cli.utils import ClickAliasedGroup
 from nb_cli.handlers import search_adapter, create_adapter
-from nb_cli.handlers import search_plugin, create_plugin, update_plugin, install_plugin
 from nb_cli.handlers import run_bot, create_project, handle_no_subcommand
 from nb_cli.handlers import build_docker_image, run_docker_image, exit_docker_image
+from nb_cli.handlers import search_plugin, create_plugin, update_plugin, install_plugin, uninstall_plugin
 
 sys.path.insert(0, ".")
 
@@ -153,6 +153,17 @@ def install(name, file, index):
 def update(name, index):
     """Update nonebot plugin."""
     update_plugin(name, index)
+
+
+@plugin.command(aliases=["remove"])
+@click.option("-f",
+              "--file",
+              default="pyproject.toml",
+              show_default=True,
+              help="Plugin loading file of your bot")
+@click.argument("name", nargs=1)
+def uninstall(name, file):
+    uninstall_plugin(name, file)
 
 
 @plugin.command(aliases=["create"])

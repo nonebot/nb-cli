@@ -9,7 +9,7 @@ from nb_cli.utils import list_style
 from .project import create_project
 from .deploy import run_bot, build_docker_image, run_docker_image, exit_docker_image
 from .adapter import create_adapter, search_adapter
-from .plugin import create_plugin, search_plugin, install_plugin, update_plugin
+from .plugin import create_plugin, search_plugin, install_plugin, update_plugin, uninstall_plugin
 
 
 def draw_logo():
@@ -32,6 +32,7 @@ def handle_no_subcommand():
         "Search for Published Plugin": search_plugin,
         "Install a Published Plugin": install_plugin,
         "Update a Published Plugin": update_plugin,
+        "Remove an Installed Plugin": uninstall_plugin,
         "Create a Custom Adapter": create_adapter,
         "List All Published Adapters": partial(search_adapter, ""),
         "Search for Published Adapters": search_adapter,

@@ -18,3 +18,7 @@ def _call_pip_update(package: str, index: Optional[str] = None):
         return pipmain(["install", "--upgrade", "-i", index, package])
     else:
         return pipmain(["install", "--upgrade", package])
+
+
+def _call_pip_uninstall(package: str):
+    return pipmain(["uninstall", package])
