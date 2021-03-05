@@ -17,6 +17,14 @@ list_style = style_from_dict({
 })
 
 
+class ClickAliasedCommand(click.Command):
+
+    def __init__(self, *args, **kwargs) -> None:
+        aliases = kwargs.pop("aliases", None)
+        self._aliases: Optional[List[str]] = aliases
+        super().__init__(*args, **kwargs)
+
+
 class ClickAliasedGroup(click.Group):
 
     def __init__(self, *args, **kwargs):
@@ -25,20 +33,8 @@ class ClickAliasedGroup(click.Group):
         self._aliases = {}
 
     def command(self, *args, **kwargs):
-        aliases = kwargs.pop("aliases", [])
-        decorator = super(ClickAliasedGroup, self).command(*args, **kwargs)
-        if not aliases:
-            return decorator
-
-        def _decorator(f):
-            cmd = decorator(f)
-            if aliases:
-                self._commands[cmd.name] = aliases
-                for alias in aliases:
-                    self._aliases[alias] = cmd.name
-            return cmd
-
-        return _decorator
+        cls = kwargs.pop("cls", ClickAliasedCommand)
+        return super(ClickAliasedGroup, self).command(*args, cls=cls, **kwargs)
 
     def group(self, *args, **kwargs):
         aliases = kwargs.pop("aliases", [])
@@ -60,6 +56,16 @@ class ClickAliasedGroup(click.Group):
         if cmd_name in self._aliases:
             return self._aliases[cmd_name]
         return cmd_name
+
+    def add_command(self,
+                    cmd: click.Command,
+                    name: Optional[str] = None) -> None:
+        aliases: Optional[List[str]] = getattr(cmd, "_aliases", None)
+        if aliases:
+            self._commands[cmd.name] = aliases
+            for alias in aliases:
+                self._aliases[alias] = cmd.name
+        return super(ClickAliasedGroup, self).add_command(cmd, name=name)
 
     def get_command(self, ctx, cmd_name):
         cmd_name = self.resolve_alias(cmd_name)
@@ -83,7 +89,7 @@ class ClickAliasedGroup(click.Group):
                 continue
             if sub_command in self._commands:
                 aliases = ",".join(sorted(self._commands[sub_command]))
-                sub_command = "{0} ({1})".format(sub_command, aliases)
+                sub_command = f"{sub_command} ({aliases})"
             cmd_help = cmd.get_short_help_str(limit)
             rows.append((sub_command, cmd_help))
 
