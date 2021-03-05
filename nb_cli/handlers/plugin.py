@@ -9,6 +9,7 @@ from PyInquirer import prompt
 from tomlkit.items import Table, Array
 from cookiecutter.main import cookiecutter
 
+from ._config import TOMLConfig, JSONConfig
 from nb_cli.utils import Plugin, list_style, print_package_results
 from ._pip import _call_pip_install, _call_pip_update, _call_pip_uninstall
 
@@ -144,24 +145,18 @@ def install_plugin(package: Optional[str] = None,
     else:
         plugin = plugin_exact[0]
     status = _call_pip_install(plugin.link, index)
-    if status == 0 and os.path.isfile(file):  # SUCCESS
-        with open(file, "r", encoding="utf-8") as f:
-            data = tomlkit.parse(f.read())
-        nonebot_data = data.setdefault("nonebot", tomlkit.table())
-        if not isinstance(nonebot_data, Table):
-            raise ValueError("'nonebot' in toml file is not a Table!")
-        plugin_data = nonebot_data.setdefault("plugins", tomlkit.table())
-        if not isinstance(plugin_data, Table):
-            raise ValueError("'nonebot.plugins' in toml file is not a Table!")
-        plugins = plugin_data["plugins"]
-        if not isinstance(plugins, Array):
-            raise ValueError(
-                "'nonebot.plugins.plugins' in toml file is not a Array!")
-        plugins.append(plugin.id)
-        with open(file, "w", encoding="utf-8") as f:
-            f.write(tomlkit.dumps(data))
-    elif status == 0:
-        click.secho(f"Cannot find {file} in current folder!", fg="red")
+    if status == 0:  # SUCCESS
+        try:
+            if Path(file).suffix == ".toml":
+                config = TOMLConfig(file)
+            elif Path(file).suffix == ".json":
+                config = JSONConfig(file)
+            else:
+                raise ValueError(
+                    "Unknown config file format! Expect 'json' / 'toml'.")
+            config.add_plugin(plugin.id)
+        except Exception as e:
+            click.secho(repr(e), fg="red")
 
 
 def update_plugin(package: Optional[str] = None, index: Optional[str] = None):
@@ -231,24 +226,18 @@ def uninstall_plugin(package: Optional[str] = None,
     else:
         plugin = plugin_exact[0]
     status = _call_pip_uninstall(plugin.link)
-    if status == 0 and os.path.isfile(file):  # SUCCESS
-        with open(file, "r", encoding="utf-8") as f:
-            data = tomlkit.parse(f.read())
-        nonebot_data = data.setdefault("nonebot", tomlkit.table())
-        if not isinstance(nonebot_data, Table):
-            raise ValueError("'nonebot' in toml file is not a Table!")
-        plugin_data = nonebot_data.setdefault("plugins", tomlkit.table())
-        if not isinstance(plugin_data, Table):
-            raise ValueError("'nonebot.plugins' in toml file is not a Table!")
-        plugins = plugin_data["plugins"]
-        if not isinstance(plugins, Array):
-            raise ValueError(
-                "'nonebot.plugins.plugins' in toml file is not a Array!")
-        plugins.remove(plugin.id)
-        with open(file, "w", encoding="utf-8") as f:
-            f.write(tomlkit.dumps(data))
-    elif status == 0:
-        click.secho(f"Cannot find {file} in current folder!", fg="red")
+    if status == 0:  # SUCCESS
+        try:
+            if Path(file).suffix == ".toml":
+                config = TOMLConfig(file)
+            elif Path(file).suffix == ".json":
+                config = JSONConfig(file)
+            else:
+                raise ValueError(
+                    "Unknown config file format! Expect 'json' / 'toml'.")
+            config.remove_plugin(plugin.id)
+        except Exception as e:
+            click.secho(repr(e), fg="red")
 
 
 def _get_plugins() -> List[Plugin]:
