@@ -8,7 +8,7 @@ from nb_cli.utils import list_style
 
 from .project import create_project
 from .deploy import run_bot, build_docker_image, run_docker_image, exit_docker_image
-from .adapter import create_adapter, search_adapter
+from .adapter import create_adapter, search_adapter, install_adapter, update_adapter
 from .plugin import create_plugin, search_plugin, install_plugin, update_plugin, uninstall_plugin
 
 

@@ -4,9 +4,7 @@ from typing import List, Optional
 
 import httpx
 import click
-import tomlkit
 from PyInquirer import prompt
-from tomlkit.items import Table, Array
 from cookiecutter.main import cookiecutter
 
 from ._config import TOMLConfig, JSONConfig
@@ -89,6 +87,40 @@ def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
                  })
 
 
+def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
+    _package: str
+    if package is None:
+        question_ = [{"type": "input", "name": "package", "message": question}]
+        answers = prompt(question_, qmark="[?]", style=list_style)
+        if not answers or "package" not in answers:
+            click.secho("Error Input! Missing 'package'", fg="red")
+            return
+        _package = answers["package"]
+    else:
+        _package = package
+    plugins = _get_plugins()
+    plugin_exact = list(
+        filter(
+            lambda x: _package == x.id or _package == x.link or _package == x.
+            name, plugins))
+    if not plugin_exact:
+        plugin = list(
+            filter(
+                lambda x: _package in x.id or _package in x.link or _package in
+                x.name, plugins))
+        if len(plugin) > 1:
+            print_package_results(plugin)
+            return
+        elif len(plugin) != 1:
+            click.secho("Package not found!", fg="red")
+            return
+        else:
+            plugin = plugin[0]
+    else:
+        plugin = plugin_exact[0]
+    return plugin
+
+
 def search_plugin(package: Optional[str] = None):
     _package: str
     if package is None:
@@ -114,36 +146,9 @@ def search_plugin(package: Optional[str] = None):
 def install_plugin(package: Optional[str] = None,
                    file: str = "pyproject.toml",
                    index: Optional[str] = None):
-    _package: str
-    if package is None:
-        question = [{
-            "type": "input",
-            "name": "package",
-            "message": "Plugin name you want to search?"
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if not answers or "package" not in answers:
-            click.secho("Error Input! Missing 'package'", fg="red")
-            return
-        _package = answers["package"]
-    else:
-        _package = package
-    plugins = _get_plugins()
-    plugin_exact = list(
-        filter(lambda x: _package == x.id or _package == x.name, plugins))
-    if not plugin_exact:
-        plugin = list(
-            filter(lambda x: _package in x.id or _package in x.name, plugins))
-        if len(plugin) > 1:
-            print_package_results(plugin)
-            return
-        elif len(plugin) != 1:
-            click.secho("Package not found!", fg="red")
-            return
-        else:
-            plugin = plugin[0]
-    else:
-        plugin = plugin_exact[0]
+    plugin = _get_plugin(package, "Plugin name you want to install?")
+    if not plugin:
+        return
     status = _call_pip_install(plugin.link, index)
     if status == 0:  # SUCCESS
         try:
@@ -160,71 +165,17 @@ def install_plugin(package: Optional[str] = None,
 
 
 def update_plugin(package: Optional[str] = None, index: Optional[str] = None):
-    _package: str
-    if package is None:
-        question = [{
-            "type": "input",
-            "name": "package",
-            "message": "Plugin name you want to search?"
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if not answers or "package" not in answers:
-            click.secho("Error Input! Missing 'package'", fg="red")
-            return
-        _package = answers["package"]
-    else:
-        _package = package
-    plugins = _get_plugins()
-    plugin_exact = list(
-        filter(lambda x: _package == x.id or _package == x.name, plugins))
-    if not plugin_exact:
-        plugin = list(
-            filter(lambda x: _package in x.id or _package in x.name, plugins))
-        if len(plugin) > 1:
-            print_package_results(plugin)
-            return
-        elif len(plugin) != 1:
-            click.secho("Package not found!", fg="red")
-            return
-        else:
-            plugin = plugin[0]
-    else:
-        plugin = plugin_exact[0]
+    plugin = _get_plugin(package, "Plugin name you want to update?")
+    if not plugin:
+        return
     return _call_pip_update(plugin.link, index)
 
 
 def uninstall_plugin(package: Optional[str] = None,
                      file: str = "pyproject.toml"):
-    _package: str
-    if package is None:
-        question = [{
-            "type": "input",
-            "name": "package",
-            "message": "Plugin name you want to remove?"
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if not answers or "package" not in answers:
-            click.secho("Error Input! Missing 'package'", fg="red")
-            return
-        _package = answers["package"]
-    else:
-        _package = package
-    plugins = _get_plugins()
-    plugin_exact = list(
-        filter(lambda x: _package == x.id or _package == x.name, plugins))
-    if not plugin_exact:
-        plugin = list(
-            filter(lambda x: _package in x.id or _package in x.name, plugins))
-        if len(plugin) > 1:
-            print_package_results(plugin)
-            return
-        elif len(plugin) != 1:
-            click.secho("Package not found!", fg="red")
-            return
-        else:
-            plugin = plugin[0]
-    else:
-        plugin = plugin_exact[0]
+    plugin = _get_plugin(package, "Plugin name you want to uninstall?")
+    if not plugin:
+        return
     status = _call_pip_uninstall(plugin.link)
     if status == 0:  # SUCCESS
         try:

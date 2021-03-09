@@ -1,7 +1,7 @@
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import search_adapter, create_adapter
+from nb_cli.handlers import search_adapter, create_adapter, install_adapter, update_adapter
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -21,6 +21,22 @@ def list():
 def search(name):
     """Search for nonebot adapter published on nonebot homepage."""
     search_adapter(name)
+
+
+@adapter.command(aliases=["add"])
+@click.option("-i", "--index", default=None)
+@click.argument("name", nargs=1)
+def install(name, index):
+    """Install nonebot adapter."""
+    install_adapter(name, index)
+
+
+@adapter.command()
+@click.option("-i", "--index", default=None)
+@click.argument("name", nargs=1)
+def update(name, index):
+    """Update nonebot adapter."""
+    update_adapter(name, index)
 
 
 @adapter.command(aliases=["create"])
