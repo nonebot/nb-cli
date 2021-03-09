@@ -61,7 +61,7 @@ class ClickAliasedGroup(click.Group):
                     cmd: click.Command,
                     name: Optional[str] = None) -> None:
         aliases: Optional[List[str]] = getattr(cmd, "_aliases", None)
-        if aliases:
+        if aliases and isinstance(cmd, ClickAliasedCommand):
             self._commands[cmd.name] = aliases
             for alias in aliases:
                 self._aliases[alias] = cmd.name
