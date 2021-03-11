@@ -123,8 +123,9 @@ def print_package_results(hits: Union[List[Plugin], List[Adapter]],
         return
 
     if name_column_width is None:
-        name_column_width = max(
-            [len(f"{hit.name} ({hit.link})") for hit in hits]) + 4
+        name_column_width = (
+            max([len(f"{hit.name} ({hit.link})".encode("gbk")) for hit in hits]) + 4
+        )
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
@@ -134,10 +135,14 @@ def print_package_results(hits: Union[List[Plugin], List[Adapter]],
         target_width = terminal_width - name_column_width - 5
         if target_width > 10:
             # wrap and indent summary to fit terminal
-            summary_lines = textwrap.wrap(summary, target_width)
+            summary_lines=[]
+            while len(summary.encode('gbk')) > target_width:
+                summary_lines.append(summary[:target_width])
+                summary = summary[len(summary_lines) * target_width + 1:]
+            if not summary_lines:summary_lines=[summary]
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
 
-        line = f"{name:{name_column_width}} - {summary}"
+        line = f"{name + ' ' * (name_column_width-len(name.encode('gbk')))} - {summary}"
         try:
             print(line)
         except UnicodeEncodeError:
