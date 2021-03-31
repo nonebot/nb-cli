@@ -33,7 +33,7 @@ class Bot(BaseBot):
                 f"<r><bg #f8bbd0>Failed to handle event. Raw: {message}</bg #f8bbd0></r>"
             )
 
-    async def call_api(self, api: str, **data) -> Any:
+    async def _call_api(self, api: str, **data) -> Any:
         raise NotImplementedError
 
     async def send(self, event: Event, message: Union[str, Message,
