@@ -25,13 +25,15 @@ def run_bot(file: str = "bot.py", app: str = "app"):
         nonebot.run(app=f"{module_name}:{app}")
 
 
-def build_docker_image(args: Iterable[str]):
+def build_docker_image(args: Iterable[str] = []):
     _call_docker_compose("build", args)
 
 
-def run_docker_image(args: Iterable[str]):
+def run_docker_image(args: Iterable[str] = []):
+    if "-d" not in args:
+        args = ["-d", *args]
     _call_docker_compose("up", args)
 
 
-def exit_docker_image(args: Iterable[str]):
+def exit_docker_image(args: Iterable[str] = []):
     _call_docker_compose("down", args)

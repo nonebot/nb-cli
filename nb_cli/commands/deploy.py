@@ -28,8 +28,6 @@ def deploy(args):
     
     Options see: https://docs.docker.com/compose/reference/up/
     """
-    if "-d" not in args:
-        args = ["-d", *args]
     run_docker_image(args)
 
 
