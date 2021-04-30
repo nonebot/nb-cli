@@ -148,6 +148,22 @@ def update_adapter(package: Optional[str] = None, index: Optional[str] = None):
 
 
 def _get_adapters() -> List[Adapter]:
-    res = httpx.get("https://v2.nonebot.dev/adapters.json")
-    adapters = res.json()
+    urls = [
+        "https://v2.nonebot.dev/adapters.json",
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/docs/.vuepress/public/adapters.json",
+        "https://nonebot2-vercel-mirror.vercel.app/adapters.json"
+    ]
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        tasks = [executor.submit(httpx.get, url) for url in urls]
+
+        for future in as_completed(tasks):
+            try:
+                data = future.result()
+            except httpx.RequestError as exc:
+                print(
+                    f"An error occurred while requesting {exc.request.url!r}.")
+            else:
+                adapters = data.json()
+                break
+
     return list(map(lambda x: Adapter(**x), adapters))
