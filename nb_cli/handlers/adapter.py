@@ -4,6 +4,7 @@ from typing import List, Optional
 import httpx
 import click
 from PyInquirer import prompt
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from cookiecutter.main import cookiecutter
 
 from ._pip import _call_pip_install, _call_pip_update
