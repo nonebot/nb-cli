@@ -5,8 +5,8 @@ from typing import List, Optional
 import httpx
 import click
 from PyInquirer import prompt
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from cookiecutter.main import cookiecutter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from ._config import TOMLConfig, JSONConfig
 from nb_cli.utils import Plugin, list_style, print_package_results
@@ -195,20 +195,20 @@ def uninstall_plugin(package: Optional[str] = None,
 def _get_plugins() -> List[Plugin]:
     urls = [
         "https://v2.nonebot.dev/plugins.json",
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/docs/.vuepress/public/plugins.json",
-        "https://nonebot2-vercel-mirror.vercel.app/plugins.json"
+        "https://nonebot2-vercel-mirror.vercel.app/plugins.json",
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/docs/.vuepress/public/plugins.json"
     ]
     with ThreadPoolExecutor(max_workers=5) as executor:
         tasks = [executor.submit(httpx.get, url) for url in urls]
 
         for future in as_completed(tasks):
             try:
-                data = future.result()
-            except httpx.RequestError as exc:
-                print(
-                    f"An error occurred while requesting {exc.request.url!r}.")
-            else:
-                plugins = data.json()
+                resp = future.result()
+                plugins = resp.json()
                 break
+            except httpx.RequestError as e:
+                click.secho(
+                    f"An error occurred while requesting {e.request.url}.",
+                    fg="red")
 
     return list(map(lambda x: Plugin(**x), plugins))
