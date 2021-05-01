@@ -161,10 +161,10 @@ def _get_adapters() -> List[Adapter]:
             try:
                 resp = future.result()
                 adapters = resp.json()
-                break
+                return list(map(lambda x: Adapter(**x), adapters))
             except httpx.RequestError as e:
                 click.secho(
                     f"An error occurred while requesting {e.request.url}.",
                     fg="red")
 
-    return list(map(lambda x: Adapter(**x), adapters))
+    raise RuntimeError("Failed to get adapter list.")

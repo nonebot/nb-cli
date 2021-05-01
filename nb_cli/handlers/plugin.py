@@ -205,10 +205,10 @@ def _get_plugins() -> List[Plugin]:
             try:
                 resp = future.result()
                 plugins = resp.json()
-                break
+                return list(map(lambda x: Plugin(**x), plugins))
             except httpx.RequestError as e:
                 click.secho(
                     f"An error occurred while requesting {e.request.url}.",
                     fg="red")
 
-    return list(map(lambda x: Plugin(**x), plugins))
+    raise RuntimeError("Failed to get plugin list.")
