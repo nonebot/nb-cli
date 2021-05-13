@@ -13,7 +13,9 @@ from nb_cli.utils import Plugin, list_style, print_package_results
 from ._pip import _call_pip_install, _call_pip_update, _call_pip_uninstall
 
 
-def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
+def create_plugin(name: Optional[str] = None, 
+                  plugin_dir: Optional[str] = None, 
+                  template: Optional[str] = None):
     if not name:
         question = [{
             "type": "input",
@@ -68,24 +70,26 @@ def create_plugin(name: Optional[str] = None, plugin_dir: Optional[str] = None):
             click.secho(f"Error Input!", fg="red")
             return
         plugin_dir = answers["plugin_dir"]
-
-    question = [{
-        "type": "confirm",
-        "name": "sub_plugin",
-        "message": "Do you want to load sub plugins in current plugin?",
-        "default": False
-    }]
-    answers = prompt(question, qmark="[?]", style=list_style)
-    if not answers or "sub_plugin" not in answers:
-        click.secho(f"Error Input! Missing 'sub_plugin'", fg="red")
-        return
-    cookiecutter(str((Path(__file__).parent.parent / "plugin").resolve()),
-                 no_input=True,
-                 output_dir=plugin_dir,
-                 extra_context={
-                     "plugin_name": name,
-                     "sub_plugin": answers["sub_plugin"]
-                 })
+    if not template:
+        question = [{
+            "type": "confirm",
+            "name": "sub_plugin",
+            "message": "Do you want to load sub plugins in current plugin?",
+            "default": False
+        }]
+        answers = prompt(question, qmark="[?]", style=list_style)
+        if not answers or "sub_plugin" not in answers:
+            click.secho(f"Error Input! Missing 'sub_plugin'", fg="red")
+            return
+        cookiecutter(str((Path(__file__).parent.parent / "plugin").resolve()),
+                    no_input=True,
+                    output_dir=plugin_dir,
+                    extra_context={
+                        "plugin_name": name,
+                        "sub_plugin": answers["sub_plugin"]
+                    })
+    else:
+        cookiecutter(template, output_dir=plugin_dir, extra_context={"plugin_name": name})
 
 
 def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:

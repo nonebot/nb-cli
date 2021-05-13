@@ -60,6 +60,9 @@ def uninstall(name, file):
 @click.option("-d",
               "--plugin-dir",
               type=click.Path(exists=True, file_okay=False, writable=True))
-def new(name, plugin_dir):
+@click.option("-T",
+              "--template",
+              default=None)
+def new(name, plugin_dir, template):
     """Create a new nonebot plugin."""
-    create_plugin(name, plugin_dir)
+    create_plugin(name, plugin_dir, template)
