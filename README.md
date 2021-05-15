@@ -46,7 +46,7 @@ nb --help
   - `nb plugin update` 更新插件
   - `nb plugin uninstall (remove)` 卸载插件
 - `nb adapter` 管理适配器
-  - `nb plugin new (create)` 创建新的适配器
+  - `nb adapter new (create)` 创建新的适配器
   - `nb adapter list` 列出官方商店的所有适配器
   - `nb adapter search` 在官方商店搜索适配器
   - `nb adapter install (add)` 安装适配器
