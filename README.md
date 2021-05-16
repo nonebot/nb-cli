@@ -76,17 +76,17 @@ pip install cookiecutter
 #### 创建项目
 
 ```shell
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/project"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/project"
 ```
 
 #### 创建插件
 
 ```shell
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/plugin"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/plugin"
 ```
 
 #### 创建适配器
 
 ```shell
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/adapter"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/adapter"
 ```

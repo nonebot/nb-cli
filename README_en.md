@@ -60,17 +60,17 @@ pip install cookiecutter
 
 ```shell
 pip install cookiecutter
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/project"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/project"
 ```
 
 #### Create new plugin
 
 ```shell
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/plugin"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/plugin"
 ```
 
 #### Create new adapter
 
 ```shell
-cookiecutter https://github.com/yanyongyu/nb-cli.git --directory="nb_cli/adapter"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/adapter"
 ```
