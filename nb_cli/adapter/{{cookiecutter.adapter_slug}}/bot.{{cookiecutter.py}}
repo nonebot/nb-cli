@@ -22,7 +22,7 @@ class Bot(BaseBot):
     @overrides(BaseBot)
     async def check_permission(
             cls, driver: Driver,
-            request: HTTPConnection) -> Tuple[Optional[str], HTTPResponse]:
+            request: HTTPConnection) -> Tuple[Optional[str], Optional[HTTPResponse]]:
 
     @overrides(BaseBot)
     async def handle_message(self, message: bytes):
