@@ -19,6 +19,11 @@ class Bot(BaseBot):
         return "{{cookiecutter.adapter_slug}}"
 
     @classmethod
+    def register(cls, driver: "Driver", config: "Config"):
+        super().register(driver, config)
+        cls.{{cookiecutter.adapter_slug}}_config = {{cookiecutter.adapter_slug}}Config(**config.dict())
+
+    @classmethod
     @overrides(BaseBot)
     async def check_permission(
             cls, driver: Driver,
