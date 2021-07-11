@@ -4,7 +4,7 @@ from pydantic import Field, BaseModel
 
 
 class Config(BaseModel):
-    config1: Optional[str] = Field(default=None,
+    access_token: Optional[str] = Field(default=None,
                                         alias="{{cookiecutter.adapter_slug}}_access_token")
 
     class Config:

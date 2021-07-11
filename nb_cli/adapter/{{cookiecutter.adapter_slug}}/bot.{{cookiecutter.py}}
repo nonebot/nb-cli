@@ -44,10 +44,6 @@ class Bot(BaseBot):
         raise NotImplementedError
 
     @overrides(BaseBot)
-    async def call_api(self, api: str, **data) -> Any:
-        return await super().call_api(api, **data)
-
-    @overrides(BaseBot)
     async def send(self, event: Event, message: Union[str, Message,
                                                       MessageSegment],
                    **kwargs) -> Any:
