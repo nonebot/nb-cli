@@ -26,6 +26,7 @@ colorama = "^0.4.3"
 # pyinquirer = "=1.0.3"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
+prompt-toolkit = "^3.0.19"
 nonebot2 = "^2.0.0-alpha.12"
 docker-compose = { version = "~1.29.2", optional = true }
 # pyinquirer = { git = "https://github.com/CITGuru/PyInquirer.git", rev = "7485a1f" }
