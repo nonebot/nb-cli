@@ -53,4 +53,6 @@ class Choice:
 
 
 from .list import ListPrompt
+from .input import InputPrompt
+from .confirm import ConfirmPrompt
 from .checkbox import CheckboxPrompt

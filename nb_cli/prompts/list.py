@@ -20,9 +20,9 @@ class ListPrompt(BasePrompt[Choice]):
     Style class guide:
     
     ```
-    [?] Choose a choice and return or exit with default? (Use ↑ and ↓ to choose, Enter to submit)
-    └┬┘ └──────────────────────┬───────────────────────┘ └────────────────────┬─────────────────┘
-    questionmark            question                                      annotation
+    [?] Choose a choice and return? (Use ↑ and ↓ to choose, Enter to submit)
+    └┬┘ └──────────────┬──────────┘ └────────────────────┬─────────────────┘
+    questionmark    question                         annotation
     
      ❯  choice selected
     └┬┘ └───────┬─────┘
@@ -60,7 +60,8 @@ class ListPrompt(BasePrompt[Choice]):
             HSplit([
                 Window(FormattedTextControl(self._get_prompt),
                        height=Dimension(1),
-                       dont_extend_height=True),
+                       dont_extend_height=True,
+                       always_hide_cursor=True),
                 ConditionalContainer(
                     Window(FormattedTextControl(self._get_choices_prompt),
                            height=Dimension(1),

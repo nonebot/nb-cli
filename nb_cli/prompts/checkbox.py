@@ -1,5 +1,4 @@
 import os
-from operator import itemgetter
 from typing import Set, List, Tuple, Optional
 
 from prompt_toolkit.styles import Style
@@ -68,7 +67,8 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
             HSplit([
                 Window(FormattedTextControl(self._get_prompt),
                        height=Dimension(1),
-                       dont_extend_height=True),
+                       dont_extend_height=True,
+                       always_hide_cursor=True),
                 ConditionalContainer(
                     Window(FormattedTextControl(self._get_choices_prompt),
                            height=Dimension(1),
