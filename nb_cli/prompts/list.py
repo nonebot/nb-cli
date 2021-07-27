@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import List, TypeVar, Optional
 
 from prompt_toolkit.styles import Style
 from prompt_toolkit.filters import is_done
@@ -13,8 +13,10 @@ from prompt_toolkit.layout.containers import HSplit, Window, ConditionalContaine
 
 from . import BasePrompt, NoAnswer, Choice
 
+RT = TypeVar("RT")
 
-class ListPrompt(BasePrompt[Choice]):
+
+class ListPrompt(BasePrompt[Choice[RT]]):
     """RadioList Prompt that supports auto scrolling.
     
     Style class guide:
@@ -36,13 +38,13 @@ class ListPrompt(BasePrompt[Choice]):
 
     def __init__(self,
                  question: str,
-                 choices: List[Choice],
+                 choices: List[Choice[RT]],
                  question_mark: str = "[?]",
                  pointer: str = "❯",
                  annotation: str = "(Use ↑ and ↓ to choose, Enter to submit)",
                  max_height: Optional[int] = None):
         self.question: str = question
-        self.choices: List[Choice] = choices
+        self.choices: List[Choice[RT]] = choices
         self.question_mark: str = question_mark
         self.pointer: str = pointer
         self.annotation: str = annotation

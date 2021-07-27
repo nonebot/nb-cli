@@ -1,73 +1,56 @@
+from typing import List
 from pathlib import Path
 
 import click
-from PyInquirer import prompt
 from cookiecutter.main import cookiecutter
 
 from .adapter import _get_adapters
 from ._pip import _call_pip_install
-from nb_cli.utils import list_style
+from nb_cli.utils import default_style
+from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt, CheckboxPrompt
 
 
 def create_project():
     click.secho("Loading adapters...")
     adapters = {x.name: x for x in _get_adapters()}
     click.clear()
-    question = [{
-        "type": "input",
-        "name": "project_name",
-        "message": "Project Name:",
-        "validate": lambda x: len(x) > 0
-    }, {
-        "type":
-            "list",
-        "name":
-            "use_src",
-        "message":
-            "Where to store the plugin?",
-        "choices":
-            lambda ctx: [
-                f"1) In a \"{ctx['project_name'].lower().replace(' ', '-').replace('-', '_')}\" folder",
-                "2) In a \"src\" folder"
-            ],
-        "filter":
-            lambda x: x.startswith("2")
-    }, {
-        "type": "confirm",
-        "name": "load_builtin",
-        "message": "Load NoneBot Builtin Plugin?",
-        "default": False
-    }]
-    keys = set(map(lambda x: x["name"], question))
-    answers = prompt(question, qmark="[?]", style=list_style)
-    if keys != set(answers.keys()):
-        click.secho(f"Error Input! Missing {list(keys - set(answers.keys()))}",
-                    fg="red")
-        return
-    question2 = [{
-        "type": "checkbox",
-        "name": "adapters",
-        "message": "Which adapter(s) would you like to use?",
-        "choices": [{
-            "name": name
-        } for name in adapters.keys()]
-    }, {
-        "type": "confirm",
-        "name": "confirm",
-        "message": "You haven't chosen any adapter. Please confirm.",
-        "default": False,
-        "when": lambda x: not bool(x["adapters"])
-    }]
-    while True:
-        answers2 = prompt(question2, qmark="[?]", style=list_style)
-        if "adapters" not in answers2:
-            click.secho(f"Error Input! Missing 'adapters'", fg="red")
-            return
-        if answers2["adapters"] or answers2["confirm"]:
-            break
-    answers["adapters"] = {
-        "builtin": [adapters[name].dict() for name in answers2["adapters"]]
-    }
+    answers = {}
+
+    answers["project_name"] = InputPrompt(
+        "Project Name:",
+        validator=lambda x: len(x) > 0).prompt(style=default_style)
+
+    dir_name = answers["project_name"].lower().replace(" ",
+                                                       "-").replace("-", "_")
+    src_choices: List[Choice[bool]] = [
+        Choice(f"1) In a \"{dir_name}\" folder", False),
+        Choice("2) In a \"src\" folder", True)
+    ]
+    answers["use_src"] = ListPrompt(
+        "Where to store the plugin?",
+        src_choices).prompt(style=default_style).data
+
+    answers["load_builtin"] = ConfirmPrompt(
+        "Load NoneBot Builtin Plugin?",
+        default_choice=False).prompt(style=default_style)
+
+    answers["adapters"] = {"builtin": []}
+
+    confirm = False
+    while not confirm:
+        answers["adapters"]["builtin"] = [
+            choice.data.dict() for choice in CheckboxPrompt(
+                "Which adapter(s) would you like to use?",
+                [Choice(name, adapter)
+                 for name, adapter in adapters.items()]).prompt(
+                     style=default_style)
+        ]
+        if not answers["adapters"]["builtin"]:
+            confirm = ConfirmPrompt(
+                "You haven't chosen any adapter. Please confirm.",
+                default_choice=False).prompt(style=default_style)
+        else:
+            confirm = True
     cookiecutter(str((Path(__file__).parent.parent / "project").resolve()),
                  no_input=True,
                  extra_context=answers)

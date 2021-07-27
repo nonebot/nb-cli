@@ -1,19 +1,19 @@
 import shutil
-import textwrap
 from typing import List, Union, Optional
 
 import click
 from pydantic import BaseModel
-from PyInquirer import style_from_dict, Token
+from prompt_toolkit.styles import Style
 
-list_style = style_from_dict({
-    Token.Separator: "#6C6C6C",
-    Token.QuestionMark: "#673AB7 bold",
-    Token.Selected: "#5F819D",
-    Token.Pointer: "#FF9D00 bold",
-    Token.Instruction: "",
-    Token.Answer: "#5F819D bold",
-    Token.Question: "",
+default_style = Style.from_dict({
+    "questionmark": "fg:#673AB7 bold",
+    "question": "",
+    "sign": "",
+    "unsign": "",
+    "selected": "",
+    "pointer": "bold",
+    "annotation": "",
+    "answer": "bold",
 })
 
 
@@ -123,9 +123,9 @@ def print_package_results(hits: Union[List[Plugin], List[Adapter]],
         return
 
     if name_column_width is None:
-        name_column_width = (
-            max([len(f"{hit.name} ({hit.link})".encode("gbk")) for hit in hits]) + 4
-        )
+        name_column_width = (max(
+            [len(f"{hit.name} ({hit.link})".encode("gbk")) for hit in hits]) +
+                             4)
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
@@ -135,11 +135,12 @@ def print_package_results(hits: Union[List[Plugin], List[Adapter]],
         target_width = terminal_width - name_column_width - 5
         if target_width > 10:
             # wrap and indent summary to fit terminal
-            summary_lines=[]
+            summary_lines = []
             while len(summary.encode('gbk')) > target_width:
                 summary_lines.append(summary[:target_width])
                 summary = summary[len(summary_lines) * target_width + 1:]
-            if not summary_lines:summary_lines=[summary]
+            if not summary_lines:
+                summary_lines = [summary]
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
 
         line = f"{name + ' ' * (name_column_width-len(name.encode('gbk')))} - {summary}"

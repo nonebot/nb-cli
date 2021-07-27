@@ -3,72 +3,46 @@ from typing import List, Optional
 
 import httpx
 import click
-from PyInquirer import prompt
 from cookiecutter.main import cookiecutter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from ._pip import _call_pip_install, _call_pip_update
-from nb_cli.utils import Adapter, list_style, print_package_results
+from nb_cli.prompts import Choice, ListPrompt, InputPrompt
+from nb_cli.utils import Adapter, default_style, print_package_results
 
 
 def create_adapter(name: Optional[str] = None,
                    adapter_dir: Optional[str] = None):
     if not name:
-        question = [{
-            "type": "input",
-            "name": "adapter_name",
-            "message": "Adapter Name:",
-            "validate": lambda x: len(x) > 0
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if "adapter_name" not in answers:
-            click.secho(f"Error Input!", fg="red")
-            return
-        name = answers["adapter_name"]
+        name = InputPrompt(
+            "Adapter Name:",
+            validator=lambda x: len(x) > 0).prompt(style=default_style)
 
     if not adapter_dir:
-        detected = [
-            str(x) for x in Path(".").glob("**/adapters/") if x.is_dir()
+        detected: List[Choice[None]] = [
+            Choice(str(x))
+            for x in Path(".").glob("**/adapters/")
+            if x.is_dir()
         ] or [
-            f"{x}/adapters/" for x in Path(".").glob("*/") if x.is_dir() and
-            not x.name.startswith(".") and not x.name.startswith("_")
+            Choice(f"{x}/adapters/")
+            for x in Path(".").glob("*/")
+            if x.is_dir() and not x.name.startswith(".") and
+            not x.name.startswith("_")
         ]
-        question = [{
-            "type": "list",
-            "name": "adapter_dir",
-            "message": "Where to store the adapter?",
-            "choices": detected + ["Other"],
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if "adapter_dir" not in answers:
-            click.secho(f"Error Input!", fg="red")
-            return
-        adapter_dir = answers["adapter_dir"]
+        adapter_dir = ListPrompt(
+            "Where to store the adapter?",
+            detected + [Choice("Other")]).prompt(style=default_style).name
         if adapter_dir == "Other":
-            question = [{
-                "type": "input",
-                "name": "adapter_dir",
-                "message": "Adapter Dir:",
-                "validate": lambda x: len(x) > 0 and Path(x).is_dir()
-            }]
-            answers = prompt(question, qmark="[?]", style=list_style)
-            if "adapter_dir" not in answers:
-                click.secho(f"Error Input!", fg="red")
-                return
-            adapter_dir = answers["adapter_dir"]
+            adapter_dir = InputPrompt(
+                "Adapter Dir:",
+                validator=lambda x: len(x) > 0 and Path(x).is_dir()).prompt(
+                    style=default_style)
     elif not Path(adapter_dir).is_dir():
         click.secho(f"Adapter Dir is not a directory!", fg="yellow")
-        question = [{
-            "type": "input",
-            "name": "adapter_dir",
-            "message": "Adapter Dir:",
-            "validate": lambda x: len(x) > 0 and Path(x).is_dir()
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if "adapter_dir" not in answers:
-            click.secho(f"Error Input!", fg="red")
-            return
-        adapter_dir = answers["adapter_dir"]
+        adapter_dir = InputPrompt(
+            "Adapter Dir:",
+            validator=lambda x: len(x) > 0 and Path(x).is_dir()).prompt(
+                style=default_style)
 
     cookiecutter(str((Path(__file__).parent.parent / "adapter").resolve()),
                  no_input=True,
@@ -81,12 +55,7 @@ def create_adapter(name: Optional[str] = None,
 def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
     _package: str
     if package is None:
-        question_ = [{"type": "input", "name": "package", "message": question}]
-        answers = prompt(question_, qmark="[?]", style=list_style)
-        if not answers or "package" not in answers:
-            click.secho("Error Input! Missing 'package'", fg="red")
-            return
-        _package = answers["package"]
+        _package = InputPrompt(question).prompt(style=default_style)
     else:
         _package = package
     adapters = _get_adapters()
@@ -115,16 +84,8 @@ def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
 def search_adapter(package: Optional[str] = None):
     _package: str
     if package is None:
-        question = [{
-            "type": "input",
-            "name": "package",
-            "message": "Adapter name you want to search?"
-        }]
-        answers = prompt(question, qmark="[?]", style=list_style)
-        if not answers or "package" not in answers:
-            click.secho("Error Input! Missing 'package'", fg="red")
-            return
-        _package = answers["package"]
+        _package = InputPrompt("Adapter name you want to search?").prompt(
+            style=default_style)
     else:
         _package = package
     adapters = _get_adapters()

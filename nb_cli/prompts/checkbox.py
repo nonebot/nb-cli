@@ -1,5 +1,5 @@
 import os
-from typing import Set, List, Tuple, Optional, Callable
+from typing import Set, List, Tuple, TypeVar, Optional, Callable
 
 from prompt_toolkit.styles import Style
 from prompt_toolkit.filters import is_done
@@ -13,8 +13,10 @@ from prompt_toolkit.layout.containers import HSplit, Window, ConditionalContaine
 
 from . import BasePrompt, NoAnswer, Choice
 
+RT = TypeVar("RT")
 
-class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
+
+class CheckboxPrompt(BasePrompt[Tuple[Choice[RT], ...]]):
     """Checkbox Prompt that supports auto scrolling.
     
     Style class guide:
@@ -37,7 +39,7 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
     def __init__(
             self,
             question: str,
-            choices: List[Choice],
+            choices: List[Choice[RT]],
             question_mark: str = "[?]",
             pointer: str = "❯",
             selected_sign: str = "●",
@@ -45,15 +47,16 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
             annotation:
         str = "(Use ↑ and ↓ to move, Space to select, Enter to submit)",
             max_height: Optional[int] = None,
-            validator: Optional[Callable[[Tuple[Choice, ...]], bool]] = None):
+            validator: Optional[Callable[[Tuple[Choice[RT], ...]],
+                                         bool]] = None):
         self.question: str = question
-        self.choices: List[Choice] = choices
+        self.choices: List[Choice[RT]] = choices
         self.question_mark: str = question_mark
         self.pointer: str = pointer
         self.selected_sign: str = selected_sign
         self.unselected_sign: str = unselected_sign
         self.annotation: str = annotation
-        self.validator: Optional[Callable[[Tuple[Choice, ...]],
+        self.validator: Optional[Callable[[Tuple[Choice[RT], ...]],
                                           bool]] = validator
         self._index: int = 0
         self._display_index: int = 0
@@ -168,6 +171,6 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
                 prompts.append(("class:unselected", choice.name.strip() + "\n"))
         return prompts
 
-    def _get_result(self) -> Tuple[Choice, ...]:
+    def _get_result(self) -> Tuple[Choice[RT], ...]:
         return tuple(choice for index, choice in enumerate(self.choices)
                      if index in self._selected)
