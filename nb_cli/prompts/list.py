@@ -48,14 +48,17 @@ class ListPrompt(BasePrompt[Choice]):
         self.annotation: str = annotation
         self._index: int = 0
         self._display_index: int = 0
-        self._answered: bool = False
         self._max_height: Optional[int] = max_height
 
     @property
     def max_height(self) -> int:
         return self._max_height or os.get_terminal_size().lines
 
+    def _reset(self):
+        self._answered: bool = False
+
     def _build_layout(self) -> Layout:
+        self._reset()
         layout = Layout(
             HSplit([
                 Window(FormattedTextControl(self._get_prompt),

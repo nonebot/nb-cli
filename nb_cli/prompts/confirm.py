@@ -35,6 +35,8 @@ class ConfirmPrompt(BasePrompt[bool]):
         self.question: str = question
         self.question_mark: str = question_mark
         self.default_choice: Optional[bool] = default_choice
+
+    def _reset(self):
         self._answered: bool = False
         self._buffer: Buffer = Buffer(validator=Validator.from_callable(
             self._validate),
@@ -42,6 +44,7 @@ class ConfirmPrompt(BasePrompt[bool]):
                                       accept_handler=self._submit)
 
     def _build_layout(self) -> Layout:
+        self._reset()
         layout = Layout(
             HSplit([
                 Window(BufferControl(self._buffer,

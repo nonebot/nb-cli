@@ -1,8 +1,11 @@
+from typing import Optional, Callable
+
 from prompt_toolkit.styles import Style
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.lexers import SimpleLexer
 from prompt_toolkit.application import get_app
 from prompt_toolkit.enums import DEFAULT_BUFFER
+from prompt_toolkit.validation import Validator
 from prompt_toolkit.formatted_text import AnyFormattedText
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 
@@ -25,14 +28,24 @@ class InputPrompt(BasePrompt[str]):
     ```
     """
 
-    def __init__(self, question: str, question_mark: str = "[?]"):
+    def __init__(self,
+                 question: str,
+                 question_mark: str = "[?]",
+                 validator: Optional[Callable[[str], bool]] = None):
         self.question: str = question
         self.question_mark: str = question_mark
+        self.validator: Optional[Callable[[str], bool]] = validator
+
+    def _reset(self):
         self._answered: bool = False
-        self._buffer: Buffer = Buffer(name=DEFAULT_BUFFER,
-                                      accept_handler=self._submit)
+        self._buffer: Buffer = Buffer(
+            name=DEFAULT_BUFFER,
+            validator=Validator.from_callable(self.validator)
+            if self.validator else None,
+            accept_handler=self._submit)
 
     def _build_layout(self) -> Layout:
+        self._reset()
         layout = Layout(
             HSplit([
                 Window(BufferControl(self._buffer,

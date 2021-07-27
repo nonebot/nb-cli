@@ -1,5 +1,5 @@
 import os
-from typing import Set, List, Tuple, Optional
+from typing import Set, List, Tuple, Optional, Callable
 
 from prompt_toolkit.styles import Style
 from prompt_toolkit.filters import is_done
@@ -44,7 +44,8 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
             unselected_sign: str = "○",
             annotation:
         str = "(Use ↑ and ↓ to move, Space to select, Enter to submit)",
-            max_height: Optional[int] = None):
+            max_height: Optional[int] = None,
+            validator: Optional[Callable[[Tuple[Choice, ...]], bool]] = None):
         self.question: str = question
         self.choices: List[Choice] = choices
         self.question_mark: str = question_mark
@@ -52,17 +53,22 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
         self.selected_sign: str = selected_sign
         self.unselected_sign: str = unselected_sign
         self.annotation: str = annotation
+        self.validator: Optional[Callable[[Tuple[Choice, ...]],
+                                          bool]] = validator
         self._index: int = 0
         self._display_index: int = 0
-        self._answered: bool = False
-        self._selected: Set[int] = set()
         self._max_height: Optional[int] = max_height
 
     @property
     def max_height(self) -> int:
         return self._max_height or os.get_terminal_size().lines
 
+    def _reset(self):
+        self._answered: bool = False
+        self._selected: Set[int] = set()
+
     def _build_layout(self) -> Layout:
+        self._reset()
         layout = Layout(
             HSplit([
                 Window(FormattedTextControl(self._get_prompt),
@@ -112,6 +118,9 @@ class CheckboxPrompt(BasePrompt[Tuple[Choice, ...]]):
 
         @kb.add("enter", eager=True)
         def enter(event: KeyPressEvent):
+            if self.validator:
+                if not self.validator(self._get_result()):
+                    return
             self._answered = True
             event.app.exit(result=self._get_result())
 
