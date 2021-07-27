@@ -72,7 +72,7 @@ class TOMLConfig(Config):
         data = self._get_data()
         self._validate(data)
         plugins: Array = data["nonebot"]["plugins"]["plugins"]  # type: ignore
-        plugins.remove(plugin_name)
+        del plugins[plugins.index(plugin_name)]
         self._write_data(data)
 
     def add_plugin_dir(self, dir_name: str):
