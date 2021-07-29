@@ -30,7 +30,8 @@ class BasePrompt(abc.ABC, Generic[RT]):
             layout=self._build_layout(),
             style=self._build_style(style),
             style_transformation=DisableColorTransformation(no_ansi),
-            key_bindings=self._build_keybindings())
+            key_bindings=self._build_keybindings(),
+            mouse_support=True)
 
     def prompt(self,
                default: DT = None,

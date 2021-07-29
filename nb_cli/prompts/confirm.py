@@ -90,7 +90,7 @@ class ConfirmPrompt(BasePrompt[bool]):
     def _validate(self, input: str) -> bool:
         if not input and self.default_choice is None:
             return False
-        elif input.lower() not in ["y", "yes", "n", "no"]:
+        elif input and input.lower() not in ["y", "yes", "n", "no"]:
             return False
         return True
 
@@ -98,6 +98,7 @@ class ConfirmPrompt(BasePrompt[bool]):
         self._answered = True
         input = buffer.document.text
         if not input:
+            buffer.document.insert_after(str(self.default_choice))
             get_app().exit(result=self.default_choice)
         elif input.lower() in ["y", "yes"]:
             get_app().exit(result=True)

@@ -1,10 +1,11 @@
 import os
-from typing import List, TypeVar, Optional
+from typing import List, TypeVar, Optional, Callable
 
 from prompt_toolkit.styles import Style
 from prompt_toolkit.filters import is_done
 from prompt_toolkit.formatted_text import AnyFormattedText
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
+from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
 
 from prompt_toolkit.layout import Layout
 from prompt_toolkit.layout.dimension import Dimension
@@ -85,21 +86,11 @@ class ListPrompt(BasePrompt[Choice[RT]]):
 
         @kb.add("up", eager=True)
         def previous(event: KeyPressEvent):
-            self._index = (self._index - 1) % len(self.choices)
-            if self._index == self._display_index and self._display_index > 0:
-                self._display_index -= 1
-            elif self._index == len(self.choices) - 1:
-                start_index = len(self.choices) - self.max_height + 1
-                self._display_index = 0 if start_index < 0 else start_index
+            self._handle_up()
 
         @kb.add("down", eager=True)
         def next(event: KeyPressEvent):
-            self._index = (self._index + 1) % len(self.choices)
-            end_index = self._display_index + self.max_height - 2
-            if self._index == end_index and end_index < len(self.choices) - 1:
-                self._display_index += 1
-            elif self._index == 0:
-                self._display_index = 0
+            self._handle_down()
 
         @kb.add("enter", eager=True)
         def enter(event: KeyPressEvent):
@@ -132,12 +123,52 @@ class ListPrompt(BasePrompt[Choice[RT]]):
         for index, choice in enumerate(
                 self.choices[self._display_index:self._display_index +
                              max_num]):
-            if index + self._display_index == self._index:
-                prompts.append(("class:pointer", self.pointer))
-                prompts.append(("", " "))
-                prompts.append(("class:selected", choice.name.strip() + "\n"))
+            current_index = index + self._display_index
+            if current_index == self._index:
+                prompts.append(("class:pointer", self.pointer,
+                                self._get_mouse_handler(current_index)))
+                prompts.append(
+                    ("", " ", self._get_mouse_handler(current_index)))
+                prompts.append(("class:selected", choice.name.strip() + "\n",
+                                self._get_mouse_handler(current_index)))
             else:
-                prompts.append(("", " " * len(self.pointer)))
-                prompts.append(("", " "))
-                prompts.append(("class:unselected", choice.name.strip() + "\n"))
+                prompts.append(("", " " * len(self.pointer),
+                                self._get_mouse_handler(current_index)))
+                prompts.append(
+                    ("", " ", self._get_mouse_handler(current_index)))
+                prompts.append(("class:unselected", choice.name.strip() + "\n",
+                                self._get_mouse_handler(current_index)))
         return prompts
+
+    def _get_mouse_handler(self,
+                           index: Optional[int] = None
+                          ) -> Callable[[MouseEvent], None]:
+
+        def _handle_mouse(event: MouseEvent) -> None:
+            if event.event_type == MouseEventType.MOUSE_UP and index is not None:
+                self._jump_to(index)
+            elif event.event_type == MouseEventType.SCROLL_UP:
+                self._handle_up()
+            elif event.event_type == MouseEventType.SCROLL_DOWN:
+                self._handle_down()
+
+        return _handle_mouse
+
+    def _handle_up(self) -> None:
+        self._jump_to((self._index - 1) % len(self.choices))
+
+    def _handle_down(self) -> None:
+        self._jump_to((self._index + 1) % len(self.choices))
+
+    def _jump_to(self, index: int) -> None:
+        self._index = index
+        end_index = self._display_index + self.max_height - 2
+        if self._index == self._display_index and self._display_index > 0:
+            self._display_index -= 1
+        elif self._index == len(self.choices) - 1:
+            start_index = len(self.choices) - self.max_height + 1
+            self._display_index = 0 if start_index < 0 else start_index
+        elif self._index == end_index and end_index < len(self.choices) - 1:
+            self._display_index += 1
+        elif self._index == 0:
+            self._display_index = 0
