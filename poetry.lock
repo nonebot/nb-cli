@@ -170,7 +170,7 @@ reference = "aliyun"
 
 [[package]]
 name = "charset-normalizer"
-version = "2.0.3"
+version = "2.0.4"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 category = "main"
 optional = false
@@ -263,7 +263,7 @@ reference = "aliyun"
 
 [[package]]
 name = "distro"
-version = "1.5.0"
+version = "1.6.0"
 description = "Distro - an OS platform information API"
 category = "main"
 optional = true
@@ -359,7 +359,7 @@ reference = "aliyun"
 
 [[package]]
 name = "fastapi"
-version = "0.67.0"
+version = "0.68.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 category = "main"
 optional = false
@@ -512,7 +512,7 @@ reference = "aliyun"
 
 [[package]]
 name = "importlib-metadata"
-version = "4.6.1"
+version = "4.6.3"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
@@ -626,7 +626,7 @@ reference = "aliyun"
 
 [[package]]
 name = "nonebot2"
-version = "2.0.0a13.post1"
+version = "2.0.0-alpha.14"
 description = "An asynchronous python bot framework."
 category = "main"
 optional = false
@@ -634,7 +634,7 @@ python-versions = "^3.7.3"
 develop = true
 
 [package.dependencies]
-fastapi = "^0.67.0"
+fastapi = "^0.68.0"
 httpx = {version = "^0.18.0", extras = ["http2"]}
 loguru = "^0.5.1"
 pydantic = {version = "~1.8.0", extras = ["dotenv"]}
@@ -817,11 +817,11 @@ reference = "aliyun"
 
 [[package]]
 name = "python-dotenv"
-version = "0.18.0"
+version = "0.19.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.5"
 
 [package.extras]
 cli = ["click (>=5.0)"]
@@ -1185,7 +1185,7 @@ docker = ["docker-compose"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.3"
-content-hash = "3da5b29f97ca9aa03df133238eb62e27610d0585b30de5d3f6fca9e5f300a9b9"
+content-hash = "ff994a208b7340871136d8f6e4c8eb190a79a15b18ee3ec570cd64012af25531"
 
 [metadata.files]
 anyio = [
@@ -1277,8 +1277,8 @@ chardet = [
     {file = "chardet-4.0.0.tar.gz", hash = "sha256:0d6f53a15db4120f2b08c94f11e7d93d2c911ee118b6b30a04ec3ee8310179fa"},
 ]
 charset-normalizer = [
-    {file = "charset-normalizer-2.0.3.tar.gz", hash = "sha256:c46c3ace2d744cfbdebceaa3c19ae691f53ae621b39fd7570f59d14fb7f2fd12"},
-    {file = "charset_normalizer-2.0.3-py3-none-any.whl", hash = "sha256:88fce3fa5b1a84fdcb3f603d889f723d1dd89b26059d0123ca435570e848d5e1"},
+    {file = "charset-normalizer-2.0.4.tar.gz", hash = "sha256:f23667ebe1084be45f6ae0538e4a5a865206544097e4e8bbcacf42cd02a348f3"},
+    {file = "charset_normalizer-2.0.4-py3-none-any.whl", hash = "sha256:0c8911edd15d19223366a194a513099a302055a962bca2cec0f54b8b63175d8b"},
 ]
 click = [
     {file = "click-8.0.1-py3-none-any.whl", hash = "sha256:fba402a4a47334742d782209a7c79bc448911afe1149d07bdabdf480b3e2f4b6"},
@@ -1307,8 +1307,8 @@ cryptography = [
     {file = "cryptography-3.4.7.tar.gz", hash = "sha256:3d10de8116d25649631977cb37da6cbdd2d6fa0e0281d014a5b7d337255ca713"},
 ]
 distro = [
-    {file = "distro-1.5.0-py2.py3-none-any.whl", hash = "sha256:df74eed763e18d10d0da624258524ae80486432cd17392d9c3d96f5e83cd2799"},
-    {file = "distro-1.5.0.tar.gz", hash = "sha256:0e58756ae38fbd8fc3020d54badb8eae17c5b9dcbed388b17bb55b8a5928df92"},
+    {file = "distro-1.6.0-py2.py3-none-any.whl", hash = "sha256:c8713330ab31a034623a9515663ed87696700b55f04556b97c39cd261aa70dc7"},
+    {file = "distro-1.6.0.tar.gz", hash = "sha256:83f5e5a09f9c5f68f60173de572930effbcc0287bb84fdc4426cb4168c088424"},
 ]
 docker = [
     {file = "docker-5.0.0-py2.py3-none-any.whl", hash = "sha256:fc961d622160e8021c10d1bcabc388c57d55fb1f917175afbe24af442e6879bd"},
@@ -1325,8 +1325,8 @@ docopt = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
 ]
 fastapi = [
-    {file = "fastapi-0.67.0-py3-none-any.whl", hash = "sha256:b05f5af77af3b21cab896b8dade8b383b2d2f254caae4681a56313e29196f1ac"},
-    {file = "fastapi-0.67.0.tar.gz", hash = "sha256:24f45d65e589db3bab162c02a1e2e8b798c098861b1fa3e266efeb71b4faa8e2"},
+    {file = "fastapi-0.68.0-py3-none-any.whl", hash = "sha256:f4dba2596b1e0a1f962834c3b9ec4291a7aec387a1031c6c2e25bf239d27fd0f"},
+    {file = "fastapi-0.68.0.tar.gz", hash = "sha256:c9256a89b0436223b45f53fe3a39b178f3da6be5841a2c59deedff4b676d003f"},
 ]
 h11 = [
     {file = "h11-0.12.0-py3-none-any.whl", hash = "sha256:36a3cb8c0a032f56e2da7084577878a035d3b61d104230d4bd49c0c6b555a9c6"},
@@ -1374,8 +1374,8 @@ idna = [
     {file = "idna-3.2.tar.gz", hash = "sha256:467fbad99067910785144ce333826c71fb0e63a425657295239737f7ecd125f3"},
 ]
 importlib-metadata = [
-    {file = "importlib_metadata-4.6.1-py3-none-any.whl", hash = "sha256:9f55f560e116f8643ecf2922d9cd3e1c7e8d52e683178fecd9d08f6aa357e11e"},
-    {file = "importlib_metadata-4.6.1.tar.gz", hash = "sha256:079ada16b7fc30dfbb5d13399a5113110dab1aa7c2bc62f66af75f0b717c8cac"},
+    {file = "importlib_metadata-4.6.3-py3-none-any.whl", hash = "sha256:51c6635429c77cf1ae634c997ff9e53ca3438b495f10a55ba28594dd69764a8b"},
+    {file = "importlib_metadata-4.6.3.tar.gz", hash = "sha256:0645585859e9a6689c523927a5032f2ba5919f1f7d0e84bd4533312320de1ff9"},
 ]
 jinja2 = [
     {file = "Jinja2-3.0.1-py3-none-any.whl", hash = "sha256:1f06f2da51e7b56b8f238affdd6b4e2c61e39598a378cc49345bc1bd42a978a4"},
@@ -1525,8 +1525,8 @@ python-dateutil = [
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
 python-dotenv = [
-    {file = "python-dotenv-0.18.0.tar.gz", hash = "sha256:effaac3c1e58d89b3ccb4d04a40dc7ad6e0275fda25fd75ae9d323e2465e202d"},
-    {file = "python_dotenv-0.18.0-py2.py3-none-any.whl", hash = "sha256:dd8fe852847f4fbfadabf6183ddd4c824a9651f02d51714fa075c95561959c7d"},
+    {file = "python-dotenv-0.19.0.tar.gz", hash = "sha256:f521bc2ac9a8e03c736f62911605c5d83970021e3fa95b37d769e2bbbe9b6172"},
+    {file = "python_dotenv-0.19.0-py2.py3-none-any.whl", hash = "sha256:aae25dc1ebe97c420f50b81fb0e5c949659af713f31fdb63c749ca68748f34b1"},
 ]
 python-slugify = [
     {file = "python-slugify-5.0.2.tar.gz", hash = "sha256:f13383a0b9fcbe649a1892b9c8eb4f8eab1d6d84b84bb7a624317afa98159cab"},

@@ -17,9 +17,6 @@ def run_bot(file: str = "bot.py", app: str = "app"):
     module = importlib.import_module(module_name)
     _app = getattr(module, app, None)
     if not _app:
-        click.secho(
-            "Cannot find an asgi server. Add `app = nonebot.get_asgi()` to enable reload mode."
-        )
         nonebot.run()
     else:
         nonebot.run(app=f"{module_name}:{app}")
