@@ -21,6 +21,9 @@ driver = nonebot.get_driver(){% for adapter in cookiecutter.adapters.builtin %}
 driver.register_adapter("{{ adapter.name }}", {{ adapter.name|upper }}Bot){% endfor %}
 {% if cookiecutter.load_builtin == "True" %}
 nonebot.load_builtin_plugins(){% endif %}
+
+# Please DO NOT modify this file unless you know what you are doing!
+# As an alternative, you should use command `nb` or modify `pyproject.toml` to load plugins
 nonebot.load_from_toml("pyproject.toml")
 
 # Modify some config / config depends on loaded configs
