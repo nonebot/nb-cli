@@ -97,7 +97,7 @@ class JSONConfig(Config):
 
     def __init__(self, file: str):
         if not os.path.isfile(file):
-            raise RuntimeError(f"Config file {file} does not exist!")
+            raise RuntimeError(f"Config file {file} does not exist in current folder({os.getcwd()})!")
         self.file = file
 
     def _get_data(self):
