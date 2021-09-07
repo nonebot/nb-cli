@@ -1,6 +1,6 @@
-import os
 import abc
 import json
+from pathlib import Path
 
 import tomlkit
 from tomlkit.items import Table, Array
@@ -32,8 +32,9 @@ class Config(abc.ABC):
 class TOMLConfig(Config):
 
     def __init__(self, file: str):
-        if not os.path.isfile(file):
-            raise RuntimeError(f"Config file {file} does not exist!")
+        path = Path(file).resolve()
+        if not path.is_file():
+            raise RuntimeError(f"Config file {path} does not exist!")
         self.file = file
 
     def _get_data(self) -> TOMLDocument:
@@ -96,8 +97,9 @@ class TOMLConfig(Config):
 class JSONConfig(Config):
 
     def __init__(self, file: str):
-        if not os.path.isfile(file):
-            raise RuntimeError(f"Config file {file} does not exist in current folder({os.getcwd()})!")
+        path = Path(file).resolve()
+        if not path.is_file():
+            raise RuntimeError(f"Config file {path} does not exist!")
         self.file = file
 
     def _get_data(self):

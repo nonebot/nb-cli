@@ -1,7 +1,7 @@
 from functools import partial
+from typing import Any, List, Callable
 
 import click
-from typing import Any, List, Callable
 from pyfiglet import figlet_format
 
 from nb_cli.utils import default_style
