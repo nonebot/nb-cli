@@ -11,7 +11,7 @@ nonebot2 = "^2.0.0.a1"
 nb-cli = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
-nonebot-test = "^0.1.0"
+nonebot-plugin-test = "^0.1.0"
 
 [nonebot.plugins]
 plugins = []
