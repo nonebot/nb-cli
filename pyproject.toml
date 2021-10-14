@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nb-cli"
-version = "0.5.0"
+version = "0.5.1"
 description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
