@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import Union, Generic, TypeVar, Optional
 
 from prompt_toolkit.layout import Layout
-from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.application import Application
+from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Attrs, Style, StyleTransformation
 
 DT = TypeVar("DT")
@@ -68,7 +68,8 @@ class DisableColorTransformation(StyleTransformation):
 
     def transform_attrs(self, attrs: Attrs) -> Attrs:
         if self.no_ansi:
-            return Attrs("", "", False, False, False, False, False, False)
+            return Attrs("", "", False, False, False, False, False, False,
+                         False)
         return attrs
 
 
