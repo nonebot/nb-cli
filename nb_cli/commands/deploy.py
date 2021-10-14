@@ -1,7 +1,8 @@
 import click
 
 from nb_cli.utils import ClickAliasedCommand
-from nb_cli.handlers import build_docker_image, run_docker_image, exit_docker_image
+from nb_cli.handlers import (run_docker_image, exit_docker_image,
+                             build_docker_image)
 
 
 @click.command(cls=ClickAliasedCommand,

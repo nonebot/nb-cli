@@ -1,16 +1,16 @@
 import os
 from pathlib import Path
 from typing import List, Optional
-
-import httpx
-import click
-from cookiecutter.main import cookiecutter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from ._config import TOMLConfig, JSONConfig
+import click
+import httpx
+from cookiecutter.main import cookiecutter
+
+from ._config import JSONConfig, TOMLConfig
 from nb_cli.utils import Plugin, default_style, print_package_results
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
-from ._pip import _call_pip_install, _call_pip_update, _call_pip_uninstall
+from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 
 
 def create_plugin(name: Optional[str] = None,

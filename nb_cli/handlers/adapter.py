@@ -1,12 +1,12 @@
 from pathlib import Path
 from typing import List, Optional
-
-import httpx
-import click
-from cookiecutter.main import cookiecutter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from ._pip import _call_pip_install, _call_pip_update
+import click
+import httpx
+from cookiecutter.main import cookiecutter
+
+from ._pip import _call_pip_update, _call_pip_install
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt
 from nb_cli.utils import Adapter, default_style, print_package_results
 

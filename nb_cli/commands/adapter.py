@@ -1,7 +1,8 @@
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import search_adapter, create_adapter, install_adapter, update_adapter
+from nb_cli.handlers import (create_adapter, search_adapter, update_adapter,
+                             install_adapter)
 
 
 @click.group(cls=ClickAliasedGroup)

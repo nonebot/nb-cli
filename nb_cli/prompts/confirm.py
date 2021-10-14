@@ -2,18 +2,17 @@ from typing import Optional
 
 from prompt_toolkit.styles import Style
 from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.layout import Layout
 from prompt_toolkit.lexers import SimpleLexer
 from prompt_toolkit.application import get_app
 from prompt_toolkit.enums import DEFAULT_BUFFER
 from prompt_toolkit.validation import Validator
+from prompt_toolkit.layout.controls import BufferControl
 from prompt_toolkit.formatted_text import AnyFormattedText
+from prompt_toolkit.layout.containers import HSplit, Window
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 
-from prompt_toolkit.layout import Layout
-from prompt_toolkit.layout.controls import BufferControl
-from prompt_toolkit.layout.containers import HSplit, Window
-
-from . import BasePrompt, NoAnswer
+from . import NoAnswer, BasePrompt
 
 
 class ConfirmPrompt(BasePrompt[bool]):

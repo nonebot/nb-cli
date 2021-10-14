@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 import tomlkit
-from tomlkit.items import Table, Array
+from tomlkit.items import Array, Table
 from tomlkit.toml_document import TOMLDocument
 
 

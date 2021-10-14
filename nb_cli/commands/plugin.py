@@ -1,7 +1,8 @@
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import search_plugin, install_plugin, update_plugin, uninstall_plugin, create_plugin
+from nb_cli.handlers import (create_plugin, search_plugin, update_plugin,
+                             install_plugin, uninstall_plugin)
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -60,9 +61,7 @@ def uninstall(name, file):
 @click.option("-d",
               "--plugin-dir",
               type=click.Path(exists=True, file_okay=False, writable=True))
-@click.option("-T",
-              "--template",
-              default=None)
+@click.option("-T", "--template", default=None)
 def new(name, plugin_dir, template):
     """Create a new nonebot plugin."""
     create_plugin(name, plugin_dir, template)

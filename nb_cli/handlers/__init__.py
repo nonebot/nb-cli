@@ -4,13 +4,15 @@ from typing import Any, List, Callable
 import click
 from pyfiglet import figlet_format
 
+from .project import create_project
 from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
-
-from .project import create_project
-from .deploy import run_bot, build_docker_image, run_docker_image, exit_docker_image
-from .adapter import create_adapter, search_adapter, install_adapter, update_adapter
-from .plugin import create_plugin, search_plugin, install_plugin, update_plugin, uninstall_plugin
+from .deploy import (run_bot, run_docker_image, exit_docker_image,
+                     build_docker_image)
+from .adapter import (create_adapter, search_adapter, update_adapter,
+                      install_adapter)
+from .plugin import (create_plugin, search_plugin, update_plugin,
+                     install_plugin, uninstall_plugin)
 
 
 def draw_logo():

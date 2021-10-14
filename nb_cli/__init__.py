@@ -1,14 +1,14 @@
 import sys
+
 import click
 import pkg_resources
 
-from nb_cli.commands.main import init, run
-from nb_cli.commands.deploy import build, deploy, exit
-from nb_cli.commands.adapter import adapter
 from nb_cli.commands.plugin import plugin
-
+from nb_cli.commands.main import run, init
 from nb_cli.utils import ClickAliasedGroup
+from nb_cli.commands.adapter import adapter
 from nb_cli.handlers import handle_no_subcommand
+from nb_cli.commands.deploy import exit, build, deploy
 
 sys.path.insert(0, ".")
 
@@ -27,7 +27,7 @@ except pkg_resources.DistributionNotFound:
                       "--version",
                       message="%(prog)s: nonebot cli version %(version)s")
 @click.pass_context
-def main(ctx):
+def main(ctx: click.Context):
     if ctx.invoked_subcommand is None:
         handle_no_subcommand()
 

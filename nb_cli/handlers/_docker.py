@@ -5,8 +5,9 @@ from typing import Iterable
 import click
 
 try:
-    from compose.cli.main import TopLevelCommand, DocoptDispatcher, AnsiMode
-    from compose.cli.main import setup_console_handler, setup_parallel_logger, perform_command
+    from compose.cli.main import (AnsiMode, TopLevelCommand, DocoptDispatcher,
+                                  perform_command, setup_console_handler,
+                                  setup_parallel_logger)
     COMPOSE_INSTALLED = True
 except ImportError:
     COMPOSE_INSTALLED = False

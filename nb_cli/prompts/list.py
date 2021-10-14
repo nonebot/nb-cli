@@ -1,18 +1,18 @@
 import os
-from typing import List, TypeVar, Optional, Callable
+from typing import List, TypeVar, Callable, Optional
 
 from prompt_toolkit.styles import Style
+from prompt_toolkit.layout import Layout
 from prompt_toolkit.filters import is_done
+from prompt_toolkit.layout.dimension import Dimension
 from prompt_toolkit.formatted_text import AnyFormattedText
+from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
+from prompt_toolkit.layout.containers import (HSplit, Window,
+                                              ConditionalContainer)
 
-from prompt_toolkit.layout import Layout
-from prompt_toolkit.layout.dimension import Dimension
-from prompt_toolkit.layout.controls import FormattedTextControl
-from prompt_toolkit.layout.containers import HSplit, Window, ConditionalContainer
-
-from . import BasePrompt, NoAnswer, Choice
+from . import Choice, NoAnswer, BasePrompt
 
 RT = TypeVar("RT")
 

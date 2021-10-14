@@ -1,7 +1,7 @@
 import click
 
 from nb_cli.utils import ClickAliasedCommand
-from nb_cli.handlers import create_project, run_bot
+from nb_cli.handlers import run_bot, create_project
 
 
 @click.command(cls=ClickAliasedCommand, aliases=["create"])  # type: ignore
