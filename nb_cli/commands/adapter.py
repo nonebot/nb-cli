@@ -1,8 +1,12 @@
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import (create_adapter, search_adapter, update_adapter,
-                             install_adapter)
+from nb_cli.handlers import (
+    create_adapter,
+    search_adapter,
+    update_adapter,
+    install_adapter,
+)
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -42,9 +46,11 @@ def update(name, index):
 
 @adapter.command(aliases=["create"])
 @click.argument("name", required=False)
-@click.option("-d",
-              "--adapter-dir",
-              type=click.Path(exists=True, file_okay=False, writable=True))
+@click.option(
+    "-d",
+    "--adapter-dir",
+    type=click.Path(exists=True, file_okay=False, writable=True),
+)
 def new(name, adapter_dir):
     """Create a custom nonebot adapter."""
     create_adapter(name, adapter_dir)

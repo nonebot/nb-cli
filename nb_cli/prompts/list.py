@@ -9,8 +9,11 @@ from prompt_toolkit.formatted_text import AnyFormattedText
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
-from prompt_toolkit.layout.containers import (HSplit, Window,
-                                              ConditionalContainer)
+from prompt_toolkit.layout.containers import (
+    HSplit,
+    Window,
+    ConditionalContainer,
+)
 
 from . import Choice, NoAnswer, BasePrompt
 
@@ -19,31 +22,33 @@ RT = TypeVar("RT")
 
 class ListPrompt(BasePrompt[Choice[RT]]):
     """RadioList Prompt that supports auto scrolling.
-    
+
     Style class guide:
-    
+
     ```
     [?] Choose a choice and return? (Use ↑ and ↓ to choose, Enter to submit)
     └┬┘ └──────────────┬──────────┘ └────────────────────┬─────────────────┘
     questionmark    question                         annotation
-    
+
      ❯  choice selected
     └┬┘ └───────┬─────┘
     pointer  selected
-    
+
         choice unselected
         └───────┬───────┘
             unselected
     ```
     """
 
-    def __init__(self,
-                 question: str,
-                 choices: List[Choice[RT]],
-                 question_mark: str = "[?]",
-                 pointer: str = "❯",
-                 annotation: str = "(Use ↑ and ↓ to choose, Enter to submit)",
-                 max_height: Optional[int] = None):
+    def __init__(
+        self,
+        question: str,
+        choices: List[Choice[RT]],
+        question_mark: str = "[?]",
+        pointer: str = "❯",
+        annotation: str = "(Use ↑ and ↓ to choose, Enter to submit)",
+        max_height: Optional[int] = None,
+    ):
         self.question: str = question
         self.choices: List[Choice[RT]] = choices
         self.question_mark: str = question_mark
@@ -63,22 +68,37 @@ class ListPrompt(BasePrompt[Choice[RT]]):
     def _build_layout(self) -> Layout:
         self._reset()
         layout = Layout(
-            HSplit([
-                Window(FormattedTextControl(self._get_prompt),
-                       height=Dimension(1),
-                       dont_extend_height=True,
-                       always_hide_cursor=True),
-                ConditionalContainer(
-                    Window(FormattedTextControl(self._get_choices_prompt),
-                           height=Dimension(1),
-                           dont_extend_height=True), ~is_done)
-            ]))
+            HSplit(
+                [
+                    Window(
+                        FormattedTextControl(self._get_prompt),
+                        height=Dimension(1),
+                        dont_extend_height=True,
+                        always_hide_cursor=True,
+                    ),
+                    ConditionalContainer(
+                        Window(
+                            FormattedTextControl(self._get_choices_prompt),
+                            height=Dimension(1),
+                            dont_extend_height=True,
+                        ),
+                        ~is_done,
+                    ),
+                ]
+            )
+        )
         return layout
 
     def _build_style(self, style: Style) -> Style:
-        default = Style([("questionmark", "fg:#5F819D"), ("question", "bold"),
-                         ("answer", "fg:#FF9D00"), ("annotation", "fg:#7F8C8D"),
-                         ("selected", "fg:ansigreen noreverse")])
+        default = Style(
+            [
+                ("questionmark", "fg:#5F819D"),
+                ("question", "bold"),
+                ("answer", "fg:#FF9D00"),
+                ("annotation", "fg:#7F8C8D"),
+                ("selected", "fg:ansigreen noreverse"),
+            ]
+        )
         return Style([*default.style_rules, *style.style_rules])
 
     def _build_keybindings(self) -> KeyBindings:
@@ -105,13 +125,16 @@ class ListPrompt(BasePrompt[Choice[RT]]):
         return kb
 
     def _get_prompt(self) -> AnyFormattedText:
-        prompts: AnyFormattedText = [("class:questionmark", self.question_mark),
-                                     ("", " "),
-                                     ("class:question", self.question.strip()),
-                                     ("", " ")]
+        prompts: AnyFormattedText = [
+            ("class:questionmark", self.question_mark),
+            ("", " "),
+            ("class:question", self.question.strip()),
+            ("", " "),
+        ]
         if self._answered:
             prompts.append(
-                ("class:answer", self.choices[self._index].name.strip()))
+                ("class:answer", self.choices[self._index].name.strip())
+            )
         else:
             prompts.append(("class:annotation", self.annotation))
         return prompts
@@ -121,31 +144,55 @@ class ListPrompt(BasePrompt[Choice[RT]]):
 
         prompts: AnyFormattedText = []
         for index, choice in enumerate(
-                self.choices[self._display_index:self._display_index +
-                             max_num]):
+            self.choices[self._display_index : self._display_index + max_num]
+        ):
             current_index = index + self._display_index
             if current_index == self._index:
-                prompts.append(("class:pointer", self.pointer,
-                                self._get_mouse_handler(current_index)))
                 prompts.append(
-                    ("", " ", self._get_mouse_handler(current_index)))
-                prompts.append(("class:selected", choice.name.strip() + "\n",
-                                self._get_mouse_handler(current_index)))
+                    (
+                        "class:pointer",
+                        self.pointer,
+                        self._get_mouse_handler(current_index),
+                    )
+                )
+                prompts.append(
+                    ("", " ", self._get_mouse_handler(current_index))
+                )
+                prompts.append(
+                    (
+                        "class:selected",
+                        choice.name.strip() + "\n",
+                        self._get_mouse_handler(current_index),
+                    )
+                )
             else:
-                prompts.append(("", " " * len(self.pointer),
-                                self._get_mouse_handler(current_index)))
                 prompts.append(
-                    ("", " ", self._get_mouse_handler(current_index)))
-                prompts.append(("class:unselected", choice.name.strip() + "\n",
-                                self._get_mouse_handler(current_index)))
+                    (
+                        "",
+                        " " * len(self.pointer),
+                        self._get_mouse_handler(current_index),
+                    )
+                )
+                prompts.append(
+                    ("", " ", self._get_mouse_handler(current_index))
+                )
+                prompts.append(
+                    (
+                        "class:unselected",
+                        choice.name.strip() + "\n",
+                        self._get_mouse_handler(current_index),
+                    )
+                )
         return prompts
 
-    def _get_mouse_handler(self,
-                           index: Optional[int] = None
-                          ) -> Callable[[MouseEvent], None]:
-
+    def _get_mouse_handler(
+        self, index: Optional[int] = None
+    ) -> Callable[[MouseEvent], None]:
         def _handle_mouse(event: MouseEvent) -> None:
-            if event.event_type == MouseEventType.MOUSE_UP and index is not None:
+            if (
+                event.event_type == MouseEventType.MOUSE_UP
+                and index is not None
+            ):
                 self._jump_to(index)
             elif event.event_type == MouseEventType.SCROLL_UP:
                 self._handle_up()

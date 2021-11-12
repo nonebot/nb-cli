@@ -12,7 +12,6 @@ RT = TypeVar("RT")
 
 
 class BasePrompt(abc.ABC, Generic[RT]):
-
     @abc.abstractmethod
     def _build_layout(self) -> Layout:
         raise NotImplementedError
@@ -31,12 +30,15 @@ class BasePrompt(abc.ABC, Generic[RT]):
             style=self._build_style(style),
             style_transformation=DisableColorTransformation(no_ansi),
             key_bindings=self._build_keybindings(),
-            mouse_support=True)
+            mouse_support=True,
+        )
 
-    def prompt(self,
-               default: DT = None,
-               no_ansi: bool = False,
-               style: Optional[Style] = None) -> Union[DT, RT]:
+    def prompt(
+        self,
+        default: DT = None,
+        no_ansi: bool = False,
+        style: Optional[Style] = None,
+    ) -> Union[DT, RT]:
         app = self._build_application(no_ansi=no_ansi, style=style or Style([]))
         result: RT = app.run()
         if result is NoAnswer:
@@ -62,14 +64,14 @@ class Choice(Generic[RT]):
 
 
 class DisableColorTransformation(StyleTransformation):
-
     def __init__(self, no_ansi: bool = False):
         self.no_ansi = no_ansi
 
     def transform_attrs(self, attrs: Attrs) -> Attrs:
         if self.no_ansi:
-            return Attrs("", "", False, False, False, False, False, False,
-                         False)
+            return Attrs(
+                "", "", False, False, False, False, False, False, False
+            )
         return attrs
 
 

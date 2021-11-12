@@ -8,7 +8,6 @@ from tomlkit.toml_document import TOMLDocument
 
 
 class Config(abc.ABC):
-
     def __init__(self, *args, **kwargs):
         pass
 
@@ -30,7 +29,6 @@ class Config(abc.ABC):
 
 
 class TOMLConfig(Config):
-
     def __init__(self, file: str):
         path = Path(file).resolve()
         if not path.is_file():
@@ -55,11 +53,13 @@ class TOMLConfig(Config):
         plugins = plugin_data.setdefault("plugins", tomlkit.array())
         if not isinstance(plugins, Array):
             raise ValueError(
-                "'nonebot.plugins.plugins' in toml file is not a Array!")
+                "'nonebot.plugins.plugins' in toml file is not a Array!"
+            )
         plugin_dirs = plugin_data.setdefault("plugin_dirs", tomlkit.array())
         if not isinstance(plugin_dirs, Array):
             raise ValueError(
-                "'nonebot.plugins.plugin_dirs' in toml file is not a Array!")
+                "'nonebot.plugins.plugin_dirs' in toml file is not a Array!"
+            )
 
     def add_plugin(self, plugin_name: str):
         data = self._get_data()
@@ -80,7 +80,8 @@ class TOMLConfig(Config):
         data = self._get_data()
         self._validate(data)
         plugin_dirs: Array = data["nonebot"]["plugins"][  # type: ignore
-            "plugin_dirs"]
+            "plugin_dirs"
+        ]
         if dir_name not in plugin_dirs:
             plugin_dirs.append(dir_name)
         self._write_data(data)
@@ -89,13 +90,13 @@ class TOMLConfig(Config):
         data = self._get_data()
         self._validate(data)
         plugin_dirs: Array = data["nonebot"]["plugins"][  # type: ignore
-            "plugin_dirs"]
+            "plugin_dirs"
+        ]
         plugin_dirs.remove(dir_name)
         self._write_data(data)
 
 
 class JSONConfig(Config):
-
     def __init__(self, file: str):
         path = Path(file).resolve()
         if not path.is_file():

@@ -17,9 +17,9 @@ from . import NoAnswer, BasePrompt
 
 class ConfirmPrompt(BasePrompt[bool]):
     """Simple Confirm Prompt.
-    
+
     Style class guide:
-    
+
     ```
     [?] Choose a choice and return? (Y/n)
     └┬┘ └──────────────┬──────────┘ └─┬─┘
@@ -27,35 +27,49 @@ class ConfirmPrompt(BasePrompt[bool]):
     ```
     """
 
-    def __init__(self,
-                 question: str,
-                 question_mark: str = "[?]",
-                 default_choice: Optional[bool] = None):
+    def __init__(
+        self,
+        question: str,
+        question_mark: str = "[?]",
+        default_choice: Optional[bool] = None,
+    ):
         self.question: str = question
         self.question_mark: str = question_mark
         self.default_choice: Optional[bool] = default_choice
 
     def _reset(self):
         self._answered: bool = False
-        self._buffer: Buffer = Buffer(validator=Validator.from_callable(
-            self._validate),
-                                      name=DEFAULT_BUFFER,
-                                      accept_handler=self._submit)
+        self._buffer: Buffer = Buffer(
+            validator=Validator.from_callable(self._validate),
+            name=DEFAULT_BUFFER,
+            accept_handler=self._submit,
+        )
 
     def _build_layout(self) -> Layout:
         self._reset()
         layout = Layout(
-            HSplit([
-                Window(BufferControl(self._buffer,
-                                     lexer=SimpleLexer("class:answer")),
-                       dont_extend_height=True,
-                       get_line_prefix=self._get_prompt)
-            ]))
+            HSplit(
+                [
+                    Window(
+                        BufferControl(
+                            self._buffer, lexer=SimpleLexer("class:answer")
+                        ),
+                        dont_extend_height=True,
+                        get_line_prefix=self._get_prompt,
+                    )
+                ]
+            )
+        )
         return layout
 
     def _build_style(self, style: Style) -> Style:
-        default = Style([("questionmark", "fg:#5F819D"), ("question", "bold"),
-                         ("answer", "fg:#5F819D")])
+        default = Style(
+            [
+                ("questionmark", "fg:#5F819D"),
+                ("question", "bold"),
+                ("answer", "fg:#5F819D"),
+            ]
+        )
         return Style([*default.style_rules, *style.style_rules])
 
     def _build_keybindings(self) -> KeyBindings:
@@ -72,10 +86,15 @@ class ConfirmPrompt(BasePrompt[bool]):
 
         return kb
 
-    def _get_prompt(self, line_number: int,
-                    wrap_count: int) -> AnyFormattedText:
-        prompt = [("class:questionmark", self.question_mark), ("", " "),
-                  ("class:question", self.question.strip()), ("", " ")]
+    def _get_prompt(
+        self, line_number: int, wrap_count: int
+    ) -> AnyFormattedText:
+        prompt = [
+            ("class:questionmark", self.question_mark),
+            ("", " "),
+            ("class:question", self.question.strip()),
+            ("", " "),
+        ]
         if not self._answered:
             if self.default_choice:
                 prompt.append(("class:annotation", "(Y/n)"))
