@@ -13,7 +13,7 @@ nonebot2 = "^2.0.0.a1"
 nb-cli = "^0.5.0"
 nonebot-plugin-test = "^0.3.0"
 
-[nonebot.plugins]
+[tool.nonebot]
 plugins = []
 plugin_dirs = ["{{ cookiecutter.source_dir }}/plugins"]
 
