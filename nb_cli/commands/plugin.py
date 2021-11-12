@@ -1,8 +1,13 @@
 import click
 
 from nb_cli.utils import ClickAliasedGroup
-from nb_cli.handlers import (create_plugin, search_plugin, update_plugin,
-                             install_plugin, uninstall_plugin)
+from nb_cli.handlers import (
+    create_plugin,
+    search_plugin,
+    update_plugin,
+    install_plugin,
+    uninstall_plugin,
+)
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -26,11 +31,13 @@ def search(name):
 
 @plugin.command(aliases=["add"])
 @click.option("-i", "--index", default=None)
-@click.option("-f",
-              "--file",
-              default="pyproject.toml",
-              show_default=True,
-              help="Plugin loading file of your bot")
+@click.option(
+    "-f",
+    "--file",
+    default="pyproject.toml",
+    show_default=True,
+    help="Plugin loading file of your bot",
+)
 @click.argument("name", nargs=1)
 def install(name, file, index):
     """Install nonebot plugin."""
@@ -46,11 +53,13 @@ def update(name, index):
 
 
 @plugin.command(aliases=["remove"])
-@click.option("-f",
-              "--file",
-              default="pyproject.toml",
-              show_default=True,
-              help="Plugin loading file of your bot")
+@click.option(
+    "-f",
+    "--file",
+    default="pyproject.toml",
+    show_default=True,
+    help="Plugin loading file of your bot",
+)
 @click.argument("name", nargs=1)
 def uninstall(name, file):
     uninstall_plugin(name, file)
@@ -58,9 +67,11 @@ def uninstall(name, file):
 
 @plugin.command(aliases=["create"])
 @click.argument("name", required=False)
-@click.option("-d",
-              "--plugin-dir",
-              type=click.Path(exists=True, file_okay=False, writable=True))
+@click.option(
+    "-d",
+    "--plugin-dir",
+    type=click.Path(exists=True, file_okay=False, writable=True),
+)
 @click.option("-T", "--template", default=None)
 def new(name, plugin_dir, template):
     """Create a new nonebot plugin."""

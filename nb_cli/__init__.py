@@ -22,10 +22,12 @@ except pkg_resources.DistributionNotFound:
 
 
 @click.group(cls=ClickAliasedGroup, invoke_without_command=True)
-@click.version_option(__version__,
-                      "-V",
-                      "--version",
-                      message="%(prog)s: nonebot cli version %(version)s")
+@click.version_option(
+    __version__,
+    "-V",
+    "--version",
+    message="%(prog)s: nonebot cli version %(version)s",
+)
 @click.pass_context
 def main(ctx: click.Context):
     if ctx.invoked_subcommand is None:

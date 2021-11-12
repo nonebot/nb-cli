@@ -5,20 +5,21 @@ import click
 from pydantic import BaseModel
 from prompt_toolkit.styles import Style
 
-default_style = Style.from_dict({
-    "questionmark": "fg:#673AB7 bold",
-    "question": "",
-    "sign": "",
-    "unsign": "",
-    "selected": "",
-    "pointer": "bold",
-    "annotation": "",
-    "answer": "bold",
-})
+default_style = Style.from_dict(
+    {
+        "questionmark": "fg:#673AB7 bold",
+        "question": "",
+        "sign": "",
+        "unsign": "",
+        "selected": "",
+        "pointer": "bold",
+        "annotation": "",
+        "answer": "bold",
+    }
+)
 
 
 class ClickAliasedCommand(click.Command):
-
     def __init__(self, *args, **kwargs) -> None:
         aliases = kwargs.pop("aliases", None)
         self._aliases: Optional[List[str]] = aliases
@@ -26,7 +27,6 @@ class ClickAliasedCommand(click.Command):
 
 
 class ClickAliasedGroup(click.Group):
-
     def __init__(self, *args, **kwargs):
         super(ClickAliasedGroup, self).__init__(*args, **kwargs)
         self._commands = {}
@@ -57,9 +57,9 @@ class ClickAliasedGroup(click.Group):
             return self._aliases[cmd_name]
         return cmd_name
 
-    def add_command(self,
-                    cmd: click.Command,
-                    name: Optional[str] = None) -> None:
+    def add_command(
+        self, cmd: click.Command, name: Optional[str] = None
+    ) -> None:
         aliases: Optional[List[str]] = getattr(cmd, "_aliases", None)
         if aliases and isinstance(cmd, ClickAliasedCommand):
             self._commands[cmd.name] = aliases
@@ -116,16 +116,19 @@ class Plugin(BaseModel):
     repo: str
 
 
-def print_package_results(hits: Union[List[Plugin], List[Adapter]],
-                          name_column_width: Optional[int] = None,
-                          terminal_width: Optional[int] = None):
+def print_package_results(
+    hits: Union[List[Plugin], List[Adapter]],
+    name_column_width: Optional[int] = None,
+    terminal_width: Optional[int] = None,
+):
     if not hits:
         return
 
     if name_column_width is None:
-        name_column_width = (max(
-            [len(f"{hit.name} ({hit.link})".encode("gbk")) for hit in hits]) +
-                             4)
+        name_column_width = (
+            max([len(f"{hit.name} ({hit.link})".encode("gbk")) for hit in hits])
+            + 4
+        )
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
@@ -136,9 +139,9 @@ def print_package_results(hits: Union[List[Plugin], List[Adapter]],
         if target_width > 10:
             # wrap and indent summary to fit terminal
             summary_lines = []
-            while len(summary.encode('gbk')) > target_width:
+            while len(summary.encode("gbk")) > target_width:
                 summary_lines.append(summary[:target_width])
-                summary = summary[len(summary_lines) * target_width + 1:]
+                summary = summary[len(summary_lines) * target_width + 1 :]
             if not summary_lines:
                 summary_lines = [summary]
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)

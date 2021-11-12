@@ -7,18 +7,31 @@ from pyfiglet import figlet_format
 from .project import create_project
 from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
-from .deploy import (run_bot, run_docker_image, exit_docker_image,
-                     build_docker_image)
-from .adapter import (create_adapter, search_adapter, update_adapter,
-                      install_adapter)
-from .plugin import (create_plugin, search_plugin, update_plugin,
-                     install_plugin, uninstall_plugin)
+from .adapter import (
+    create_adapter,
+    search_adapter,
+    update_adapter,
+    install_adapter,
+)
+from .deploy import (
+    run_bot,
+    run_docker_image,
+    exit_docker_image,
+    build_docker_image,
+)
+from .plugin import (
+    create_plugin,
+    search_plugin,
+    update_plugin,
+    install_plugin,
+    uninstall_plugin,
+)
 
 
 def draw_logo():
-    click.secho(figlet_format("NoneBot", font="basic").strip(),
-                fg="cyan",
-                bold=True)
+    click.secho(
+        figlet_format("NoneBot", font="basic").strip(), fg="cyan", bold=True
+    )
 
 
 def handle_no_subcommand():
@@ -43,6 +56,9 @@ def handle_no_subcommand():
         Choice("Deploy the Bot to Docker", run_docker_image),
         Choice("Stop the Bot Container in Docker", exit_docker_image),
     ]
-    subcommand = ListPrompt("What do you want to do?",
-                            choices).prompt(style=default_style).data
+    subcommand = (
+        ListPrompt("What do you want to do?", choices)
+        .prompt(style=default_style)
+        .data
+    )
     subcommand()

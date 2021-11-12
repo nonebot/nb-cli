@@ -17,9 +17,9 @@ from . import NoAnswer, BasePrompt
 
 class InputPrompt(BasePrompt[str]):
     """Simple Input Prompt.
-    
+
     Style class guide:
-    
+
     ```
     [?] Choose a choice and return? answer
     └┬┘ └──────────────┬──────────┘ └──┬─┘
@@ -27,10 +27,12 @@ class InputPrompt(BasePrompt[str]):
     ```
     """
 
-    def __init__(self,
-                 question: str,
-                 question_mark: str = "[?]",
-                 validator: Optional[Callable[[str], bool]] = None):
+    def __init__(
+        self,
+        question: str,
+        question_mark: str = "[?]",
+        validator: Optional[Callable[[str], bool]] = None,
+    ):
         self.question: str = question
         self.question_mark: str = question_mark
         self.validator: Optional[Callable[[str], bool]] = validator
@@ -40,23 +42,36 @@ class InputPrompt(BasePrompt[str]):
         self._buffer: Buffer = Buffer(
             name=DEFAULT_BUFFER,
             validator=Validator.from_callable(self.validator)
-            if self.validator else None,
-            accept_handler=self._submit)
+            if self.validator
+            else None,
+            accept_handler=self._submit,
+        )
 
     def _build_layout(self) -> Layout:
         self._reset()
         layout = Layout(
-            HSplit([
-                Window(BufferControl(self._buffer,
-                                     lexer=SimpleLexer("class:answer")),
-                       dont_extend_height=True,
-                       get_line_prefix=self._get_prompt)
-            ]))
+            HSplit(
+                [
+                    Window(
+                        BufferControl(
+                            self._buffer, lexer=SimpleLexer("class:answer")
+                        ),
+                        dont_extend_height=True,
+                        get_line_prefix=self._get_prompt,
+                    )
+                ]
+            )
+        )
         return layout
 
     def _build_style(self, style: Style) -> Style:
-        default = Style([("questionmark", "fg:#5F819D"), ("question", "bold"),
-                         ("answer", "fg:#5F819D")])
+        default = Style(
+            [
+                ("questionmark", "fg:#5F819D"),
+                ("question", "bold"),
+                ("answer", "fg:#5F819D"),
+            ]
+        )
         return Style([*default.style_rules, *style.style_rules])
 
     def _build_keybindings(self) -> KeyBindings:
@@ -73,10 +88,15 @@ class InputPrompt(BasePrompt[str]):
 
         return kb
 
-    def _get_prompt(self, line_number: int,
-                    wrap_count: int) -> AnyFormattedText:
-        return [("class:questionmark", self.question_mark), ("", " "),
-                ("class:question", self.question.strip()), ("", " ")]
+    def _get_prompt(
+        self, line_number: int, wrap_count: int
+    ) -> AnyFormattedText:
+        return [
+            ("class:questionmark", self.question_mark),
+            ("", " "),
+            ("class:question", self.question.strip()),
+            ("", " "),
+        ]
 
     def _submit(self, buffer: Buffer) -> bool:
         self._answered = True
