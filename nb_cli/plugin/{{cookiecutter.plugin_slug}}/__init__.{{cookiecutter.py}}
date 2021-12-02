@@ -1,7 +1,7 @@
 {% if cookiecutter.sub_plugin == "True" %}from pathlib import Path
 
-{% endif %}# import nonebot
-from nonebot import get_driver
+import nonebot
+{% endif %}from nonebot import get_driver
 
 from .config import Config
 
