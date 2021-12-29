@@ -99,21 +99,25 @@ class ClickAliasedGroup(click.Group):
 
 
 class Adapter(BaseModel):
-    id: str
-    link: str
+    module_name: str
+    project_link: str
     name: str
     desc: str
     author: str
-    repo: str
+    homepage: str
+    tags: list
+    is_official: bool
 
 
 class Plugin(BaseModel):
-    id: str
-    link: str
+    module_name: str
+    project_link: str
     name: str
     desc: str
     author: str
-    repo: str
+    homepage: str
+    tags: list
+    is_official: bool
 
 
 def print_package_results(
@@ -126,14 +130,19 @@ def print_package_results(
 
     if name_column_width is None:
         name_column_width = (
-            max([len(f"{hit.name} ({hit.link})".encode("gbk")) for hit in hits])
+            max(
+                [
+                    len(f"{hit.name} ({hit.project_link})".encode("gbk"))
+                    for hit in hits
+                ]
+            )
             + 4
         )
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
     for hit in hits:
-        name = f"{hit.name} ({hit.link})"
+        name = f"{hit.name} ({hit.project_link})"
         summary = hit.desc
         target_width = terminal_width - name_column_width - 5
         if target_width > 10:

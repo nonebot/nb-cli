@@ -6,13 +6,16 @@ from nb_cli.handlers import (
     search_adapter,
     update_adapter,
     install_adapter,
+    adapter_no_subcommand,
 )
 
 
-@click.group(cls=ClickAliasedGroup)
-def adapter():
+@click.group(cls=ClickAliasedGroup, invoke_without_command=True)
+@click.pass_context
+def adapter(ctx: click.Context):
     """Manage Bot Adapter."""
-    pass
+    if ctx.invoked_subcommand is None:
+        adapter_no_subcommand()
 
 
 @adapter.command()
@@ -30,7 +33,7 @@ def search(name):
 
 @adapter.command(aliases=["add"])
 @click.option("-i", "--index", default=None)
-@click.argument("name", nargs=1)
+@click.argument("name", nargs=1, required=False)
 def install(name, index):
     """Install nonebot adapter."""
     install_adapter(name, index)

@@ -16,7 +16,7 @@ from nb_cli.prompts import (
 )
 
 
-def create_project():
+def create_project() -> bool:
     click.secho("Loading adapters...")
     adapters = {x.name: x for x in _get_adapters()}
     click.clear()
@@ -69,3 +69,4 @@ def create_project():
 
     for adapter in answers["adapters"]["builtin"]:
         _call_pip_install(adapter["link"])
+    return True

@@ -5,33 +5,34 @@ import click
 from pyfiglet import figlet_format
 
 from .project import create_project
+from .deploy import run_bot as run_bot
 from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
-from .adapter import (
-    create_adapter,
-    search_adapter,
-    update_adapter,
-    install_adapter,
-)
-from .deploy import (
-    run_bot,
-    run_docker_image,
-    exit_docker_image,
-    build_docker_image,
-)
-from .plugin import (
-    create_plugin,
-    search_plugin,
-    update_plugin,
-    install_plugin,
-    uninstall_plugin,
-)
+from .driver import search_driver as search_driver
+from .plugin import create_plugin as create_plugin
+from .plugin import search_plugin as search_plugin
+from .plugin import update_plugin as update_plugin
+from .driver import install_driver as install_driver
+from .plugin import install_plugin as install_plugin
+from .adapter import create_adapter as create_adapter
+from .adapter import search_adapter as search_adapter
+from .adapter import update_adapter as update_adapter
+from .adapter import install_adapter as install_adapter
+from .deploy import run_docker_image as run_docker_image
+from .plugin import uninstall_plugin as uninstall_plugin
+from .deploy import exit_docker_image as exit_docker_image
+from .deploy import build_docker_image as build_docker_image
+from .deploy import deploy_no_subcommand as deploy_no_subcommand
+from .driver import driver_no_subcommand as driver_no_subcommand
+from .plugin import plugin_no_subcommand as plugin_no_subcommand
+from .adapter import adapter_no_subcommand as adapter_no_subcommand
 
 
-def draw_logo():
+def draw_logo() -> bool:
     click.secho(
         figlet_format("NoneBot", font="basic").strip(), fg="cyan", bold=True
     )
+    return True
 
 
 def handle_no_subcommand():
@@ -39,26 +40,21 @@ def handle_no_subcommand():
     click.echo("\n\b")
     click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
 
-    choices: List[Choice[Callable[[], Any]]] = [
-        Choice("Show Logo", draw_logo),
-        Choice("Create a New Project", create_project),
-        Choice("Run the Bot in Current Folder", run_bot),
-        Choice("Create a New NoneBot Plugin", create_plugin),
-        Choice("List All Published Plugins", partial(search_plugin, "")),
-        Choice("Search for Published Plugin", search_plugin),
-        Choice("Install a Published Plugin", install_plugin),
-        Choice("Update a Published Plugin", update_plugin),
-        Choice("Remove an Installed Plugin", uninstall_plugin),
-        Choice("Create a Custom Adapter", create_adapter),
-        Choice("List All Published Adapters", partial(search_adapter, "")),
-        Choice("Search for Published Adapters", search_adapter),
-        Choice("Build Docker Image for the Bot", build_docker_image),
-        Choice("Deploy the Bot to Docker", run_docker_image),
-        Choice("Stop the Bot Container in Docker", exit_docker_image),
-    ]
-    subcommand = (
-        ListPrompt("What do you want to do?", choices)
-        .prompt(style=default_style)
-        .data
-    )
-    subcommand()
+    while True:
+        choices: List[Choice[Callable[[], bool]]] = [
+            Choice("Show Logo", draw_logo),
+            Choice("Create a New Project", create_project),
+            Choice("Run the Bot in Current Folder", run_bot),
+            Choice("Driver ->", partial(driver_no_subcommand, True)),
+            Choice("Plugin ->", partial(plugin_no_subcommand, True)),
+            Choice("Adapter ->", partial(adapter_no_subcommand, True)),
+            Choice("Deploy ->", partial(deploy_no_subcommand, True)),
+        ]
+        subcommand = (
+            ListPrompt("What do you want to do?", choices)
+            .prompt(style=default_style)
+            .data
+        )
+        result = subcommand()
+        if result:
+            break

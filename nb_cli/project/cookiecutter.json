@@ -8,5 +8,7 @@
   "adapters": {
     "builtin": []
   },
-  "load_builtin": false
+  "plugins": {
+    "builtin": []
+  }
 }

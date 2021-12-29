@@ -23,7 +23,7 @@ def build(args):
 
 @click.command(
     cls=ClickAliasedCommand,
-    aliases=["up"],  # type: ignore
+    aliases=["up"],
     context_settings={"ignore_unknown_options": True},
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
@@ -39,7 +39,7 @@ def deploy(args):
 
 @click.command(
     cls=ClickAliasedCommand,
-    aliases=["down"],  # type: ignore
+    aliases=["down"],
     context_settings={"ignore_unknown_options": True},
 )
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)

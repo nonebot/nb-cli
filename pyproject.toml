@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nb-cli"
-version = "0.5.1"
+version = "0.6.0"
 description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
@@ -20,19 +20,19 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7.3"
 click = "^8.0.0"
-httpx = ">=0.18.0, <1.0.0"
 tomlkit = "^0.7.0"
 colorama = "^0.4.3"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
+httpx = ">=0.18.0, <1.0.0"
 prompt-toolkit = "^3.0.19"
-nonebot2 = "^2.0.0-alpha.14"
+nonebot2 = "^2.0.0-beta.1"
 docker-compose = { version = "~1.29.2", optional = true }
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
 black = "^21.10b0"
-nonebot2 = { path = "../nonebot2", develop = true }
+nonebot2 = { git = "https://github.com/nonebot/nonebot2", branch = "dev" }
 
 [tool.poetry.extras]
 deploy = ["docker-compose"]

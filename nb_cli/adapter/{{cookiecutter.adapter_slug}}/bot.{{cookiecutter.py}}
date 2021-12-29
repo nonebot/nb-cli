@@ -1,50 +1,18 @@
-from typing import Any, Tuple, Union, Optional, TYPE_CHECKING
+from nonebot.typing import overrides
 
-from nonebot.log import logger
-from nonebot.message import handle_event
 from nonebot.adapters import Bot as BaseBot
-from nonebot.drivers import Driver, HTTPConnection, HTTPRequest, HTTPResponse
 
 from .event import Event
 from .message import Message, MessageSegment
 
-if TYPE_CHECKING:
-    from nonebot.config import Config
-
 
 class Bot(BaseBot):
 
-    @property
-    def type(self) -> str:
-        return "{{cookiecutter.adapter_slug}}"
-
-    @classmethod
-    def register(cls, driver: "Driver", config: "Config"):
-        super().register(driver, config)
-        cls.{{cookiecutter.adapter_slug}}_config = {{cookiecutter.adapter_slug}}Config(**config.dict())
-
-    @classmethod
     @overrides(BaseBot)
-    async def check_permission(
-            cls, driver: Driver,
-            request: HTTPConnection) -> Tuple[Optional[str], Optional[HTTPResponse]]:
-
-    @overrides(BaseBot)
-    async def handle_message(self, message: bytes):
-        try:
-            event = Event.parse_obj(message)
-            await handle_event(self, event)
-        except Exception as e:
-            logger.opt(colors=True, exception=e).error(
-                f"<r><bg #f8bbd0>Failed to handle event. Raw: {message}</bg #f8bbd0></r>"
-            )
-
-    @overrides(BaseBot)
-    async def _call_api(self, api: str, **data) -> Any:
-        raise NotImplementedError
-
-    @overrides(BaseBot)
-    async def send(self, event: Event, message: Union[str, Message,
-                                                      MessageSegment],
-                   **kwargs) -> Any:
-        raise NotImplementedError
+    async def send(
+        self,
+        event: Event,
+        message: Union[str, Message, MessageSegment],
+        **kwargs,
+    ) -> Any:
+        ...

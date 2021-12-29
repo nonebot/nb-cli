@@ -38,6 +38,10 @@ nb --help
 
 - `nb init (create)` 创建新的 Nonebot 项目
 - `nb run` 在当前目录启动 Nonebot
+- `nb driver` 管理驱动器
+  - `nb driver list` 查看驱动器列表
+  - `nb driver search` 搜索驱动器
+  - `nb driver install (add)` 安装驱动器
 - `nb plugin` 管理插件
   - `nb plugin new (create)` 创建新的插件
   - `nb plugin list` 列出官方商店的所有插件

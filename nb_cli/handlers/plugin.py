@@ -1,6 +1,6 @@
-import os
 from pathlib import Path
-from typing import List, Optional
+from functools import partial
+from typing import List, Callable, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
@@ -13,11 +13,30 @@ from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 
 
+def plugin_no_subcommand(add_back: bool = False) -> bool:
+    choices: List[Choice[Callable[[], bool]]] = [
+        Choice("Create a New NoneBot Plugin", create_plugin),
+        Choice("List All Published Plugins", partial(search_plugin, "")),
+        Choice("Search for Published Plugin", search_plugin),
+        Choice("Install a Published Plugin", install_plugin),
+        Choice("Update a Published Plugin", update_plugin),
+        Choice("Remove an Installed Plugin", uninstall_plugin),
+    ]
+    if add_back:
+        choices.append(Choice("<- Back", lambda: False))
+    subcommand = (
+        ListPrompt("What do you want to do?", choices)
+        .prompt(style=default_style)
+        .data
+    )
+    return subcommand()
+
+
 def create_plugin(
     name: Optional[str] = None,
     plugin_dir: Optional[str] = None,
     template: Optional[str] = None,
-):
+) -> bool:
     if not name:
         name = InputPrompt(
             "Plugin Name:", validator=lambda x: len(x) > 0
@@ -59,6 +78,7 @@ def create_plugin(
         cookiecutter(
             template, output_dir=plugin_dir, extra_context={"plugin_name": name}
         )
+    return True
 
 
 def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
@@ -70,8 +90,8 @@ def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
     plugins = _get_plugins()
     plugin_exact = list(
         filter(
-            lambda x: _package == x.id
-            or _package == x.link
+            lambda x: _package == x.module_name
+            or _package == x.project_link
             or _package == x.name,
             plugins,
         )
@@ -79,8 +99,8 @@ def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
     if not plugin_exact:
         plugin = list(
             filter(
-                lambda x: _package in x.id
-                or _package in x.link
+                lambda x: _package in x.module_name
+                or _package in x.project_link
                 or _package in x.name,
                 plugins,
             )
@@ -98,7 +118,7 @@ def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
     return plugin
 
 
-def search_plugin(package: Optional[str] = None):
+def search_plugin(package: Optional[str] = None) -> bool:
     _package: str
     if package is None:
         _package = InputPrompt("Plugin name you want to search?").prompt(
@@ -114,17 +134,18 @@ def search_plugin(package: Optional[str] = None):
         )
     )
     print_package_results(plugins)
+    return True
 
 
 def install_plugin(
     package: Optional[str] = None,
     file: str = "pyproject.toml",
     index: Optional[str] = None,
-):
+) -> bool:
     plugin = _get_plugin(package, "Plugin name you want to install?")
     if not plugin:
-        return
-    status = _call_pip_install(plugin.link, index)
+        return True
+    status = _call_pip_install(plugin.project_link, index)
     if status == 0:  # SUCCESS
         try:
             if Path(file).suffix == ".toml":
@@ -135,25 +156,28 @@ def install_plugin(
                 raise ValueError(
                     "Unknown config file format! Expect 'json' / 'toml'."
                 )
-            config.add_plugin(plugin.id)
+            config.add_plugin(plugin.module_name)
         except Exception as e:
             click.secho(repr(e), fg="red")
+    return True
 
 
-def update_plugin(package: Optional[str] = None, index: Optional[str] = None):
+def update_plugin(
+    package: Optional[str] = None, index: Optional[str] = None
+) -> bool:
     plugin = _get_plugin(package, "Plugin name you want to update?")
-    if not plugin:
-        return
-    return _call_pip_update(plugin.link, index)
+    if plugin:
+        _call_pip_update(plugin.project_link, index)
+    return True
 
 
 def uninstall_plugin(
     package: Optional[str] = None, file: str = "pyproject.toml"
-):
+) -> bool:
     plugin = _get_plugin(package, "Plugin name you want to uninstall?")
     if not plugin:
-        return
-    status = _call_pip_uninstall(plugin.link)
+        return True
+    status = _call_pip_uninstall(plugin.project_link)
     if status == 0:  # SUCCESS
         try:
             if Path(file).suffix == ".toml":
@@ -164,9 +188,10 @@ def uninstall_plugin(
                 raise ValueError(
                     "Unknown config file format! Expect 'json' / 'toml'."
                 )
-            config.remove_plugin(plugin.id)
+            config.remove_plugin(plugin.module_name)
         except Exception as e:
             click.secho(repr(e), fg="red")
+    return True
 
 
 def _get_plugins() -> List[Plugin]:
