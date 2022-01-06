@@ -153,8 +153,7 @@ def update_adapter(
 def _get_adapters() -> List[Adapter]:
     urls = [
         "https://v2.nonebot.dev/adapters.json",
-        "https://nonebot2-vercel-mirror.vercel.app/adapters.json",
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/docs/.vuepress/public/adapters.json",
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/adapters.json",
     ]
     with ThreadPoolExecutor(max_workers=5) as executor:
         tasks = [executor.submit(httpx.get, url) for url in urls]

@@ -196,8 +196,7 @@ def uninstall_plugin(
 def _get_plugins() -> List[Plugin]:
     urls = [
         "https://v2.nonebot.dev/plugins.json",
-        "https://nonebot2-vercel-mirror.vercel.app/plugins.json",
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/docs/.vuepress/public/plugins.json",
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/plugins.json",
     ]
     with ThreadPoolExecutor(max_workers=5) as executor:
         tasks = [executor.submit(httpx.get, url) for url in urls]
