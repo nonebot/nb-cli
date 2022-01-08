@@ -2,6 +2,7 @@ from typing import List
 from pathlib import Path
 
 import click
+import nonebot
 from cookiecutter.main import cookiecutter
 
 from .adapter import _get_adapters
@@ -14,6 +15,16 @@ from nb_cli.prompts import (
     ConfirmPrompt,
     CheckboxPrompt,
 )
+
+
+def _get_builtin_plugins() -> List[str]:
+    try:
+        plugin_dir = Path(nonebot.__path__[0]) / "plugins"  # type: ignore
+        if not plugin_dir.is_dir():
+            return []
+        return [file.stem for file in plugin_dir.glob("*.py")]
+    except Exception:
+        return []
 
 
 def create_project() -> bool:
@@ -39,9 +50,14 @@ def create_project() -> bool:
         .data
     )
 
-    answers["load_builtin"] = ConfirmPrompt(
-        "Load NoneBot Builtin Plugin?", default_choice=False
-    ).prompt(style=default_style)
+    answers["plugins"] = {"builtin": []}
+    answers["plugins"]["builtin"] = [
+        choice.data
+        for choice in CheckboxPrompt(
+            "Which builtin plugin(s) would you like to use?",
+            [Choice(name, name) for name in _get_builtin_plugins()],
+        ).prompt(style=default_style)
+    ]
 
     answers["adapters"] = {"builtin": []}
 
