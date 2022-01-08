@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "nb-cli"
-version = "0.6.0"
+version = "0.6.1"
 description = "CLI for nonebot2"
 authors = ["yanyongyu <yanyongyu_1@126.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/nonebot/nb-cli"
+homepage = "https://v2.nonebot.dev/"
 repository = "https://github.com/nonebot/nb-cli"
 keywords = ["bot", "qq", "nonebot"]
 classifiers = [

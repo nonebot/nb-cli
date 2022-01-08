@@ -12,8 +12,8 @@ from nb_cli.utils import Driver, default_style, print_package_results
 
 def _get_drivers() -> List[Driver]:
     urls = [
-        "https://v2.nonebot.dev/plugins.json",
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/plugins.json",
+        "https://v2.nonebot.dev/drivers.json",
+        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/drivers.json",
     ]
     with ThreadPoolExecutor(max_workers=5) as executor:
         tasks = [executor.submit(httpx.get, url) for url in urls]
@@ -21,8 +21,8 @@ def _get_drivers() -> List[Driver]:
         for future in as_completed(tasks):
             try:
                 resp = future.result()
-                plugins = resp.json()
-                return list(map(lambda x: Driver(**x), plugins))
+                drivers = resp.json()
+                return list(map(lambda x: Driver(**x), drivers))
             except httpx.RequestError as e:
                 click.secho(
                     f"An error occurred while requesting {e.request.url}.",

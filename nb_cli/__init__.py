@@ -3,6 +3,7 @@ import sys
 import click
 import pkg_resources
 
+from nb_cli.commands.driver import driver
 from nb_cli.commands.plugin import plugin
 from nb_cli.commands.main import run, init
 from nb_cli.utils import ClickAliasedGroup
@@ -43,6 +44,7 @@ main.add_command(exit)
 
 main.add_command(adapter)
 main.add_command(plugin)
+main.add_command(driver)
 
 if __name__ == "__main__":
     main()
