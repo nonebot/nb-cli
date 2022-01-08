@@ -103,10 +103,6 @@ class Adapter(BaseModel):
     project_link: str
     name: str
     desc: str
-    author: str
-    homepage: str
-    tags: list
-    is_official: bool
 
 
 class Plugin(BaseModel):
@@ -114,14 +110,17 @@ class Plugin(BaseModel):
     project_link: str
     name: str
     desc: str
-    author: str
-    homepage: str
-    tags: list
-    is_official: bool
+
+
+class Driver(BaseModel):
+    module_name: str
+    project_link: str
+    name: str
+    desc: str
 
 
 def print_package_results(
-    hits: Union[List[Plugin], List[Adapter]],
+    hits: Union[List[Plugin], List[Adapter], List[Driver]],
     name_column_width: Optional[int] = None,
     terminal_width: Optional[int] = None,
 ):
