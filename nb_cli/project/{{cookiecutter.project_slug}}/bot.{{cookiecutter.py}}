@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import nonebot{% for adapter in cookiecutter.adapters.builtin %}
-from {{ adapter.id }} import Bot as {{ adapter.name|upper }}Bot{% endfor %}
+from {{ adapter.module_name }} import Bot as {{ adapter.name|upper }}Bot{% endfor %}
+
 
 # Custom your logger
 # 
