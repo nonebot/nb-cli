@@ -84,5 +84,5 @@ def create_project() -> bool:
     )
 
     for adapter in answers["adapters"]["builtin"]:
-        _call_pip_install(adapter["link"])
+        _call_pip_install(adapter["project_link"])
     return True
