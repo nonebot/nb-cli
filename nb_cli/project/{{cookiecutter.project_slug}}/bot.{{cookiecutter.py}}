@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import nonebot{% for adapter in cookiecutter.adapters.builtin %}
-from {{ adapter.id }} import Adapter as {{ adapter.name|upper }}Adapter{% endfor %}
+from {{ adapter.module_name }} import Adapter as {{ adapter.name|upper }}Adapter{% endfor %}
 
 # Custom your logger
 # 
