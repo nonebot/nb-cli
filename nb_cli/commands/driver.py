@@ -28,6 +28,6 @@ def search(name):
 @driver.command(aliases=["add"])
 @click.option("-i", "--index", default=None)
 @click.argument("name", nargs=1, required=False)
-def install(name, file, index):
+def install(name, index):
     """Install nonebot driver."""
     install_driver(name, index)
