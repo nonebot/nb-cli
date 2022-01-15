@@ -28,6 +28,7 @@ cookiecutter = "^1.7.2"
 prompt-toolkit = "^3.0.19"
 nonebot2 = "^2.0.0-alpha.14"
 docker-compose = { version = "~1.29.2", optional = true }
+wcwidth = "^0.2.5"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"

@@ -1,7 +1,8 @@
 import shutil
-from typing import List, Union, Optional
+from typing import List, Union, Optional, cast
 
 import click
+from wcwidth import wcswidth
 from pydantic import BaseModel
 from prompt_toolkit.styles import Style
 
@@ -129,14 +130,17 @@ def print_package_results(
         return
 
     if name_column_width is None:
-        name_column_width = (
-            max(
-                [
-                    len(f"{hit.name} ({hit.project_link})".encode("gbk"))
-                    for hit in hits
-                ]
-            )
-            + 4
+        name_column_width = cast(
+            int,
+            (
+                max(
+                    [
+                        wcswidth(f"{hit.name} ({hit.project_link})")
+                        for hit in hits
+                    ]
+                )
+                + 4
+            ),
         )
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
@@ -148,14 +152,17 @@ def print_package_results(
         if target_width > 10:
             # wrap and indent summary to fit terminal
             summary_lines = []
-            while len(summary.encode("gbk")) > target_width:
-                summary_lines.append(summary[:target_width])
-                summary = summary[len(summary_lines) * target_width + 1 :]
+            while wcswidth(summary) > target_width:
+                tmp_length = target_width
+                while wcswidth(summary[:tmp_length]) > target_width:
+                    tmp_length = tmp_length - 1
+                summary_lines.append(summary[:tmp_length])
+                summary = summary[tmp_length:]
             if not summary_lines:
                 summary_lines = [summary]
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
 
-        line = f"{name + ' ' * (name_column_width-len(name.encode('gbk')))} - {summary}"
+        line = f"{name + ' ' * (name_column_width-wcswidth(name))} - {summary}"
         try:
             print(line)
         except UnicodeEncodeError:
