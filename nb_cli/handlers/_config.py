@@ -44,27 +44,27 @@ class TOMLConfig(Config):
             f.write(tomlkit.dumps(data))
 
     def _validate(self, data: TOMLDocument) -> None:
-        tool_data = data.setdefault("tool", tomlkit.table())
-        if not isinstance(tool_data, Table):
-            raise ValueError("'tool' in toml file is not a Table!")
-        nonebot_data = tool_data.setdefault("nonebot", tomlkit.table())
+        nonebot_data = data.setdefault("nonebot", tomlkit.table())
         if not isinstance(nonebot_data, Table):
-            raise ValueError("'tool.nonebot' in toml file is not a Table!")
-        plugins = nonebot_data.setdefault("plugins", tomlkit.array())
+            raise ValueError("'nonebot' in toml file is not a Table!")
+        plugin_data = nonebot_data.setdefault("plugins", tomlkit.table())
+        if not isinstance(plugin_data, Table):
+            raise ValueError("'nonebot.plugins' in toml file is not a Table!")
+        plugins = plugin_data.setdefault("plugins", tomlkit.array())
         if not isinstance(plugins, Array):
             raise ValueError(
-                "'tool.nonebot.plugins' in toml file is not a Array!"
+                "'nonebot.plugins.plugins' in toml file is not a Array!"
             )
-        plugin_dirs = nonebot_data.setdefault("plugin_dirs", tomlkit.array())
+        plugin_dirs = plugin_data.setdefault("plugin_dirs", tomlkit.array())
         if not isinstance(plugin_dirs, Array):
             raise ValueError(
-                "'tool.nonebot.plugin_dirs' in toml file is not a Array!"
+                "'nonebot.plugins.plugin_dirs' in toml file is not a Array!"
             )
 
     def add_plugin(self, plugin_name: str):
         data = self._get_data()
         self._validate(data)
-        plugins: Array = data["tool"]["nonebot"]["plugins"]  # type: ignore
+        plugins: Array = data["nonebot"]["plugins"]["plugins"]  # type: ignore
         if plugin_name not in plugins:
             plugins.append(plugin_name)
         self._write_data(data)
@@ -72,14 +72,14 @@ class TOMLConfig(Config):
     def remove_plugin(self, plugin_name: str):
         data = self._get_data()
         self._validate(data)
-        plugins: Array = data["tool"]["nonebot"]["plugins"]  # type: ignore
+        plugins: Array = data["nonebot"]["plugins"]["plugins"]  # type: ignore
         del plugins[plugins.index(plugin_name)]
         self._write_data(data)
 
     def add_plugin_dir(self, dir_name: str):
         data = self._get_data()
         self._validate(data)
-        plugin_dirs: Array = data["tool"]["nonebot"][  # type: ignore
+        plugin_dirs: Array = data["nonebot"]["plugins"][  # type: ignore
             "plugin_dirs"
         ]
         if dir_name not in plugin_dirs:
@@ -89,7 +89,7 @@ class TOMLConfig(Config):
     def remove_plugin_dir(self, dir_name: str):
         data = self._get_data()
         self._validate(data)
-        plugin_dirs: Array = data["tool"]["nonebot"][  # type: ignore
+        plugin_dirs: Array = data["nonebot"]["plugins"][  # type: ignore
             "plugin_dirs"
         ]
         plugin_dirs.remove(dir_name)
