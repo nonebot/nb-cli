@@ -1,5 +1,5 @@
 import shutil
-from typing import List, Union, Optional, cast
+from typing import List, Union, Optional, cast,Any
 
 import click
 from wcwidth import wcswidth
@@ -109,6 +109,11 @@ class Adapter(BaseModel):
     tags: list
     is_official: bool
 
+    def __init__(self, **data: Any) -> None:
+        super().__init__(**data)
+        if self.name == "OneBot V11":
+            self.module_name = "nonebot.adapters.cqhttp"
+            self.project_link = "nonebot-adapter-cqhttp"
 
 class Plugin(BaseModel):
     module_name: str
