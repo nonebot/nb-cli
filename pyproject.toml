@@ -26,14 +26,14 @@ colorama = "^0.4.3"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
 prompt-toolkit = "^3.0.19"
-nonebot2 = "^2.0.0-alpha.14"
+nonebot2 = ">=2.0.0-alpha.14, <2.0.0b1"
 docker-compose = { version = "~1.29.2", optional = true }
 wcwidth = "^0.2.5"
 
 [tool.poetry.dev-dependencies]
+setuptools = "^60.5.0"
 isort = "^5.10.1"
 black = "^21.10b0"
-nonebot2 = { path = "../nonebot2", develop = true }
 
 [tool.poetry.extras]
 deploy = ["docker-compose"]
