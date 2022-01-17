@@ -4,13 +4,13 @@ from nb_cli.utils import ClickAliasedCommand
 from nb_cli.handlers import run_bot, create_project
 
 
-@click.command(cls=ClickAliasedCommand, aliases=["create"])  # type: ignore
+@click.command(cls=ClickAliasedCommand, aliases=["create"])
 def init():
     """Create A NoneBot Project."""
     create_project()
 
 
-@click.command(cls=ClickAliasedCommand, aliases=["start"])  # type: ignore
+@click.command(cls=ClickAliasedCommand, aliases=["start"])
 @click.option(
     "-f",
     "--file",

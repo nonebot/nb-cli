@@ -7,13 +7,16 @@ from nb_cli.handlers import (
     update_plugin,
     install_plugin,
     uninstall_plugin,
+    plugin_no_subcommand,
 )
 
 
-@click.group(cls=ClickAliasedGroup)
-def plugin():
+@click.group(cls=ClickAliasedGroup, invoke_without_command=True)
+@click.pass_context
+def plugin(ctx: click.Context):
     """Manage Bot Plugin."""
-    pass
+    if ctx.invoked_subcommand is None:
+        plugin_no_subcommand()
 
 
 @plugin.command()
@@ -38,7 +41,7 @@ def search(name):
     show_default=True,
     help="Plugin loading file of your bot",
 )
-@click.argument("name", nargs=1)
+@click.argument("name", nargs=1, required=False)
 def install(name, file, index):
     """Install nonebot plugin."""
     install_plugin(name, file, index)

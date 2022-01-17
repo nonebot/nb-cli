@@ -1,5 +1,6 @@
 from pathlib import Path
-from typing import List, Optional
+from functools import partial
+from typing import List, Callable, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
@@ -11,9 +12,26 @@ from nb_cli.prompts import Choice, ListPrompt, InputPrompt
 from nb_cli.utils import Adapter, default_style, print_package_results
 
 
+def adapter_no_subcommand(add_back: bool = False) -> bool:
+    choices: List[Choice[Callable[[], bool]]] = [
+        Choice("Create a Custom Adapter", create_adapter),
+        Choice("List All Published Adapters", partial(search_adapter, "")),
+        Choice("Search for Published Adapters", search_adapter),
+        Choice("Install a Published Adapter", install_adapter),
+    ]
+    if add_back:
+        choices.append(Choice("<- Back", lambda: False))
+    subcommand = (
+        ListPrompt("What do you want to do?", choices)
+        .prompt(style=default_style)
+        .data
+    )
+    return subcommand()
+
+
 def create_adapter(
     name: Optional[str] = None, adapter_dir: Optional[str] = None
-):
+) -> bool:
     if not name:
         name = InputPrompt(
             "Adapter Name:", validator=lambda x: len(x) > 0
@@ -55,6 +73,7 @@ def create_adapter(
             "adapter_name": name,
         },
     )
+    return True
 
 
 def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
@@ -66,8 +85,8 @@ def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
     adapters = _get_adapters()
     adapter_exact = list(
         filter(
-            lambda x: _package == x.id
-            or _package == x.link
+            lambda x: _package == x.module_name
+            or _package == x.project_link
             or _package == x.name,
             adapters,
         )
@@ -75,8 +94,8 @@ def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
     if not adapter_exact:
         adapter = list(
             filter(
-                lambda x: _package in x.id
-                or _package in x.link
+                lambda x: _package in x.module_name
+                or _package in x.project_link
                 or _package in x.name,
                 adapters,
             )
@@ -94,7 +113,7 @@ def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
     return adapter
 
 
-def search_adapter(package: Optional[str] = None):
+def search_adapter(package: Optional[str] = None) -> bool:
     _package: str
     if package is None:
         _package = InputPrompt("Adapter name you want to search?").prompt(
@@ -110,20 +129,25 @@ def search_adapter(package: Optional[str] = None):
         )
     )
     print_package_results(adapters)
+    return True
 
 
-def install_adapter(package: Optional[str] = None, index: Optional[str] = None):
+def install_adapter(
+    package: Optional[str] = None, index: Optional[str] = None
+) -> bool:
     adapter = _get_adapter(package, "Adapter name you want to install?")
-    if not adapter:
-        return
-    return _call_pip_install(adapter.link, index)
+    if adapter:
+        _call_pip_install(adapter.project_link, index)
+    return True
 
 
-def update_adapter(package: Optional[str] = None, index: Optional[str] = None):
+def update_adapter(
+    package: Optional[str] = None, index: Optional[str] = None
+) -> bool:
     adapter = _get_adapter(package, "Adapter name you want to update?")
-    if not adapter:
-        return
-    return _call_pip_update(adapter.link, index)
+    if adapter:
+        _call_pip_update(adapter.project_link, index)
+    return True
 
 
 def _get_adapters() -> List[Adapter]:
