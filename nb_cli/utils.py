@@ -112,6 +112,7 @@ class Adapter(BaseModel):
     def __init__(self, **data: Any) -> None:
         super().__init__(**data)
         if self.name == "OneBot V11":
+            self.name = "CQHTTP"
             self.module_name = "nonebot.adapters.cqhttp"
             self.project_link = "nonebot-adapter-cqhttp"
 
