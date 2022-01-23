@@ -164,8 +164,7 @@ def print_package_results(
                     tmp_length = tmp_length - 1
                 summary_lines.append(summary[:tmp_length])
                 summary = summary[tmp_length:]
-            if not summary_lines:
-                summary_lines = [summary]
+            summary_lines.append(summary)
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
 
         line = f"{name + ' ' * (name_column_width-wcswidth(name))} - {summary}"
