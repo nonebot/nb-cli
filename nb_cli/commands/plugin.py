@@ -43,7 +43,7 @@ def search(name):
 )
 @click.argument("name", nargs=1, required=False)
 def install(name, file, index):
-    """Install nonebot plugin."""
+    """Install nonebot plugin to current project."""
     install_plugin(name, file, index)
 
 
@@ -65,6 +65,7 @@ def update(name, index):
 )
 @click.argument("name", nargs=1)
 def uninstall(name, file):
+    """Uninstall nonebot plugin from current project."""
     uninstall_plugin(name, file)
 
 
