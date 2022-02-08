@@ -18,10 +18,8 @@ WORKDIR /app
 
 COPY --from=requirements-stage /tmp/requirements.txt /app/requirements.txt
 
-# RUN python3 -m pip config set global.index-url https://mirrors.aliyun.com/pypi/simple
-
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN rm requirements.txt
 
-# COPY ./ /app/
+COPY ./ /app/
