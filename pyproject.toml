@@ -33,7 +33,7 @@ docker-compose = { version = "~1.29.2", optional = true }
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
 black = "^21.10b0"
-nonebot2 = { git = "https://github.com/nonebot/nonebot2", branch = "dev" }
+nonebot2 = { git = "https://github.com/nonebot/nonebot2" }
 
 [tool.poetry.extras]
 deploy = ["docker-compose"]
