@@ -152,3 +152,5 @@ dmypy.json
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 
 !nb_cli/project/{{cookiecutter.project_slug}}/.env
+
+.idea

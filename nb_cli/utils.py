@@ -1,9 +1,6 @@
-import shutil
-from typing import List, Union, Optional, cast
+from typing import List, Optional
 
 import click
-from wcwidth import wcswidth
-from pydantic import BaseModel
 from prompt_toolkit.styles import Style
 
 default_style = Style.from_dict(
@@ -97,71 +94,3 @@ class ClickAliasedGroup(click.Group):
         if rows:
             with formatter.section("Commands"):
                 formatter.write_dl(rows)
-
-
-class Adapter(BaseModel):
-    module_name: str
-    project_link: str
-    name: str
-    desc: str
-
-
-class Plugin(BaseModel):
-    module_name: str
-    project_link: str
-    name: str
-    desc: str
-
-
-class Driver(BaseModel):
-    module_name: str
-    project_link: str
-    name: str
-    desc: str
-
-
-def print_package_results(
-    hits: Union[List[Plugin], List[Adapter], List[Driver]],
-    name_column_width: Optional[int] = None,
-    terminal_width: Optional[int] = None,
-):
-    if not hits:
-        return
-
-    if name_column_width is None:
-        name_column_width = cast(
-            int,
-            (
-                max(
-                    [
-                        wcswidth(f"{hit.name} ({hit.project_link})")
-                        for hit in hits
-                    ]
-                )
-                + 4
-            ),
-        )
-    if terminal_width is None:
-        terminal_width = shutil.get_terminal_size()[0]
-
-    for hit in hits:
-        name = f"{hit.name} ({hit.project_link})"
-        summary = hit.desc
-        target_width = terminal_width - name_column_width - 5
-        if target_width > 10:
-            # wrap and indent summary to fit terminal
-            summary_lines = []
-            while wcswidth(summary) > target_width:
-                tmp_length = target_width
-                while wcswidth(summary[:tmp_length]) > target_width:
-                    tmp_length = tmp_length - 1
-                summary_lines.append(summary[:tmp_length])
-                summary = summary[tmp_length:]
-            summary_lines.append(summary)
-            summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
-
-        line = f"{name + ' ' * (name_column_width-wcswidth(name))} - {summary}"
-        try:
-            print(line)
-        except UnicodeEncodeError:
-            pass
