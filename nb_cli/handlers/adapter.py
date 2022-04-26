@@ -1,15 +1,19 @@
 from pathlib import Path
 from functools import partial
 from typing import List, Callable, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
-import httpx
 from cookiecutter.main import cookiecutter
 
 from ._pip import _call_pip_update, _call_pip_install
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt
-from nb_cli.utils import Adapter, default_style, print_package_results
+from .utils import (
+    Adapter,
+    default_style,
+    _get_module,
+    _get_modules,
+    _search_module,
+)
 
 
 def adapter_no_subcommand(add_back: bool = False) -> bool:
@@ -77,59 +81,11 @@ def create_adapter(
 
 
 def _get_adapter(package: Optional[str], question: str) -> Optional[Adapter]:
-    _package: str
-    if package is None:
-        _package = InputPrompt(question).prompt(style=default_style)
-    else:
-        _package = package
-    adapters = _get_adapters()
-    adapter_exact = list(
-        filter(
-            lambda x: _package == x.module_name
-            or _package == x.project_link
-            or _package == x.name,
-            adapters,
-        )
-    )
-    if not adapter_exact:
-        adapter = list(
-            filter(
-                lambda x: _package in x.module_name
-                or _package in x.project_link
-                or _package in x.name,
-                adapters,
-            )
-        )
-        if len(adapter) > 1:
-            print_package_results(adapter)
-            return
-        elif len(adapter) != 1:
-            click.secho("Package not found!", fg="red")
-            return
-        else:
-            adapter = adapter[0]
-    else:
-        adapter = adapter_exact[0]
-    return adapter
+    return _get_module(Adapter, package, question)
 
 
 def search_adapter(package: Optional[str] = None) -> bool:
-    _package: str
-    if package is None:
-        _package = InputPrompt("Adapter name you want to search?").prompt(
-            style=default_style
-        )
-    else:
-        _package = package
-    adapters = _get_adapters()
-    adapters = list(
-        filter(
-            lambda x: any(_package in value for value in x.dict().values()),
-            adapters,
-        )
-    )
-    print_package_results(adapters)
-    return True
+    return _search_module(Adapter, package)
 
 
 def install_adapter(
@@ -151,22 +107,4 @@ def update_adapter(
 
 
 def _get_adapters() -> List[Adapter]:
-    urls = [
-        "https://v2.nonebot.dev/adapters.json",
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/adapters.json",
-    ]
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        tasks = [executor.submit(httpx.get, url) for url in urls]
-
-        for future in as_completed(tasks):
-            try:
-                resp = future.result()
-                adapters = resp.json()
-                return list(map(lambda x: Adapter(**x), adapters))
-            except httpx.RequestError as e:
-                click.secho(
-                    f"An error occurred while requesting {e.request.url}.",
-                    fg="red",
-                )
-
-    raise RuntimeError("Failed to get adapter list.")
+    return _get_modules(Adapter)

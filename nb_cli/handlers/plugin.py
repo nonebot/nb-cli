@@ -1,14 +1,18 @@
 from pathlib import Path
 from functools import partial
 from typing import List, Callable, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
-import httpx
 from cookiecutter.main import cookiecutter
 
 from ._config import JSONConfig, TOMLConfig
-from nb_cli.utils import Plugin, default_style, print_package_results
+from .utils import (
+    Plugin,
+    default_style,
+    _get_modules,
+    _get_module,
+    _search_module,
+)
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 
@@ -82,59 +86,11 @@ def create_plugin(
 
 
 def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
-    _package: str
-    if package is None:
-        _package = InputPrompt(question).prompt(style=default_style)
-    else:
-        _package = package
-    plugins = _get_plugins()
-    plugin_exact = list(
-        filter(
-            lambda x: _package == x.module_name
-            or _package == x.project_link
-            or _package == x.name,
-            plugins,
-        )
-    )
-    if not plugin_exact:
-        plugin = list(
-            filter(
-                lambda x: _package in x.module_name
-                or _package in x.project_link
-                or _package in x.name,
-                plugins,
-            )
-        )
-        if len(plugin) > 1:
-            print_package_results(plugin)
-            return
-        elif len(plugin) != 1:
-            click.secho("Package not found!", fg="red")
-            return
-        else:
-            plugin = plugin[0]
-    else:
-        plugin = plugin_exact[0]
-    return plugin
+    return _get_module(Plugin, package, question)
 
 
 def search_plugin(package: Optional[str] = None) -> bool:
-    _package: str
-    if package is None:
-        _package = InputPrompt("Plugin name you want to search?").prompt(
-            style=default_style
-        )
-    else:
-        _package = package
-    plugins = _get_plugins()
-    plugins = list(
-        filter(
-            lambda x: any(_package in value for value in x.dict().values()),
-            plugins,
-        )
-    )
-    print_package_results(plugins)
-    return True
+    return _search_module(Plugin, package)
 
 
 def install_plugin(
@@ -195,22 +151,4 @@ def uninstall_plugin(
 
 
 def _get_plugins() -> List[Plugin]:
-    urls = [
-        "https://v2.nonebot.dev/plugins.json",
-        "https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/plugins.json",
-    ]
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        tasks = [executor.submit(httpx.get, url) for url in urls]
-
-        for future in as_completed(tasks):
-            try:
-                resp = future.result()
-                plugins = resp.json()
-                return list(map(lambda x: Plugin(**x), plugins))
-            except httpx.RequestError as e:
-                click.secho(
-                    f"An error occurred while requesting {e.request.url}.",
-                    fg="red",
-                )
-
-    raise RuntimeError("Failed to get plugin list.")
+    return _get_modules(Plugin)
