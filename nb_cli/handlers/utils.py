@@ -1,5 +1,5 @@
 import shutil
-from typing import List, Type, Union, Optional, TypeVar, cast
+from typing import List, Type, Union, TypeVar, Optional, cast
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
@@ -11,6 +11,7 @@ from nb_cli.prompts import InputPrompt
 from nb_cli.utils import default_style
 
 T = TypeVar("T", "Adapter", "Plugin", "Driver")
+
 
 class Adapter(BaseModel):
     module_name: str
@@ -34,7 +35,7 @@ class Driver(BaseModel):
 
 
 def print_package_results(
-    hits: Union[List[Plugin], List[Adapter], List[Driver]],
+    hits: List[T],
     name_column_width: Optional[int] = None,
     terminal_width: Optional[int] = None,
 ):
@@ -82,8 +83,8 @@ def print_package_results(
             pass
 
 
-def _get_modules(module: Type[T]) -> List[T]:
-    module_name = module.__name__.lower()
+def _get_modules(module_type: Type[T]) -> List[T]:
+    module_name = module_type.__name__.lower()
 
     urls = [
         f"https://v2.nonebot.dev/{module_name}s.json",
@@ -96,7 +97,7 @@ def _get_modules(module: Type[T]) -> List[T]:
             try:
                 resp = future.result()
                 items = resp.json()
-                return list(map(lambda x: module(**x), items))
+                return list(map(lambda x: module_type(**x), items))
             except httpx.RequestError as e:
                 click.secho(
                     f"An error occurred while requesting {e.request.url}.",
@@ -107,14 +108,14 @@ def _get_modules(module: Type[T]) -> List[T]:
 
 
 def _get_module(
-    module: Type[T], package: Optional[str], question: str
+    module_type: Type[T], package: Optional[str], question: str
 ) -> Optional[T]:
     _package: str
     if package is None:
         _package = InputPrompt(question).prompt(style=default_style)
     else:
         _package = package
-    modules = _get_modules(module)
+    modules = _get_modules(module_type)
     modules_exact = list(
         filter(
             lambda x: _package == x.module_name
@@ -145,7 +146,7 @@ def _get_module(
     return module
 
 
-def _search_module(module: T, package: Optional[str] = None) -> bool:
+def _search_module(module_type: Type[T], package: Optional[str] = None) -> bool:
     _package: str
     if package is None:
         _package = InputPrompt("Adapter name you want to search?").prompt(
@@ -153,7 +154,7 @@ def _search_module(module: T, package: Optional[str] = None) -> bool:
         )
     else:
         _package = package
-    modules = _get_modules(module)
+    modules = _get_modules(module_type)
     modules = list(
         filter(
             lambda x: any(_package in value for value in x.dict().values()),
