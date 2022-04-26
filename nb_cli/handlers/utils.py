@@ -1,5 +1,5 @@
 import shutil
-from typing import List, Union, Optional, cast
+from typing import List, Type, Union, Optional, TypeVar, cast
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from nb_cli.prompts import InputPrompt
 from nb_cli.utils import default_style
 
+T = TypeVar("T", "Adapter", "Plugin", "Driver")
 
 class Adapter(BaseModel):
     module_name: str
@@ -81,7 +82,7 @@ def print_package_results(
             pass
 
 
-def _get_modules(module: type) -> List[Union[Adapter, Plugin, Driver]]:
+def _get_modules(module: Type[T]) -> List[T]:
     module_name = module.__name__.lower()
 
     urls = [
@@ -106,8 +107,8 @@ def _get_modules(module: type) -> List[Union[Adapter, Plugin, Driver]]:
 
 
 def _get_module(
-    module: type, package: Optional[str], question: str
-) -> Optional[Adapter]:
+    module: Type[T], package: Optional[str], question: str
+) -> Optional[T]:
     _package: str
     if package is None:
         _package = InputPrompt(question).prompt(style=default_style)
@@ -144,7 +145,7 @@ def _get_module(
     return module
 
 
-def _search_module(module: type, package: Optional[str] = None) -> bool:
+def _search_module(module: T, package: Optional[str] = None) -> bool:
     _package: str
     if package is None:
         _package = InputPrompt("Adapter name you want to search?").prompt(
