@@ -5,13 +5,14 @@ from typing import List, Callable, Optional
 import click
 from cookiecutter.main import cookiecutter
 
-from ._pip import _call_pip_update, _call_pip_install
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt
+
+from ._pip import _call_pip_update, _call_pip_install
 from .utils import (
     Adapter,
-    default_style,
     _get_module,
     _get_modules,
+    default_style,
     _search_module,
 )
 

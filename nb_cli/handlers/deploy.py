@@ -6,8 +6,9 @@ import click
 import nonebot
 
 from nb_cli.utils import default_style
-from ._docker import _call_docker_compose
 from nb_cli.prompts import Choice, ListPrompt
+
+from ._docker import _call_docker_compose
 
 
 def run_bot(file: str = "bot.py", app: str = "app") -> bool:

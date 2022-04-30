@@ -5,8 +5,6 @@ import click
 import nonebot
 from cookiecutter.main import cookiecutter
 
-from .adapter import _get_adapters
-from ._pip import _call_pip_install
 from nb_cli.utils import default_style
 from nb_cli.prompts import (
     Choice,
@@ -15,6 +13,9 @@ from nb_cli.prompts import (
     ConfirmPrompt,
     CheckboxPrompt,
 )
+
+from .adapter import _get_adapters
+from ._pip import _call_pip_install
 
 
 def _get_builtin_plugins() -> List[str]:

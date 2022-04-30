@@ -1,13 +1,14 @@
 from functools import partial
 from typing import List, Callable, Optional
 
-from ._pip import _call_pip_install
 from nb_cli.prompts import Choice, ListPrompt
+
+from ._pip import _call_pip_install
 from .utils import (
     Driver,
-    default_style,
     _get_module,
     _get_modules,
+    default_style,
     _search_module,
 )
 

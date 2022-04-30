@@ -5,16 +5,17 @@ from typing import List, Callable, Optional
 import click
 from cookiecutter.main import cookiecutter
 
+from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
+
 from ._config import JSONConfig, TOMLConfig
+from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 from .utils import (
     Plugin,
-    default_style,
-    _get_modules,
     _get_module,
+    _get_modules,
+    default_style,
     _search_module,
 )
-from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
-from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 
 
 def plugin_no_subcommand(add_back: bool = False) -> bool:
