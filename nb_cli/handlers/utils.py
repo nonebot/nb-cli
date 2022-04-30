@@ -1,37 +1,15 @@
 import shutil
-from typing import List, Type, Union, TypeVar, Optional, cast
+from typing import List, Type, TypeVar, Optional, cast
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import click
 import httpx
 from wcwidth import wcswidth
-from pydantic import BaseModel
 
 from nb_cli.prompts import InputPrompt
-from nb_cli.utils import default_style
+from nb_cli.utils import default_style, Cache
 
 T = TypeVar("T", "Adapter", "Plugin", "Driver")
-
-
-class Adapter(BaseModel):
-    module_name: str
-    project_link: str
-    name: str
-    desc: str
-
-
-class Plugin(BaseModel):
-    module_name: str
-    project_link: str
-    name: str
-    desc: str
-
-
-class Driver(BaseModel):
-    module_name: str
-    project_link: str
-    name: str
-    desc: str
 
 
 def print_package_results(
@@ -97,6 +75,7 @@ def _get_modules(module_type: Type[T]) -> List[T]:
             try:
                 resp = future.result()
                 items = resp.json()
+                Cache.flush_cache(module_name, [item['module_name'] for item in items] + [item['name'] for item in items])
                 return list(map(lambda x: module_type(**x), items))
             except httpx.RequestError as e:
                 click.secho(
@@ -147,9 +126,11 @@ def _get_module(
 
 
 def _search_module(module_type: Type[T], package: Optional[str] = None) -> bool:
+    module_name = module_type.__name__
+
     _package: str
     if package is None:
-        _package = InputPrompt("Adapter name you want to search?").prompt(
+        _package = InputPrompt(f"{module_name} name you want to search?").prompt(
             style=default_style
         )
     else:

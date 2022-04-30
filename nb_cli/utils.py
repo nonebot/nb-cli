@@ -1,7 +1,9 @@
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, TypedDict
 
 import click
 from prompt_toolkit.styles import Style
+from pydantic import BaseModel
 
 default_style = Style.from_dict(
     {
@@ -94,3 +96,68 @@ class ClickAliasedGroup(click.Group):
         if rows:
             with formatter.section("Commands"):
                 formatter.write_dl(rows)
+
+
+class Adapter(BaseModel):
+    module_name: str
+    project_link: str
+    name: str
+    desc: str
+
+
+class Plugin(BaseModel):
+    module_name: str
+    project_link: str
+    name: str
+    desc: str
+
+
+class Driver(BaseModel):
+    module_name: str
+    project_link: str
+    name: str
+    desc: str
+
+
+class CacheDict(TypedDict):
+    adapter: Optional[List[str]]
+    driver: Optional[List[str]]
+    plugin: Optional[List[str]]
+
+
+class ModuleCache:
+    def __init__(self) -> None:
+        self.nb_cli_directory = Path.home() / ".nb_cli"
+        self.nb_cli_directory.mkdir(parents=True, exist_ok=True)
+        self.cache: CacheDict = self._load_cache()
+
+    def _load_cache(self) -> CacheDict:
+        cache: CacheDict = {
+            "adapter": None,
+            "driver": None,
+            "plugin": None,
+        }
+        for module_name in cache.keys():
+            file_path = self.nb_cli_directory / f"{module_name}s.txt"
+            if file_path.is_file():
+                cache[module_name] = list(map(lambda x: x.strip(), file_path.read_text().split("\n")))  # type: ignore
+
+        return cache
+
+    def get_cache(self, module_name: str) -> Optional[List[str]]:
+        module_name = module_name.lower()
+        if module_name not in self.cache:
+            return None
+        return self.cache[module_name]  # type: ignore
+
+    def flush_cache(self, module_name: str, module_cache: List[str]) -> None:
+        module_name = module_name.lower()
+        if module_cache is None or module_name not in self.cache:
+            return None
+
+        self.cache[module_name] = module_cache  # type: ignore
+        file_path = self.nb_cli_directory / f"{module_name}s.txt"
+        file_path.write_text(data="\n".join(module_cache))
+
+
+Cache: ModuleCache = ModuleCache()

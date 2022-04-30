@@ -1,5 +1,6 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 
+from prompt_toolkit.completion import WordCompleter, FuzzyWordCompleter
 from prompt_toolkit.styles import Style
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout import Layout
@@ -13,6 +14,7 @@ from prompt_toolkit.layout.containers import HSplit, Window
 from prompt_toolkit.key_binding import KeyBindings, KeyPressEvent
 
 from . import NoAnswer, BasePrompt
+from ..utils import Cache
 
 
 class InputPrompt(BasePrompt[str]):
@@ -38,6 +40,8 @@ class InputPrompt(BasePrompt[str]):
         self.validator: Optional[Callable[[str], bool]] = validator
 
     def _reset(self):
+        candidates: List[str] = Cache.get_cache(self.question.split(" ")[0].lower())
+        completer = FuzzyWordCompleter(candidates if candidates is not None else [])
         self._answered: bool = False
         self._buffer: Buffer = Buffer(
             name=DEFAULT_BUFFER,
@@ -45,6 +49,7 @@ class InputPrompt(BasePrompt[str]):
             if self.validator
             else None,
             accept_handler=self._submit,
+            completer=completer, complete_while_typing=True
         )
 
     def _build_layout(self) -> Layout:

@@ -7,12 +7,12 @@ from cookiecutter.main import cookiecutter
 
 from ._config import JSONConfig, TOMLConfig
 from .utils import (
-    Plugin,
     default_style,
     _get_modules,
     _get_module,
     _search_module,
 )
+from ..utils import Plugin
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 
