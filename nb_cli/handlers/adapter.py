@@ -7,13 +7,13 @@ from cookiecutter.main import cookiecutter
 
 from ._pip import _call_pip_update, _call_pip_install
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt
+from nb_cli.utils import Adapter
 from .utils import (
     default_style,
     _get_module,
     _get_modules,
     _search_module,
 )
-from ..utils import Adapter
 
 
 def adapter_no_subcommand(add_back: bool = False) -> bool:

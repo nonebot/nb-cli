@@ -75,7 +75,11 @@ def _get_modules(module_type: Type[T]) -> List[T]:
             try:
                 resp = future.result()
                 items = resp.json()
-                Cache.flush_cache(module_name, [item['module_name'] for item in items] + [item['name'] for item in items])
+                Cache.flush_cache(
+                    module_name,
+                    [item["module_name"] for item in items]
+                    + [item["name"] for item in items],
+                )
                 return list(map(lambda x: module_type(**x), items))
             except httpx.RequestError as e:
                 click.secho(
@@ -130,9 +134,9 @@ def _search_module(module_type: Type[T], package: Optional[str] = None) -> bool:
 
     _package: str
     if package is None:
-        _package = InputPrompt(f"{module_name} name you want to search?").prompt(
-            style=default_style
-        )
+        _package = InputPrompt(
+            f"{module_name} name you want to search?"
+        ).prompt(style=default_style)
     else:
         _package = package
     modules = _get_modules(module_type)

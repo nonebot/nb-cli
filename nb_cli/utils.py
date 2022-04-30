@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, TypedDict
+from typing import List, Optional, Mapping
 
 import click
 from prompt_toolkit.styles import Style
@@ -119,20 +119,14 @@ class Driver(BaseModel):
     desc: str
 
 
-class CacheDict(TypedDict):
-    adapter: Optional[List[str]]
-    driver: Optional[List[str]]
-    plugin: Optional[List[str]]
-
-
 class ModuleCache:
     def __init__(self) -> None:
         self.nb_cli_directory = Path.home() / ".nb_cli"
         self.nb_cli_directory.mkdir(parents=True, exist_ok=True)
-        self.cache: CacheDict = self._load_cache()
+        self.cache: Mapping[str, Optional[List[str]]] = self._load_cache()
 
-    def _load_cache(self) -> CacheDict:
-        cache: CacheDict = {
+    def _load_cache(self) -> Mapping[str, Optional[List[str]]]:
+        cache: Mapping[str, Optional[List[str]]] = {
             "adapter": None,
             "driver": None,
             "plugin": None,
@@ -140,7 +134,9 @@ class ModuleCache:
         for module_name in cache.keys():
             file_path = self.nb_cli_directory / f"{module_name}s.txt"
             if file_path.is_file():
-                cache[module_name] = list(map(lambda x: x.strip(), file_path.read_text().split("\n")))  # type: ignore
+                cache[module_name] = list(
+                    map(lambda x: x.strip(), file_path.read_text().split("\n"))
+                )
 
         return cache
 
@@ -148,14 +144,14 @@ class ModuleCache:
         module_name = module_name.lower()
         if module_name not in self.cache:
             return None
-        return self.cache[module_name]  # type: ignore
+        return self.cache[module_name]
 
     def flush_cache(self, module_name: str, module_cache: List[str]) -> None:
         module_name = module_name.lower()
         if module_cache is None or module_name not in self.cache:
             return None
 
-        self.cache[module_name] = module_cache  # type: ignore
+        self.cache[module_name] = module_cache
         file_path = self.nb_cli_directory / f"{module_name}s.txt"
         file_path.write_text(data="\n".join(module_cache))
 

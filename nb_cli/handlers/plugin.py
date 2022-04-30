@@ -12,7 +12,7 @@ from .utils import (
     _get_module,
     _search_module,
 )
-from ..utils import Plugin
+from nb_cli.utils import Plugin
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 

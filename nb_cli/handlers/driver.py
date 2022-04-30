@@ -3,13 +3,13 @@ from typing import List, Callable, Optional
 
 from ._pip import _call_pip_install
 from nb_cli.prompts import Choice, ListPrompt
+from nb_cli.utils import Driver
 from .utils import (
     default_style,
     _get_module,
     _get_modules,
     _search_module,
 )
-from ..utils import Driver
 
 
 def _get_drivers() -> List[Driver]:

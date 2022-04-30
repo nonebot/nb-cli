@@ -40,8 +40,12 @@ class InputPrompt(BasePrompt[str]):
         self.validator: Optional[Callable[[str], bool]] = validator
 
     def _reset(self):
-        candidates: List[str] = Cache.get_cache(self.question.split(" ")[0].lower())
-        completer = FuzzyWordCompleter(candidates if candidates is not None else [])
+        candidates: List[str] = Cache.get_cache(
+            self.question.split(" ")[0].lower()
+        )
+        completer = FuzzyWordCompleter(
+            candidates if candidates is not None else []
+        )
         self._answered: bool = False
         self._buffer: Buffer = Buffer(
             name=DEFAULT_BUFFER,
@@ -49,7 +53,8 @@ class InputPrompt(BasePrompt[str]):
             if self.validator
             else None,
             accept_handler=self._submit,
-            completer=completer, complete_while_typing=True
+            completer=completer,
+            complete_while_typing=True,
         )
 
     def _build_layout(self) -> Layout:
