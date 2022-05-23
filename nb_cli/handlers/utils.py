@@ -88,7 +88,7 @@ def _get_modules(module_type: Type[T]) -> List[T]:
 
     urls = [
         f"https://v2.nonebot.dev/{module_name}s.json",
-        f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/{module_name}s.json",
+        f"https://fastly.jsdelivr.net/gh/nonebot/nonebot2/website/static/{module_name}s.json",
     ]
     with ThreadPoolExecutor(max_workers=5) as executor:
         tasks = [executor.submit(httpx.get, url) for url in urls]
