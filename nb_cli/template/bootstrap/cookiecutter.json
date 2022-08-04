@@ -1,0 +1,14 @@
+{
+  "py": "py",
+  "project_name": "AwesomeBot",
+  "project_slug": "{{ cookiecutter.project_name|replace(' ', '-') }}",
+  "project_desc": "{{ cookiecutter.project_name }}",
+  "use_src": false,
+  "source_dir": "{{ 'src' if cookiecutter.use_src == 'True' else cookiecutter.project_slug|lower|replace('-', '_') }}",
+  "adapters": {
+    "builtin": []
+  },
+  "plugins": {
+    "builtin": []
+  }
+}
