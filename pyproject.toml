@@ -27,14 +27,14 @@ pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
 httpx = ">=0.18.0, <1.0.0"
 prompt-toolkit = "^3.0.19"
-nonebot2 = "^2.0.0-beta.1"
 docker-compose = { version = "~1.29.2", optional = true }
+watchfiles = "^0.16.1"
+pydantic = "^1.9.1"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
 black = "^22.3.0"
 pre-commit = "^2.18.1"
-nonebot2 = { git = "https://github.com/nonebot/nonebot2" }
 
 [tool.poetry.extras]
 deploy = ["docker-compose"]
