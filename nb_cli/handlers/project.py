@@ -2,7 +2,6 @@ from typing import List
 from pathlib import Path
 
 import click
-import nonebot
 from cookiecutter.main import cookiecutter
 
 from nb_cli.utils import default_style
@@ -79,7 +78,7 @@ def create_project() -> bool:
         else:
             confirm = True
     cookiecutter(
-        str((Path(__file__).parent.parent / "project").resolve()),
+        str((Path(__file__).parent.parent / "template" / "project").resolve()),
         no_input=True,
         extra_context=answers,
     )

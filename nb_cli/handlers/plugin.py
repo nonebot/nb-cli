@@ -74,7 +74,9 @@ def create_plugin(
             default_choice=False,
         ).prompt(style=default_style)
         cookiecutter(
-            str((Path(__file__).parent.parent / "plugin").resolve()),
+            str(
+                (Path(__file__).parent.parent / "template" / "plugin").resolve()
+            ),
             no_input=True,
             output_dir=plugin_dir,
             extra_context={"plugin_name": name, "sub_plugin": sub_plugin},

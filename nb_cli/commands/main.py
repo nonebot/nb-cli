@@ -25,6 +25,6 @@ def init():
     show_default=True,
     help="ASGI application of your bot",
 )
-def run(file, app):
+def run():
     """Run the Bot in Current Folder."""
-    run_bot(file, app)
+    run_bot()

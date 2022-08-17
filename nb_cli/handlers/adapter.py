@@ -71,7 +71,7 @@ def create_adapter(
         ).prompt(style=default_style)
 
     cookiecutter(
-        str((Path(__file__).parent.parent / "adapter").resolve()),
+        str((Path(__file__).parent.parent / "template" / "adapter").resolve()),
         no_input=True,
         output_dir=adapter_dir,
         extra_context={
