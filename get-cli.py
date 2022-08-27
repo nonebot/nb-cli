@@ -14,26 +14,22 @@ It does, in order:
     is restored.
 """
 
-import argparse
-import json
 import os
 import re
-import shutil
-import site
-import subprocess
 import sys
-import sysconfig
+import json
+import site
+import shutil
+import argparse
 import tempfile
-
-from contextlib import closing
-from contextlib import contextmanager
+import sysconfig
+import subprocess
+from pathlib import Path
 from functools import cmp_to_key
 from io import UnsupportedOperation
-from pathlib import Path
 from typing import Iterator, Optional
-from urllib.request import Request
-from urllib.request import urlopen
-
+from urllib.request import Request, urlopen
+from contextlib import closing, contextmanager
 
 SHELL = os.getenv("SHELL", "")
 WINDOWS = sys.platform.startswith("win") or (

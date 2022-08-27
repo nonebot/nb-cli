@@ -1,12 +1,11 @@
 from pathlib import Path
 from typing import Set, List
+
 import tomlkit
 from pydantic import BaseSettings
-from nb_cli.handlers._config import (
-    TOMLConfig,
-    JSONConfig,
-)
+
 from nb_cli.utils import DATA_DIR
+from nb_cli.handlers._config import JSONConfig, TOMLConfig
 
 
 class Config(BaseSettings):

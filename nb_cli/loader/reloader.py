@@ -1,6 +1,6 @@
 import os
-import platform
 import signal
+import platform
 import threading
 from pathlib import Path
 from types import FrameType
