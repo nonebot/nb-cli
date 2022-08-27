@@ -6,6 +6,7 @@ import click
 from cookiecutter.main import cookiecutter
 
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt, ConfirmPrompt
+from nb_cli.config import ConfigManager
 
 from ._config import JSONConfig, TOMLConfig
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
@@ -107,14 +108,7 @@ def install_plugin(
     status = _call_pip_install(plugin.project_link, index)
     if status == 0:  # SUCCESS
         try:
-            if Path(file).suffix == ".toml":
-                config = TOMLConfig(file)
-            elif Path(file).suffix == ".json":
-                config = JSONConfig(file)
-            else:
-                raise ValueError(
-                    "Unknown config file format! Expect 'json' / 'toml'."
-                )
+            config = ConfigManager.get_local_config(file)
             config.add_plugin(plugin.module_name)
         except Exception as e:
             click.secho(repr(e), fg="red")
@@ -139,14 +133,7 @@ def uninstall_plugin(
     status = _call_pip_uninstall(plugin.project_link)
     if status == 0:  # SUCCESS
         try:
-            if Path(file).suffix == ".toml":
-                config = TOMLConfig(file)
-            elif Path(file).suffix == ".json":
-                config = JSONConfig(file)
-            else:
-                raise ValueError(
-                    "Unknown config file format! Expect 'json' / 'toml'."
-                )
+            config = ConfigManager.get_local_config(file)
             config.remove_plugin(plugin.module_name)
         except Exception as e:
             click.secho(repr(e), fg="red")
