@@ -15,3 +15,5 @@ nb-cli = "^0.6.0"
 [tool.nonebot]
 plugins = []
 plugin_dirs = ["{{ cookiecutter.source_dir }}/plugins"]
+adapters = []
+builtin_plugins = []
