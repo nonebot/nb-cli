@@ -38,7 +38,7 @@ class Config(abc.ABC):
     @abc.abstractmethod
     def add_adapter(self, adapter_name: str):
         raise NotImplementedError
-    
+
     @abc.abstractmethod
     def add_builtin_plugin(self, plugin_name: str):
         raise NotImplementedError
@@ -50,6 +50,7 @@ class Config(abc.ABC):
     @abc.abstractmethod
     def remove_builtin_plugin(self, plugin_name: str):
         raise NotImplementedError
+
 
 class TOMLConfig(Config):
     def __init__(self, file: str):
@@ -133,7 +134,7 @@ class TOMLConfig(Config):
     def add_adapter(self, adapter_name: str):
         data = self._get_data()
         self._validate(data)
-        adapters: Array = data["tool"]["nonebot"]["adapters"] # type: ignore
+        adapters: Array = data["tool"]["nonebot"]["adapters"]  # type: ignore
         if adapter_name not in adapters:
             adapters.append(adapter_name)
         self._write_data(data)
@@ -141,7 +142,7 @@ class TOMLConfig(Config):
     def add_builtin_plugin(self, plugin_name: str):
         data = self._get_data()
         self._validate(data)
-        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"] # type: ignore
+        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"]  # type: ignore
         if plugin_name not in builtin_plugins:
             builtin_plugins.append(plugin_name)
         self._write_data(data)
@@ -149,14 +150,14 @@ class TOMLConfig(Config):
     def remove_adapter(self, adapter_name: str):
         data = self._get_data()
         self._validate(data)
-        adapters: Array = data["tool"]["nonebot"]["adapters"] # type: ignore
+        adapters: Array = data["tool"]["nonebot"]["adapters"]  # type: ignore
         adapters.remove(adapter_name)
         self._write_data(data)
 
     def remove_builtin_plugin(self, plugin_name: str):
         data = self._get_data()
         self._validate(data)
-        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"] # type: ignore
+        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"]  # type: ignore
         builtin_plugins.remove(plugin_name)
         self._write_data(data)
 

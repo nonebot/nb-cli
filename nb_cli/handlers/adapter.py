@@ -4,8 +4,8 @@ from typing import List, Callable, Optional
 
 import click
 from cookiecutter.main import cookiecutter
-from nb_cli.config import ConfigManager
 
+from nb_cli.config import ConfigManager
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt
 
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall

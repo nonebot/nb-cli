@@ -1,7 +1,7 @@
 import click
-from nb_cli.handlers.adapter import uninstall_adapter
 
 from nb_cli.utils import ClickAliasedGroup
+from nb_cli.handlers.adapter import uninstall_adapter
 from nb_cli.handlers import (
     create_adapter,
     search_adapter,
