@@ -34,9 +34,16 @@ def search(name):
 @adapter.command(aliases=["add"])
 @click.option("-i", "--index", default=None)
 @click.argument("name", nargs=1, required=False)
-def install(name, index):
+@click.option(
+    "-c",
+    "--config",
+    default="pyproject.toml",
+    show_default=True,
+    help="Config file of your bot",
+)
+def install(name, index, config):
     """Install nonebot adapter."""
-    install_adapter(name, index)
+    install_adapter(name, index, config)
 
 
 @adapter.command()

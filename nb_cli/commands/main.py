@@ -19,12 +19,12 @@ def init():
     help="Entry file of your bot",
 )
 @click.option(
-    "-a",
-    "--app",
-    default="app",
+    "-c",
+    "--config",
+    default="pyproject.toml",
     show_default=True,
-    help="ASGI application of your bot",
+    help="Config file of your bot",
 )
-def run():
+def run(file, config):
     """Run the Bot in Current Folder."""
-    run_bot()
+    run_bot(file, config)
