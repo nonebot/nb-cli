@@ -4,10 +4,11 @@ from typing import List, Callable, Optional
 
 import click
 from cookiecutter.main import cookiecutter
+from nb_cli.config import ConfigManager
 
 from nb_cli.prompts import Choice, ListPrompt, InputPrompt
 
-from ._pip import _call_pip_update, _call_pip_install
+from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 from .utils import (
     Adapter,
     _get_module,
@@ -90,11 +91,15 @@ def search_adapter(package: Optional[str] = None) -> bool:
 
 
 def install_adapter(
-    package: Optional[str] = None, index: Optional[str] = None
+    package: Optional[str] = None,
+    index: Optional[str] = None,
+    config: str = "pyproject.toml",
 ) -> bool:
     adapter = _get_adapter(package, "Adapter name you want to install?")
     if adapter:
         _call_pip_install(adapter.project_link, index)
+        local_config = ConfigManager.get_local_config(config)
+        local_config.add_adapter(adapter.module_name)
     return True
 
 
@@ -104,6 +109,22 @@ def update_adapter(
     adapter = _get_adapter(package, "Adapter name you want to update?")
     if adapter:
         _call_pip_update(adapter.project_link, index)
+    return True
+
+
+def uninstall_adapter(
+    package: Optional[str] = None, file: str = "pyproject.toml"
+) -> bool:
+    adapter = _get_adapter(package, "Adapter name you want to uninstall?")
+    if not adapter:
+        return True
+    status = _call_pip_uninstall(adapter.project_link)
+    if status == 0:  # SUCCESS
+        try:
+            config = ConfigManager.get_local_config(file)
+            config.remove_adapter(adapter.project_link)
+        except Exception as e:
+            click.secho(repr(e), fg="red")
     return True
 
 

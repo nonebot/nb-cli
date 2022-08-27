@@ -1,4 +1,5 @@
 import click
+from nb_cli.handlers.adapter import uninstall_adapter
 
 from nb_cli.utils import ClickAliasedGroup
 from nb_cli.handlers import (
@@ -52,6 +53,20 @@ def install(name, index, config):
 def update(name, index):
     """Update nonebot adapter."""
     update_adapter(name, index)
+
+
+@adapter.command(aliases=["remove"])
+@click.option(
+    "-f",
+    "--file",
+    default="pyproject.toml",
+    show_default=True,
+    help="Adapter loading file of your bot",
+)
+@click.argument("name", nargs=1)
+def uninstall(name, file):
+    """Uninstall nonebot plugin from current project."""
+    uninstall_adapter(name, file)
 
 
 @adapter.command(aliases=["create"])

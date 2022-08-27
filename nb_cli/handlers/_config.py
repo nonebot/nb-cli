@@ -27,6 +27,29 @@ class Config(abc.ABC):
     def remove_plugin_dir(self, dir_name: str):
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def get_adapters(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_builtin_plugins(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def add_adapter(self, adapter_name: str):
+        raise NotImplementedError
+    
+    @abc.abstractmethod
+    def add_builtin_plugin(self, plugin_name: str):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def remove_adapter(self, adapter_name: str):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def remove_builtin_plugin(self, plugin_name: str):
+        raise NotImplementedError
 
 class TOMLConfig(Config):
     def __init__(self, file: str):
@@ -95,6 +118,48 @@ class TOMLConfig(Config):
         plugin_dirs.remove(dir_name)
         self._write_data(data)
 
+    def get_adapters(self):
+        data = self._get_data()
+        self._validate(data)
+        adapters: Array = data["tool"]["nonebot"]["adapters"]  # type: ignore
+        return adapters
+
+    def get_builtin_plugins(self):
+        data = self._get_data()
+        self._validate(data)
+        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"]  # type: ignore
+        return builtin_plugins
+
+    def add_adapter(self, adapter_name: str):
+        data = self._get_data()
+        self._validate(data)
+        adapters: Array = data["tool"]["nonebot"]["adapters"] # type: ignore
+        if adapter_name not in adapters:
+            adapters.append(adapter_name)
+        self._write_data(data)
+
+    def add_builtin_plugin(self, plugin_name: str):
+        data = self._get_data()
+        self._validate(data)
+        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"] # type: ignore
+        if plugin_name not in builtin_plugins:
+            builtin_plugins.append(plugin_name)
+        self._write_data(data)
+
+    def remove_adapter(self, adapter_name: str):
+        data = self._get_data()
+        self._validate(data)
+        adapters: Array = data["tool"]["nonebot"]["adapters"] # type: ignore
+        adapters.remove(adapter_name)
+        self._write_data(data)
+
+    def remove_builtin_plugin(self, plugin_name: str):
+        data = self._get_data()
+        self._validate(data)
+        builtin_plugins: Array = data["tool"]["nonebot"]["builtin_plugins"] # type: ignore
+        builtin_plugins.remove(plugin_name)
+        self._write_data(data)
+
 
 class JSONConfig(Config):
     def __init__(self, file: str):
@@ -149,4 +214,46 @@ class JSONConfig(Config):
         self._validate(data)
         plugin_dirs: list = data["plugin_dir"]
         plugin_dirs.remove(dir_name)
+        self._write_data(data)
+
+    def get_adapters(self):
+        data = self._get_data()
+        self._validate(data)
+        adapters: list = data["adapters"]
+        return adapters
+
+    def get_builtin_plugins(self):
+        data = self._get_data()
+        self._validate(data)
+        builtin_plugins: list = data["builtin_plugins"]
+        return builtin_plugins
+
+    def add_adapter(self, adapter_name: str):
+        data = self._get_data()
+        self._validate(data)
+        adapters: list = data["adapters"]
+        if adapter_name not in adapters:
+            adapters.append(adapter_name)
+        self._write_data(data)
+
+    def add_builtin_plugin(self, plugin_name: str):
+        data = self._get_data()
+        self._validate(data)
+        builtin_plugins: list = data["builtin_plugins"]
+        if plugin_name not in builtin_plugins:
+            builtin_plugins.append(plugin_name)
+        self._write_data(data)
+
+    def remove_adapter(self, adapter_name: str):
+        data = self._get_data()
+        self._validate(data)
+        adapters: list = data["adapters"]
+        adapters.remove(adapter_name)
+        self._write_data(data)
+
+    def remove_builtin_plugin(self, plugin_name: str):
+        data = self._get_data()
+        self._validate(data)
+        builtin_plugins: list = data["builtin_plugins"]
+        builtin_plugins.remove(plugin_name)
         self._write_data(data)
