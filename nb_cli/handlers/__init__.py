@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, List, Callable
+from typing import List, Callable
 
 import click
 from pyfiglet import figlet_format
