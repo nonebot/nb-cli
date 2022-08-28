@@ -10,6 +10,12 @@ def init():
     create_project()
 
 
+@click.command(cls=ClickAliasedCommand, aliases=["bootstrap"])
+def bootstrap():
+    """Bootstrap a NoneBot Project."""
+    create_project("bootstrap")
+
+
 @click.command(cls=ClickAliasedCommand, aliases=["start"])
 @click.option(
     "-f",

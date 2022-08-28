@@ -36,7 +36,7 @@ def _get_builtin_plugins() -> List[str]:
         return []
 
 
-def create_project() -> bool:
+def create_project(type_: str = "project") -> bool:
     click.secho("Loading adapters...")
     adapters = {x.name: x for x in _get_adapters()}
     click.clear()
@@ -86,8 +86,17 @@ def create_project() -> bool:
             ).prompt(style=default_style)
         else:
             confirm = True
+
+    if type_ == "bootstrap":
+        template = str(
+            (Path(__file__).parent.parent / "template" / "bootstrap").resolve()
+        )
+    else:
+        template = str(
+            (Path(__file__).parent.parent / "template" / "project").resolve()
+        )
     cookiecutter(
-        str((Path(__file__).parent.parent / "template" / "project").resolve()),
+        template,
         no_input=True,
         extra_context=answers,
     )
