@@ -456,6 +456,28 @@ optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*"
 
 [[package]]
+name = "nonemoji"
+version = "0.1.2"
+description = "Simple gitmoji cli written in python"
+category = "dev"
+optional = false
+python-versions = ">=3.7.3,<4.0.0"
+
+[package.dependencies]
+noneprompt = ">=0.1.3,<0.2.0"
+
+[[package]]
+name = "noneprompt"
+version = "0.1.4"
+description = "Prompt toolkit for console interaction"
+category = "dev"
+optional = false
+python-versions = ">=3.7.3,<4.0.0"
+
+[package.dependencies]
+prompt-toolkit = ">=3.0.19,<4.0.0"
+
+[[package]]
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
@@ -843,7 +865,7 @@ docker = ["docker-compose"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.3"
-content-hash = "ef16a8ae04d645c637bc3c3c26af82505823122a7452444d0e5ac3852f836736"
+content-hash = "ad223a2965f84bed4a624dd296a9a736438123660ebe009c3a9e993d01fa5b7a"
 
 [metadata.files]
 anyio = [
@@ -1138,6 +1160,14 @@ mypy-extensions = [
 nodeenv = [
     {file = "nodeenv-1.7.0-py2.py3-none-any.whl", hash = "sha256:27083a7b96a25f2f5e1d8cb4b6317ee8aeda3bdd121394e5ac54e498028a042e"},
     {file = "nodeenv-1.7.0.tar.gz", hash = "sha256:e0e7f7dfb85fc5394c6fe1e8fa98131a2473e04311a45afb6508f7cf1836fa2b"},
+]
+nonemoji = [
+    {file = "nonemoji-0.1.2-py3-none-any.whl", hash = "sha256:bb54ff9940e97fdbe530caf531ac5dd885f0b809757b02bbca0d7f1d0b50d1fe"},
+    {file = "nonemoji-0.1.2.tar.gz", hash = "sha256:f7b4101510bb8c6bbd25986962317fb30e5fb1f92adbc337b115154224c1b055"},
+]
+noneprompt = [
+    {file = "noneprompt-0.1.4-py3-none-any.whl", hash = "sha256:0c2c568e52067d9cf28bbc0b9b84cbcac02859a1de01e2b9ae5ce759a7eb1b21"},
+    {file = "noneprompt-0.1.4.tar.gz", hash = "sha256:de31010f992e2790ee6d8d4ad1bae0826bd1701ca9257356a716b8cc7b633028"},
 ]
 packaging = [
     {file = "packaging-21.3-py3-none-any.whl", hash = "sha256:ef103e05f519cdc783ae24ea4e2e0f508a9c99b2d4969652eed6a2e1ea5bd522"},
