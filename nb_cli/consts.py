@@ -29,6 +29,11 @@ LOAD_BUILTIN_PLUGIN_TEMPLATE = """\
 nonebot.load_builtin_plugins("{name}")
 """
 
+GET_BUILTIN_PLUGINS_SCRIPT = """\
+import nonebot
+print(nonebot.__path__[0])
+"""
+
 SHELL = os.getenv("SHELL", "")
 WINDOWS = sys.platform.startswith("win") or (
     sys.platform == "cli" and os.name == "nt"

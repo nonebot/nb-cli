@@ -5,6 +5,8 @@ import click
 from cookiecutter.main import cookiecutter
 
 from nb_cli.utils import default_style
+from nb_cli.loader.utils import run_script
+from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
 from nb_cli.prompts import (
     Choice,
     ListPrompt,
@@ -19,11 +21,18 @@ from ._pip import _call_pip_install
 
 def _get_builtin_plugins() -> List[str]:
     try:
-        plugin_dir = Path(nonebot.__path__[0]) / "plugins"  # type: ignore
+        nonebot_path = run_script(
+            ["python", "-W", "ignore", "-"],
+            input_=GET_BUILTIN_PLUGINS_SCRIPT,
+            capture_output=True,
+        )
+        if isinstance(nonebot_path, bytes):
+            nonebot_path = nonebot_path.decode("utf-8")
+        plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
         if not plugin_dir.is_dir():
             return []
         return [file.stem for file in plugin_dir.glob("*.py")]
-    except Exception:
+    except Exception as e:
         return []
 
 

@@ -76,7 +76,7 @@ def encode(string: str, encodings: Union[List[str], None] = None) -> bytes:
     return string.encode(encodings[0], errors="ignore")
 
 
-def run_script(cmd: list[str], **kwargs: Any) -> Union[int, str, None]:
+def run_script(cmd: list[str], **kwargs: Any) -> Union[int, str, bytes, None]:
     """
     Run a command inside the Python environment.
     """
