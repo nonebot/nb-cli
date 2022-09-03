@@ -36,6 +36,7 @@ isort = "^5.10.1"
 black = "^22.3.0"
 pre-commit = "^2.18.1"
 nonemoji = "^0.1.2"
+nb-autodoc = { git = "https://github.com/nonebot/nb-autodoc.git" }
 
 [tool.poetry.extras]
 deploy = ["docker-compose"]
