@@ -4,8 +4,7 @@ from pathlib import Path
 import click
 from cookiecutter.main import cookiecutter
 
-from nb_cli.utils import default_style
-from nb_cli.loader.utils import run_script
+from nb_cli.utils import run_script, default_style
 from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
 from nb_cli.prompts import (
     Choice,

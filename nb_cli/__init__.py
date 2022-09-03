@@ -3,6 +3,7 @@ import sys
 import click
 import pkg_resources
 
+from nb_cli.commands.config import config
 from nb_cli.commands.driver import driver
 from nb_cli.commands.plugin import plugin
 from nb_cli.utils import ClickAliasedGroup
@@ -39,6 +40,7 @@ main.add_command(init)
 main.add_command(bootstrap)
 main.add_command(run)
 
+main.add_command(config)
 main.add_command(build)
 main.add_command(deploy)
 main.add_command(exit)

@@ -4,10 +4,9 @@ import platform
 import subprocess
 from typing import Dict, Optional
 
+from nb_cli.utils import gen_script
+from nb_cli.config import LocalConfig
 from nb_cli.config import Config as GlobalConfig
-from nb_cli.handlers._config import Config as LocalConfig
-
-from .utils import gen_script
 
 
 class NoneBotProcess:
