@@ -1,6 +1,6 @@
 import shutil
-from typing import List, Type, Union, TypeVar, Optional, cast
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, List, Type, TypeVar, Callable, Optional, cast
 
 import click
 import httpx
@@ -32,6 +32,21 @@ class Driver(BaseModel):
     project_link: str
     name: str
     desc: str
+
+
+def boolean_normalizer(val: str) -> bool:
+    return val in ["true", "1"]
+
+
+def int_normalizer(val: str) -> int:
+    return int(val)
+
+
+def get_normalizer(name: str) -> Callable[[str], Any]:
+    if name in {"reload"}:
+        return boolean_normalizer
+
+    return lambda val: val
 
 
 def print_package_results(

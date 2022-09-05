@@ -6,7 +6,6 @@ from typing import Dict, Optional
 
 from nb_cli.utils import gen_script
 from nb_cli.config import LocalConfig
-from nb_cli.config import Config as GlobalConfig
 
 
 class NoneBotProcess:
@@ -14,12 +13,10 @@ class NoneBotProcess:
 
     def __init__(
         self,
-        global_config: GlobalConfig,
         config: LocalConfig,
         file: Optional[str] = None,
     ):
         self.config = config
-        self.global_config = global_config
         self.file: Optional[str] = file
 
     def _process_executor(self) -> int:
@@ -30,7 +27,7 @@ class NoneBotProcess:
         )
         ProcessManager.add(self)
         if self.process.stdin:
-            if self.global_config.reload:
+            if self.config.get("reload"):
                 self.process.stdin.write(
                     gen_script(
                         self.config.get_adapters(),

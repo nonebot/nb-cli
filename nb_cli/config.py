@@ -1,10 +1,9 @@
 import abc
 import json
+from typing import Any
 from pathlib import Path
-from typing import Set, List
 
 import tomlkit
-from pydantic import BaseSettings
 from tomlkit.items import Array, Table
 from tomlkit.toml_document import TOMLDocument
 
@@ -14,6 +13,22 @@ from nb_cli.utils import DATA_DIR
 class LocalConfig(abc.ABC):
     def __init__(self, *args, **kwargs):
         pass
+
+    @abc.abstractmethod
+    def list(self) -> Any:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get(self, key: str):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def update(self, key: str, value: Any):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def unset(self, key: str):
+        raise NotImplementedError
 
     @abc.abstractmethod
     def add_plugin(self, plugin_name: str):
@@ -88,6 +103,29 @@ class TOMLConfig(LocalConfig):
             raise ValueError(
                 "'tool.nonebot.plugin_dirs' in toml file is not a Array!"
             )
+
+    def list(self):
+        data = self._get_data()
+        self._validate(data)
+        print(data["tool"]["nonebot"])  # type: ignore
+
+    def get(self, key: str):
+        data = self._get_data()
+        self._validate(data)
+        value = data["tool"]["nonebot"].get(key)  # type: ignore
+        return value
+
+    def update(self, key: str, value: Any):
+        data = self._get_data()
+        self._validate(data)
+        data["tool"]["nonebot"][key] = value  # type: ignore
+        self._write_data(data)
+
+    def unset(self, key: str):
+        data = self._get_data()
+        self._validate(data)
+        del data["tool"]["nonebot"][key]  # type: ignore
+        self._write_data(data)
 
     def add_plugin(self, plugin_name: str):
         data = self._get_data()
@@ -191,6 +229,29 @@ class JSONConfig(LocalConfig):
         if not isinstance(plugin_dirs, list):
             raise ValueError("'plugin_dirs' is not a list!")
 
+    def list(self):
+        data = self._get_data()
+        self._validate(data)
+        print(data)
+
+    def get(self, key: str):
+        data = self._get_data()
+        self._validate(data)
+        value = data.get(key)
+        return value
+
+    def update(self, key: str, value: Any):
+        data = self._get_data()
+        self._validate(data)
+        data[key] = value
+        self._write_data(data)
+
+    def unset(self, key: str):
+        data = self._get_data()
+        self._validate(data)
+        del data[key]
+        self._write_data(data)
+
     def add_plugin(self, plugin_name: str):
         data = self._get_data()
         self._validate(data)
@@ -264,6 +325,7 @@ class JSONConfig(LocalConfig):
         self._write_data(data)
 
 
+"""
 class Config(BaseSettings):
     reload: bool = False
     reload_dirs: List[Path] = []
@@ -274,9 +336,12 @@ class Config(BaseSettings):
     class Config:
         extra = "allow"
         env_prefix = "nb_cli_"
+"""
 
 
 class ConfigManager:
+    GLOBAL_CONFIG_PATH = (Path(DATA_DIR) / "config.toml").resolve()
+
     @classmethod
     def get_local_config(cls, file: str):
         if Path(file).suffix == ".toml":
@@ -290,13 +355,20 @@ class ConfigManager:
 
         return local_config
 
+
+"""
     @classmethod
     def get_global_config(cls):
-        path = Path(DATA_DIR) / "config.toml"
-        if not path.exists():
-            with open(path, "w") as f:
+        if not cls.GLOBAL_CONFIG_PATH.exists():
+            with open(cls.GLOBAL_CONFIG_PATH, "w") as f:
                 return Config()
         else:
-            with open(path, "r") as f:
+            with open(cls.GLOBAL_CONFIG_PATH, "r") as f:
                 data = tomlkit.parse(f.read())
                 return Config(**data)
+
+    @classmethod
+    def set_global_config(cls, config):
+        with open(cls.GLOBAL_CONFIG_PATH, "w") as f:
+            f.write(tomlkit.dumps(config.dict()))
+"""

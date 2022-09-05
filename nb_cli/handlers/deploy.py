@@ -10,17 +10,16 @@ from nb_cli.loader.reloader import WatchFilesReload
 from ._docker import _call_docker_compose
 
 
-def run_bot(file: str = "bot.py", config: str = "pyproject.toml") -> bool:
-    local_config = ConfigManager.get_local_config(config)
-    global_config = ConfigManager.get_global_config()
+def run_bot(script: str = "bot.py", file: str = "pyproject.toml") -> bool:
+    config = ConfigManager.get_local_config(file)
 
-    if os.path.isfile(file):
-        process = NoneBotProcess(global_config, local_config, file)
+    if os.path.isfile(script):
+        process = NoneBotProcess(config, script)
     else:
-        process = NoneBotProcess(global_config, local_config)
+        process = NoneBotProcess(config)
 
-    if global_config.reload:
-        WatchFilesReload(global_config, process).run()
+    if config.get("reload"):
+        WatchFilesReload(config, process).run()
     else:
         process.run()
 

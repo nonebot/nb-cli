@@ -9,7 +9,7 @@ from typing import List, Iterator, Optional
 import click
 from watchfiles import watch
 
-from nb_cli.config import Config
+from nb_cli.config import LocalConfig
 
 from .process import NoneBotProcess
 
@@ -20,24 +20,24 @@ HANDLED_SIGNALS = (
 
 
 class FileFilter:
-    def __init__(self, config: Config):
+    def __init__(self, config: LocalConfig):
         default_includes = ["*.py"]
         self.includes = [
             default
             for default in default_includes
-            if default not in config.reload_excludes
+            if default not in config.get("reload_excludes")
         ]
-        self.includes.extend(config.reload_includes)
+        self.includes.extend(config.get("reload_includes"))
         self.includes = list(set(self.includes))
 
         default_excludes = [".*", ".py[cod]", ".sw.*", "~*"]
         self.excludes = [
             default
             for default in default_excludes
-            if default not in config.reload_includes
+            if default not in config.get("reload_includes")
         ]
         self.exclude_dirs = []
-        for e in config.reload_excludes:
+        for e in config.get("reload_excludes"):
             p = Path(e)
             try:
                 is_dir = p.is_dir()
@@ -67,13 +67,13 @@ class FileFilter:
 
 
 class WatchFilesReload:
-    def __init__(self, config: Config, app: NoneBotProcess):
+    def __init__(self, config: LocalConfig, app: NoneBotProcess):
         self.pid = os.getpid()
         self.app = app
         self.reload_dirs = []
         self.should_exit = threading.Event()
         self.is_restarting = False
-        for directory in config.reload_dirs:
+        for directory in config.get("reload_dirs"):
             if Path.cwd() not in directory.parents:
                 self.reload_dirs.append(directory)
         if Path.cwd() not in self.reload_dirs:

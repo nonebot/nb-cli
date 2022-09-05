@@ -8,8 +8,8 @@ from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
 
 from .project import create_project
-from .generate import generate_script
 from .deploy import run_bot as run_bot
+from .config import update_config as update_config
 from .driver import search_driver as search_driver
 from .plugin import create_plugin as create_plugin
 from .plugin import search_plugin as search_plugin
@@ -21,6 +21,7 @@ from .adapter import search_adapter as search_adapter
 from .adapter import update_adapter as update_adapter
 from .adapter import install_adapter as install_adapter
 from .deploy import run_docker_image as run_docker_image
+from .generate import generate_script as generate_script
 from .plugin import uninstall_plugin as uninstall_plugin
 from .deploy import exit_docker_image as exit_docker_image
 from .deploy import build_docker_image as build_docker_image

@@ -1,6 +1,7 @@
 import click
 
 from nb_cli.config import ConfigManager
+from nb_cli.handlers import update_config
 from nb_cli.utils import ClickAliasedCommand
 
 
@@ -13,26 +14,29 @@ from nb_cli.utils import ClickAliasedCommand
     help="Config file of your bot",
 )
 @click.option(
-    "-g",
-    "--global",
-    "is_global",
+    "--list",
     is_flag=True,
     default=False,
     show_default=True,
-    help="Modify cli global config or bot local config",
+    help="List configuration settings",
 )
 @click.option(
-    "-l",
-    "--local",
-    "is_local",
+    "--unset",
     is_flag=True,
-    default=True,
+    default=False,
     show_default=True,
-    help="Modify cli global config or bot local config",
+    help="Unset configuration setting",
 )
-def config(file, is_global, is_local):
-    """Modify config file of your bot"""
-    if is_global:
-        config = ConfigManager.get_local_config(file)
-    elif is_local:
-        config = ConfigManager.get_global_config()
+@click.argument("key", nargs=1, required=False)
+@click.argument("value", nargs=1, required=False)
+def config(file, list, unset, key, value):
+    """Modify config file of your project"""
+    config = ConfigManager.get_local_config(file)
+
+    if list:
+        config.list()
+    elif unset:
+        update_config(config, key, None)
+    else:
+        if key is not None and value is not None:
+            update_config(config, key, value)
