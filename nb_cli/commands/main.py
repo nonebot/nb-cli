@@ -1,5 +1,3 @@
-from email.policy import default
-
 import click
 
 from nb_cli.utils import ClickAliasedCommand
@@ -7,15 +5,20 @@ from nb_cli.handlers import run_bot, create_project, generate_script
 
 
 @click.command(cls=ClickAliasedCommand, aliases=["create"])
-def init():
-    """Bootstrap a NoneBot Project."""
-    create_project("bootstrap")
-
-
-@click.command(cls=ClickAliasedCommand)
-def bootstrap():
-    """Create A NoneBot Project."""
-    create_project()
+@click.option(
+    "-f",
+    "--full",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Whether to use full project template or simplified one",
+)
+def init(full):
+    """Init a NoneBot Project."""
+    if full:
+        create_project()
+    else:
+        create_project("bootstrap")
 
 
 @click.command(cls=ClickAliasedCommand)

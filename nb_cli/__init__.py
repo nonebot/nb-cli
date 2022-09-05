@@ -9,8 +9,8 @@ from nb_cli.commands.plugin import plugin
 from nb_cli.utils import ClickAliasedGroup
 from nb_cli.commands.adapter import adapter
 from nb_cli.handlers import handle_no_subcommand
+from nb_cli.commands.main import run, init, generate
 from nb_cli.commands.deploy import exit, build, deploy
-from nb_cli.commands.main import run, init, generate, bootstrap
 
 sys.path.insert(0, ".")
 
@@ -37,7 +37,6 @@ def main(ctx: click.Context):
 
 
 main.add_command(init)
-main.add_command(bootstrap)
 main.add_command(generate)
 main.add_command(run)
 
