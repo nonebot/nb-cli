@@ -118,7 +118,7 @@ class TOMLConfig(LocalConfig):
         ]:
             self._validate_array(nonebot_data, key)
 
-        self._validate_bool(nonebot_data, "reload", False)
+        self._validate_bool(nonebot_data, "reload", "False")
 
     def list(self):
         data = self._get_data()
