@@ -8,6 +8,7 @@ from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
 
 from .project import create_project
+from .generate import generate_script
 from .deploy import run_bot as run_bot
 from .driver import search_driver as search_driver
 from .plugin import create_plugin as create_plugin
