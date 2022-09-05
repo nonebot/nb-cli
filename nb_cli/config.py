@@ -4,7 +4,7 @@ from typing import Any
 from pathlib import Path
 
 import tomlkit
-from tomlkit.items import Bool, Array, Table
+from tomlkit.items import Array, Table
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli.utils import DATA_DIR
@@ -100,7 +100,7 @@ class TOMLConfig(LocalConfig):
 
     def _validate_bool(self, data, key, default):
         updated_data = data.setdefault(key, tomlkit.boolean(default))
-        if not isinstance(updated_data, Bool):
+        if not isinstance(updated_data, bool):
             raise ValueError(f"'{key}' in toml file is not a Boolean!")
         return updated_data
 
@@ -109,6 +109,8 @@ class TOMLConfig(LocalConfig):
         nonebot_data = self._validate_table(tool_data, "tool")
 
         for key in [
+            "plugins",
+            "plugin_dirs",
             "adapters",
             "builtin_plugins",
             "reload_dirs",
@@ -118,7 +120,7 @@ class TOMLConfig(LocalConfig):
         ]:
             self._validate_array(nonebot_data, key)
 
-        self._validate_bool(nonebot_data, "reload", "False")
+        self._validate_bool(nonebot_data, "reload", "false")
 
     def list(self):
         data = self._get_data()
