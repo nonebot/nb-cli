@@ -4,7 +4,7 @@ from typing import Any
 from pathlib import Path
 
 import tomlkit
-from tomlkit.items import Array, Table
+from tomlkit.items import Bool, Array, Table
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli.utils import DATA_DIR
@@ -86,23 +86,39 @@ class TOMLConfig(LocalConfig):
         with open(self.file, "w", encoding="utf-8") as f:
             f.write(tomlkit.dumps(data))
 
+    def _validate_table(self, data, key):
+        updated_data = data.setdefault(key, tomlkit.table())
+        if not isinstance(updated_data, Table):
+            raise ValueError(f"'{key}' in toml file is not a Table!")
+        return updated_data
+
+    def _validate_array(self, data, key):
+        updated_data = data.setdefault(key, tomlkit.array())
+        if not isinstance(updated_data, Array):
+            raise ValueError(f"'{key}' in toml file is not a Array!")
+        return updated_data
+
+    def _validate_bool(self, data, key, default):
+        updated_data = data.setdefault(key, tomlkit.boolean(default))
+        if not isinstance(updated_data, Bool):
+            raise ValueError(f"'{key}' in toml file is not a Boolean!")
+        return updated_data
+
     def _validate(self, data: TOMLDocument) -> None:
-        tool_data = data.setdefault("tool", tomlkit.table())
-        if not isinstance(tool_data, Table):
-            raise ValueError("'tool' in toml file is not a Table!")
-        nonebot_data = tool_data.setdefault("nonebot", tomlkit.table())
-        if not isinstance(nonebot_data, Table):
-            raise ValueError("'tool.nonebot' in toml file is not a Table!")
-        plugins = nonebot_data.setdefault("plugins", tomlkit.array())
-        if not isinstance(plugins, Array):
-            raise ValueError(
-                "'tool.nonebot.plugins' in toml file is not a Array!"
-            )
-        plugin_dirs = nonebot_data.setdefault("plugin_dirs", tomlkit.array())
-        if not isinstance(plugin_dirs, Array):
-            raise ValueError(
-                "'tool.nonebot.plugin_dirs' in toml file is not a Array!"
-            )
+        tool_data = self._validate_table(data, "tool")
+        nonebot_data = self._validate_table(tool_data, "tool")
+
+        for key in [
+            "adapters",
+            "builtin_plugins",
+            "reload_dirs",
+            "reload_dirs_excludes",
+            "reload_excludes",
+            "reload_includes",
+        ]:
+            self._validate_array(nonebot_data, key)
+
+        self._validate_bool(nonebot_data, "reload", False)
 
     def list(self):
         data = self._get_data()
