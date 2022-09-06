@@ -1,8 +1,7 @@
 import click
 
-from nb_cli.config import ConfigManager
-from nb_cli.handlers import update_config
 from nb_cli.utils import ClickAliasedCommand
+from nb_cli.handlers import config_no_subcommand
 
 
 @click.command(cls=ClickAliasedCommand)
@@ -27,16 +26,9 @@ from nb_cli.utils import ClickAliasedCommand
     show_default=True,
     help="Unset configuration setting",
 )
+@click.option("-e", "--element", multiple=True)
 @click.argument("key", nargs=1, required=False)
 @click.argument("value", nargs=1, required=False)
-def config(file, list, unset, key, value):
+def config(file, list, unset, key, value, element):
     """Modify config file of your project"""
-    config = ConfigManager.get_local_config(file)
-
-    if list:
-        config.list()
-    elif unset:
-        update_config(config, key, None)
-    else:
-        if key is not None and value is not None:
-            update_config(config, key, value)
+    config_no_subcommand(file, list, unset, key, value, element)

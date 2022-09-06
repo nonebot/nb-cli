@@ -8,6 +8,7 @@ from tomlkit.items import Array, Table
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli.utils import DATA_DIR
+from nb_cli.consts import ARRAY_CONFIGS
 
 
 class LocalConfig(abc.ABC):
@@ -23,7 +24,7 @@ class LocalConfig(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def list(self):
+    def print(self):
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -106,16 +107,7 @@ class TOMLConfig(LocalConfig):
         tool_data = self._validate_table(data, "tool")
         nonebot_data = self._validate_table(tool_data, "tool")
 
-        for key in {
-            "plugins",
-            "plugin_dirs",
-            "adapters",
-            "builtin_plugins",
-            "reload_dirs",
-            "reload_dirs_excludes",
-            "reload_excludes",
-            "reload_includes",
-        }:
+        for key in ARRAY_CONFIGS:
             self._validate_array(nonebot_data, key)
 
         self._validate_bool(nonebot_data, "reload", "false")
@@ -135,7 +127,7 @@ class TOMLConfig(LocalConfig):
         del sub_data[sub_data.index(value)]
         self._write_data(data)
 
-    def list(self):
+    def print(self):
         data = self._get_data()
         self._validate(data)
         print(data["tool"]["nonebot"])  # type: ignore
@@ -199,7 +191,7 @@ class JSONConfig(LocalConfig):
         del sub_data[sub_data.index(value)]
         self._write_data(data)
 
-    def list(self):
+    def print(self):
         data = self._get_data()
         self._validate(data)
         print(data)

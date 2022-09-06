@@ -1,12 +1,14 @@
 import shutil
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Any, List, Type, TypeVar, Callable, Optional, cast
+from typing import Any, List, Type, Union, TypeVar, Callable, Optional, cast
 
 import click
 import httpx
 from wcwidth import wcswidth
 from pydantic import BaseModel
 
+from nb_cli.consts import PATH_CONFIGS
 from nb_cli.prompts import InputPrompt
 from nb_cli.utils import default_style
 
@@ -42,20 +44,15 @@ def int_normalizer(val: str) -> int:
     return int(val)
 
 
-def get_normalizer(name: str) -> Callable[[str], Any]:
+def path_normalizer(vals: List[str]):
+    return [Path(val) for val in vals]
+
+
+def get_normalizer(name: str) -> Callable[[Any], Any]:
     if name in {"reload"}:
         return boolean_normalizer
-    elif name in {
-        "plugins",
-        "plugin_dirs",
-        "adapters",
-        "builtin_plugins",
-        "reload_dirs",
-        "reload_dirs_excludes",
-        "reload_excludes",
-        "reload_includes",
-    }:
-        return lambda val: val.split(",")
+    elif name in PATH_CONFIGS:
+        return path_normalizer
 
     return lambda val: val
 

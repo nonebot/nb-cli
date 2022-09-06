@@ -25,6 +25,7 @@ from .generate import generate_script as generate_script
 from .plugin import uninstall_plugin as uninstall_plugin
 from .deploy import exit_docker_image as exit_docker_image
 from .deploy import build_docker_image as build_docker_image
+from .config import config_no_subcommand as config_no_subcommand
 from .deploy import deploy_no_subcommand as deploy_no_subcommand
 from .driver import driver_no_subcommand as driver_no_subcommand
 from .plugin import plugin_no_subcommand as plugin_no_subcommand

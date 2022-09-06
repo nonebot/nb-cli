@@ -2,6 +2,25 @@ import os
 import sys
 import sysconfig
 
+ARRAY_CONFIGS = {
+    "plugins",
+    "plugin_dirs",
+    "adapters",
+    "builtin_plugins",
+    "reload_dirs",
+    "reload_dirs_excludes",
+    "reload_excludes",
+    "reload_includes",
+}
+
+PATH_CONFIGS = {
+    "plugin_dirs",
+    "reload_dirs",
+    "reload_dirs_excludes",
+    "reload_excludes",
+    "reload_includes",
+}
+
 BOT_STARTUP_TEMPLATE = """\
 import nonebot
 {adapters_import}
