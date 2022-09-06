@@ -1,5 +1,3 @@
-from email.policy import default
-
 import click
 
 from nb_cli.utils import ClickAliasedCommand
