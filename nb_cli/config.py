@@ -105,7 +105,7 @@ class TOMLConfig(LocalConfig):
 
     def _validate(self, data: TOMLDocument) -> None:
         tool_data = self._validate_table(data, "tool")
-        nonebot_data = self._validate_table(tool_data, "tool")
+        nonebot_data = self._validate_table(tool_data, "nonebot")
 
         for key in ARRAY_CONFIGS:
             self._validate_array(nonebot_data, key)

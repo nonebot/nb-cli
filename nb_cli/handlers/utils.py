@@ -45,7 +45,7 @@ def int_normalizer(val: str) -> int:
 
 
 def path_normalizer(vals: List[str]):
-    return [Path(val) for val in vals]
+    return [str(Path(val)) for val in vals]
 
 
 def get_normalizer(name: str) -> Callable[[Any], Any]:

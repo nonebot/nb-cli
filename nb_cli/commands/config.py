@@ -1,3 +1,5 @@
+from email.policy import default
+
 import click
 
 from nb_cli.utils import ClickAliasedCommand
@@ -26,7 +28,7 @@ from nb_cli.handlers import config_no_subcommand
     show_default=True,
     help="Unset configuration setting",
 )
-@click.option("-e", "--element", multiple=True)
+@click.option("-e", "--element", multiple=True, default=[])
 @click.argument("key", nargs=1, required=False)
 @click.argument("value", nargs=1, required=False)
 def config(file, list, unset, key, value, element):
