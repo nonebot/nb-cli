@@ -51,10 +51,10 @@ class LocalConfig(abc.ABC):
         self.remove("plugin_dirs", dir_name)
 
     def get_adapters(self):
-        self.get("adapters")
+        return self.get("adapters")
 
     def get_builtin_plugins(self):
-        self.get("builtin_plugins")
+        return self.get("builtin_plugins")
 
     def add_adapter(self, adapter_name: str):
         self.append("adapters", adapter_name)
