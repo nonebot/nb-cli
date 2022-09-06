@@ -45,6 +45,17 @@ def int_normalizer(val: str) -> int:
 def get_normalizer(name: str) -> Callable[[str], Any]:
     if name in {"reload"}:
         return boolean_normalizer
+    elif name in {
+        "plugins",
+        "plugin_dirs",
+        "adapters",
+        "builtin_plugins",
+        "reload_dirs",
+        "reload_dirs_excludes",
+        "reload_excludes",
+        "reload_includes",
+    }:
+        return lambda val: val.split(",")
 
     return lambda val: val
 
