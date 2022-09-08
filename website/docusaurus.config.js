@@ -128,9 +128,9 @@ const config = {
         darkTheme: darkCodeTheme,
       },
       algolia: {
-        appId: null,
-        apiKey: null,
-        indexName: null,
+        appId: "<empty>",
+        apiKey: "<empty>",
+        indexName: "<empty>",
         contextualSearch: true,
       },
       tailwindConfig: require("./tailwind.config"),
