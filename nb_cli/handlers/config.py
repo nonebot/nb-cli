@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from nb_cli.consts import ARRAY_CONFIGS
+from nb_cli.consts import NONEBOT_ARRAY_CONFIGS
 from nb_cli.handlers.utils import get_normalizer
 from nb_cli.config import LocalConfig, ConfigManager
 
@@ -23,7 +23,7 @@ def config_no_subcommand(
     if unset:
         update_config(config, key, None)
     if key is not None:
-        if len(element) == 0 and key in ARRAY_CONFIGS:
+        if len(element) == 0 and key in NONEBOT_ARRAY_CONFIGS:
             raise ValueError(
                 "No element supplied for array config, please use -e to input element"
             )
