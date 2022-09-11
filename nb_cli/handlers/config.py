@@ -1,5 +1,4 @@
 from typing import List, Union
-from multiprocessing.sharedctypes import Value
 
 from nb_cli.consts import ARRAY_CONFIGS
 from nb_cli.handlers.utils import get_normalizer
