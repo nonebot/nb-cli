@@ -1,5 +1,4 @@
 import abc
-import json
 from typing import Any
 from pathlib import Path
 
@@ -151,70 +150,6 @@ class TOMLConfig(LocalConfig):
         self._write_data(data)
 
 
-class JSONConfig(LocalConfig):
-    def __init__(self, file: str):
-        path = Path(file).resolve()
-        if not path.is_file():
-            raise RuntimeError(f"Config file {path} does not exist!")
-        self.file = file
-
-    def _get_data(self):
-        with open(self.file, "r", encoding="utf-8") as f:
-            return json.load(f)
-
-    def _write_data(self, data):
-        with open(self.file, "w", encoding="utf-8") as f:
-            json.dump(data, f)
-
-    def _validate(self, data):
-        if not isinstance(data, dict):
-            raise ValueError("Data in file is not a dict!")
-        plugins = data.setdefault("plugins", [])
-        if not isinstance(plugins, list):
-            raise ValueError("'plugins' is not a list!")
-        plugin_dirs = data.setdefault("plugin_dirs", [])
-        if not isinstance(plugin_dirs, list):
-            raise ValueError("'plugin_dirs' is not a list!")
-
-    def append(self, key: str, value: Any):
-        data = self._get_data()
-        self._validate(data)
-        sub_data: Array = data[key]
-        if value not in sub_data:
-            sub_data.append(value)
-        self._write_data(data)
-
-    def remove(self, key: str, value: Any):
-        data = self._get_data()
-        self._validate(data)
-        sub_data: Array = data[key]
-        del sub_data[sub_data.index(value)]
-        self._write_data(data)
-
-    def print(self):
-        data = self._get_data()
-        self._validate(data)
-        print(data)
-
-    def get(self, key: str):
-        data = self._get_data()
-        self._validate(data)
-        value = data.get(key)
-        return value
-
-    def update(self, key: str, value: Any):
-        data = self._get_data()
-        self._validate(data)
-        data[key] = value
-        self._write_data(data)
-
-    def unset(self, key: str):
-        data = self._get_data()
-        self._validate(data)
-        del data[key]
-        self._write_data(data)
-
-
 """
 class Config(BaseSettings):
     reload: bool = False
@@ -234,16 +169,7 @@ class ConfigManager:
 
     @classmethod
     def get_local_config(cls, file: str):
-        if Path(file).suffix == ".toml":
-            local_config = TOMLConfig(file)
-        elif Path(file).suffix == ".json":
-            local_config = JSONConfig(file)
-        else:
-            raise ValueError(
-                "Unknown config file format! Expect 'json' / 'toml'."
-            )
-
-        return local_config
+        return TOMLConfig(file)
 
 
 """
