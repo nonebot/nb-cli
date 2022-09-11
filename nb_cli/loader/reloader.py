@@ -74,7 +74,7 @@ class WatchFilesReload:
         self.should_exit = threading.Event()
         self.is_restarting = False
         for directory in config.get("reload_dirs"):
-            if Path.cwd() not in directory.parents:
+            if Path.cwd() not in Path(directory).parents:
                 self.reload_dirs.append(directory)
         if Path.cwd() not in self.reload_dirs:
             self.reload_dirs.append(Path.cwd())
