@@ -2,7 +2,7 @@ import os
 import sys
 import sysconfig
 
-ARRAY_CONFIGS = {
+NONEBOT_ARRAY_CONFIGS = {
     "plugins",
     "plugin_dirs",
     "adapters",
@@ -11,6 +11,11 @@ ARRAY_CONFIGS = {
     "reload_dirs_excludes",
     "reload_excludes",
     "reload_includes",
+}
+
+CLI_ARRAY_CONFIGS = {
+    "plugins",
+    "plugin_dirs",
 }
 
 PATH_CONFIGS = {

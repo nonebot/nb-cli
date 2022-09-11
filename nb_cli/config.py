@@ -7,7 +7,7 @@ from tomlkit.items import Array, Table
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli.utils import DATA_DIR
-from nb_cli.consts import ARRAY_CONFIGS
+from nb_cli.consts import CLI_ARRAY_CONFIGS, NONEBOT_ARRAY_CONFIGS
 
 
 class LocalConfig(abc.ABC):
@@ -105,8 +105,13 @@ class TOMLConfig(LocalConfig):
     def _validate(self, data: TOMLDocument) -> None:
         tool_data = self._validate_table(data, "tool")
         nonebot_data = self._validate_table(tool_data, "nonebot")
+        self._validate_table(nonebot_data, "scripts")
+        cli_data = self._validate_table(tool_data, "nb-cli")
 
-        for key in ARRAY_CONFIGS:
+        for key in CLI_ARRAY_CONFIGS:
+            self._validate_array(cli_data, key)
+
+        for key in NONEBOT_ARRAY_CONFIGS:
             self._validate_array(nonebot_data, key)
 
         self._validate_bool(nonebot_data, "reload", "false")
