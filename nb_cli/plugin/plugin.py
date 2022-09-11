@@ -1,7 +1,7 @@
 """本模块定义插件对象。
 FrontMatter:
     sidebar_position: 3
-    description: nonebot.plugin.plugin 模块
+    description: nb_cli.plugin.plugin 模块
 """
 from types import ModuleType
 from dataclasses import field, dataclass
@@ -35,7 +35,7 @@ class Plugin:
     """存储插件信息"""
 
     name: str
-    """插件索引标识，NoneBot 使用 文件/文件夹 名称作为标识符"""
+    """插件索引标识，NoneBot CLI 使用 文件/文件夹 名称作为标识符"""
     module: ModuleType
     """插件模块对象"""
     module_name: str
