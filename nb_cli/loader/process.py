@@ -26,22 +26,22 @@ class NoneBotProcess:
             encoding="utf-8",
         )
         ProcessManager.add(self)
-        if self.process.stdin:
-            if self.config.get("reload"):
-                self.process.stdin.write(
-                    gen_script(
-                        self.config.get_adapters(),
-                        self.config.get_builtin_plugins(),
-                    )
+        assert self.process.stdin
+        if self.config.get("reload"):
+            self.process.stdin.write(
+                gen_script(
+                    self.config.get_adapters(),
+                    self.config.get_builtin_plugins(),
                 )
-                self.process.stdin.close()
-            else:
-                self.process.communicate(
-                    input=gen_script(
-                        self.config.get_adapters(),
-                        self.config.get_builtin_plugins(),
-                    )
+            )
+            self.process.stdin.close()
+        else:
+            self.process.communicate(
+                input=gen_script(
+                    self.config.get_adapters(),
+                    self.config.get_builtin_plugins(),
                 )
+            )
 
         return self.process.returncode
 
