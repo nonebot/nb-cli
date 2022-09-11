@@ -24,9 +24,7 @@ def _get_builtin_plugins() -> List[str]:
             ["python", "-W", "ignore", "-"],
             input_=GET_BUILTIN_PLUGINS_SCRIPT,
             capture_output=True,
-        )
-        if isinstance(nonebot_path, bytes):
-            nonebot_path = nonebot_path.decode("utf-8")
+        ).decode("utf-8")
         plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
         if not plugin_dir.is_dir():
             return []

@@ -2,7 +2,7 @@ import os
 import subprocess
 from pathlib import Path
 from contextlib import suppress
-from typing import Any, List, Union, Optional
+from typing import Any, List, Union, Optional, overload
 
 import click
 from prompt_toolkit.styles import Style
@@ -92,7 +92,19 @@ def encode(string: str, encodings: Union[List[str], None] = None) -> bytes:
     return string.encode(encodings[0], errors="ignore")
 
 
-def run_script(cmd: list[str], **kwargs: Any) -> Union[int, str, bytes, None]:
+@overload
+def run_script(cmd: List[str], *, call: bool, **kwargs: Any) -> int:
+    ...
+
+
+@overload
+def run_script(
+    cmd: List[str], *, input_: Optional[str], **kwargs: Any
+) -> bytes:
+    ...
+
+
+def run_script(cmd: List[str], **kwargs: Any) -> Union[int, str, bytes, None]:
     """
     Run a command inside the Python environment.
     """
