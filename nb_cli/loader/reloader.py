@@ -30,7 +30,7 @@ class FileFilter:
         self.includes.extend(config.get("reload_includes"))
         self.includes = list(set(self.includes))
 
-        default_excludes = [".*", ".py[cod]", ".sw.*", "~*"]
+        default_excludes = [".*", "~*"]
         self.excludes = [
             default
             for default in default_excludes
