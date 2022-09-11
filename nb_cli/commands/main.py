@@ -11,7 +11,7 @@ from nb_cli.handlers import run_bot, create_project, generate_script
     is_flag=True,
     default=False,
     show_default=True,
-    help="Whether to use full project template or simplified one",
+    help="Whether to use full project template or simplified one.",
 )
 def init(full):
     """Init a NoneBot Project."""
