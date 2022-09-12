@@ -14,18 +14,6 @@ export default function Home() {
     tagline: "out of box",
     description: "使用 NB-CLI 快速构建属于你的机器人",
   } as const;
-  const secondFeatures = [
-    {
-      title: "插件系统",
-      tagline: "plugin system",
-      description: "插件化开发，模块化管理",
-    },
-    {
-      title: "跨平台支持",
-      tagline: "cross-platform support",
-      description: "支持多种平台，以及多样的事件响应方式",
-    },
-  ] as const;
 
   return (
     <Layout>
@@ -59,54 +47,6 @@ export default function Home() {
               ].join("\n")}
             </CodeBlock>
           </HeroFeature>
-        </div>
-      }
-      {
-        <div className="max-w-7xl mx-auto py-16 px-4 md:grid md:grid-cols-2 md:gap-6 md:px-16">
-          <div className="pb-16 text-center md:pb-0">
-            <HeroFeature {...secondFeatures[0]}>
-              <CodeBlock
-                title
-                className={clsx(
-                  "inline-block language-python",
-                  styles.homeCodeBlock
-                )}
-              >
-                {[
-                  "import nonebot",
-                  "# 加载一个插件",
-                  'nonebot.load_plugin("path.to.your.plugin")',
-                  "# 从文件夹加载插件",
-                  'nonebot.load_plugins("plugins")',
-                  "# 从配置文件加载多个插件",
-                  'nonebot.load_from_json("plugins.json")',
-                  'nonebot.load_from_toml("pyproject.toml")',
-                ].join("\n")}
-              </CodeBlock>
-            </HeroFeature>
-          </div>
-          <div className="text-center">
-            <HeroFeature {...secondFeatures[1]}>
-              <CodeBlock
-                title
-                className={clsx(
-                  "inline-block language-python",
-                  styles.homeCodeBlock
-                )}
-              >
-                {[
-                  "import nonebot",
-                  "# OneBot",
-                  "from nonebot.adapters.onebot.v11 import Adapter as OneBotAdapter",
-                  "# 钉钉",
-                  "from nonebot.adapters.ding import Adapter as DingAdapter",
-                  "driver = nonebot.get_driver()",
-                  "driver.register_adapter(OneBotAdapter)",
-                  "driver.register_adapter(DingAdapter)",
-                ].join("\n")}
-              </CodeBlock>
-            </HeroFeature>
-          </div>
         </div>
       }
     </Layout>
