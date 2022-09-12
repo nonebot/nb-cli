@@ -206,6 +206,7 @@ def get_data_dir(version: Optional[str] = None) -> Path:
 
     if WINDOWS:
         try:
+            from ctypes import windll
 
             _get_win_folder = _get_win_folder_with_ctypes
         except ImportError:
