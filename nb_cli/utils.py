@@ -30,6 +30,19 @@ default_style = Style.from_dict(
 )
 
 
+def script_wrapper(command: str):
+    @click.command(
+        context_settings={
+            "ignore_unknown_options": True,
+        }
+    )
+    @click.argument("args", nargs=-1, type=click.UNPROCESSED)
+    def _func(args):
+        run_script(command.split(" ") + list(args), call=True)
+
+    return _func
+
+
 def gen_script(adapters: List[str], builtin_plugins: List[str]) -> str:
     adapters_import: List[str] = []
     adapters_register: List[str] = []
@@ -193,7 +206,6 @@ def get_data_dir(version: Optional[str] = None) -> Path:
 
     if WINDOWS:
         try:
-            from ctypes import windll
 
             _get_win_folder = _get_win_folder_with_ctypes
         except ImportError:

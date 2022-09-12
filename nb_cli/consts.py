@@ -11,11 +11,8 @@ NONEBOT_ARRAY_CONFIGS = {
     "reload_dirs_excludes",
     "reload_excludes",
     "reload_includes",
-}
-
-CLI_ARRAY_CONFIGS = {
-    "plugins",
-    "plugin_dirs",
+    "cli_plugins",
+    "cli_plugin_dirs",
 }
 
 PATH_CONFIGS = {
@@ -25,6 +22,8 @@ PATH_CONFIGS = {
     "reload_excludes",
     "reload_includes",
 }
+
+BOOLEAN_CONFIGS = {"reload"}
 
 BOT_STARTUP_TEMPLATE = """\
 import nonebot

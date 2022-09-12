@@ -1,16 +1,16 @@
 import shutil
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Any, List, Type, Union, TypeVar, Callable, Optional, cast
+from typing import Any, List, Type, TypeVar, Callable, Optional, cast
 
 import click
 import httpx
 from wcwidth import wcswidth
 from pydantic import BaseModel
 
-from nb_cli.consts import PATH_CONFIGS
 from nb_cli.prompts import InputPrompt
 from nb_cli.utils import default_style
+from nb_cli.consts import PATH_CONFIGS, BOOLEAN_CONFIGS
 
 T = TypeVar("T", "Adapter", "Plugin", "Driver")
 
@@ -49,7 +49,7 @@ def path_normalizer(vals: List[str]):
 
 
 def get_normalizer(name: str) -> Callable[[Any], Any]:
-    if name in {"reload"}:
+    if name in BOOLEAN_CONFIGS:
         return boolean_normalizer
     elif name in PATH_CONFIGS:
         return path_normalizer

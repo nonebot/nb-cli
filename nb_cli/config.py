@@ -1,13 +1,13 @@
 import abc
-from typing import Any
 from pathlib import Path
+from typing import Any, Dict
 
 import tomlkit
 from tomlkit.items import Array, Table
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli.utils import DATA_DIR
-from nb_cli.consts import CLI_ARRAY_CONFIGS, NONEBOT_ARRAY_CONFIGS
+from nb_cli.consts import NONEBOT_ARRAY_CONFIGS
 
 
 class LocalConfig(abc.ABC):
@@ -55,6 +55,9 @@ class LocalConfig(abc.ABC):
 
     def get_builtin_plugins(self):
         return self.get("builtin_plugins")
+
+    def get_scripts(self) -> Dict[str, str]:
+        return self.get("scripts")
 
     def add_adapter(self, adapter_name: str):
         self.append("adapters", adapter_name)
@@ -106,10 +109,6 @@ class TOMLConfig(LocalConfig):
         tool_data = self._validate_table(data, "tool")
         nonebot_data = self._validate_table(tool_data, "nonebot")
         self._validate_table(nonebot_data, "scripts")
-        cli_data = self._validate_table(tool_data, "nb-cli")
-
-        for key in CLI_ARRAY_CONFIGS:
-            self._validate_array(cli_data, key)
 
         for key in NONEBOT_ARRAY_CONFIGS:
             self._validate_array(nonebot_data, key)
@@ -173,7 +172,7 @@ class ConfigManager:
     GLOBAL_CONFIG_PATH = (Path(DATA_DIR) / "config.toml").resolve()
 
     @classmethod
-    def get_local_config(cls, file: str):
+    def get_local_config(cls, file: str = "pyproject.toml"):
         return TOMLConfig(file)
 
 

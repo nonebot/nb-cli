@@ -7,9 +7,9 @@ def _call_pip_install(
     package: str, index: Optional[str] = None, python_path: str = "python"
 ) -> int:
     if index:
-        cmd = [python_path, "-m", "pip", "install", package]
-    else:
         cmd = [python_path, "-m", "pip", "install", "-i", index, package]
+    else:
+        cmd = [python_path, "-m", "pip", "install", package]
     return run_script(cmd, call=True)
 
 

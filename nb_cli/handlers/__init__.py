@@ -24,6 +24,7 @@ from .deploy import run_docker_image as run_docker_image
 from .generate import generate_script as generate_script
 from .plugin import uninstall_plugin as uninstall_plugin
 from .deploy import exit_docker_image as exit_docker_image
+from .self import self_no_subcommand as self_no_subcommand
 from .deploy import build_docker_image as build_docker_image
 from .config import config_no_subcommand as config_no_subcommand
 from .deploy import deploy_no_subcommand as deploy_no_subcommand
@@ -53,6 +54,7 @@ def handle_no_subcommand():
             Choice("Plugin ->", partial(plugin_no_subcommand, True)),
             Choice("Adapter ->", partial(adapter_no_subcommand, True)),
             Choice("Deploy ->", partial(deploy_no_subcommand, True)),
+            Choice("Self ->", partial(self_no_subcommand, True)),
         ]
         subcommand = (
             ListPrompt("What do you want to do?", choices)
