@@ -58,7 +58,7 @@ def load_all_plugins(
 
 
 def load_from_toml(file_path: str, encoding: str = "utf-8") -> Set[Plugin]:
-    """导入指定 toml 文件 `[tool.nb-cli]` 中的 `plugins` 以及 `plugin_dirs` 下多个插件，以 `_` 开头的插件不会被导入!
+    """导入指定 toml 文件 `[tool.nonebot]` 中的 `cli_plugins` 以及 `cli_plugin_dirs` 下多个插件，以 `_` 开头的插件不会被导入!
 
     参数:
         file_path: 指定 toml 文件路径
@@ -66,26 +66,28 @@ def load_from_toml(file_path: str, encoding: str = "utf-8") -> Set[Plugin]:
 
     用法:
         ```toml title=pyproject.toml
-        [tool.nb-cli]
-        plugins = ["some_plugin"]
-        plugin_dirs = ["some_dir"]
+        [tool.nonebot]
+        cli_plugins = ["some_plugin"]
+        cli_plugin_dirs = ["some_dir"]
         ```
     """
     with open(file_path, "r", encoding=encoding) as f:
         data = tomlkit.parse(f.read())  # type: ignore
 
-    nb_cli_data = data.get("tool", {}).get("nb-cli")
+    nb_cli_data = data.get("tool", {}).get("nonebot")
     if nb_cli_data is None:
-        raise ValueError("Cannot find '[tool.nb-cli]' in given toml file!")
+        raise ValueError("Cannot find '[tool.nonebot]' in given toml file!")
     if not isinstance(nb_cli_data, dict):
-        raise TypeError("'[tool.nb-cli]' must be a Table!")
-    plugins = nb_cli_data.get("plugins", [])
-    plugin_dirs = nb_cli_data.get("plugin_dirs", [])
-    assert isinstance(plugins, list), "plugins must be a list of plugin name"
+        raise TypeError("'[tool.nonebot]' must be a Table!")
+    cli_plugins = nb_cli_data.get("cli_plugins", [])
+    cli_plugin_dirs = nb_cli_data.get("cli_plugin_dirs", [])
     assert isinstance(
-        plugin_dirs, list
+        cli_plugins, list
+    ), "plugins must be a list of plugin name"
+    assert isinstance(
+        cli_plugin_dirs, list
     ), "plugin_dirs must be a list of directories"
-    return load_all_plugins(plugins, plugin_dirs)
+    return load_all_plugins(cli_plugins, cli_plugin_dirs)
 
 
 def _find_manager_by_name(name: str) -> Optional[PluginManager]:

@@ -9,6 +9,7 @@ from nb_cli.commands.config import config
 from nb_cli.commands.driver import driver
 from nb_cli.commands.plugin import plugin
 from nb_cli.commands.adapter import adapter
+from nb_cli.plugin.load import load_from_toml
 from nb_cli.handlers import handle_no_subcommand
 from nb_cli.commands.main import run, init, generate
 from nb_cli.commands.deploy import exit, build, deploy
@@ -62,6 +63,8 @@ for name, command in scripts.items():
         raise ValueError(
             f'The command "{name}" in local config has been already registered!'
         )
+
+load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":
     main()
