@@ -1,6 +1,5 @@
 from typing import List
 from pathlib import Path
-import ctypes  # An included library with Python install.
 
 import click
 from cookiecutter.main import cookiecutter
