@@ -1,5 +1,6 @@
 from typing import List
 from pathlib import Path
+import ctypes  # An included library with Python install.
 
 import click
 from cookiecutter.main import cookiecutter
@@ -19,18 +20,15 @@ from ._pip import _call_pip_install
 
 
 def _get_builtin_plugins() -> List[str]:
-    try:
-        nonebot_path = run_script(
-            ["python", "-W", "ignore", "-"],
-            input_=GET_BUILTIN_PLUGINS_SCRIPT,
-            capture_output=True,
-        ).decode("utf-8")
-        plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
-        if not plugin_dir.is_dir():
-            return []
-        return [file.stem for file in plugin_dir.glob("*.py")]
-    except Exception as e:
+    nonebot_path: str = run_script(
+        ["python", "-W", "ignore", "-"],
+        input_=GET_BUILTIN_PLUGINS_SCRIPT,
+        capture_output=True,
+    )  # type: ignore
+    plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
+    if not plugin_dir.is_dir():
         return []
+    return [file.stem for file in plugin_dir.glob("*.py")]
 
 
 def create_project(type_: str = "project") -> bool:

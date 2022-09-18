@@ -111,9 +111,7 @@ def run_script(cmd: List[str], *, call: bool, **kwargs: Any) -> int:
 
 
 @overload
-def run_script(
-    cmd: List[str], *, input_: Optional[str], **kwargs: Any
-) -> bytes:
+def run_script(cmd: List[str], *, input_: Optional[str], **kwargs: Any) -> str:
     ...
 
 
