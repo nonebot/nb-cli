@@ -52,20 +52,21 @@ main.add_command(plugin)
 main.add_command(driver)
 main.add_command(self)
 
-local_config = ConfigManager.get_local_config()
-scripts = local_config.get_scripts()
+if ConfigManager.LOCAL_CONFIG_PATH.exists():
+    local_config = ConfigManager.get_local_config()
+    scripts = local_config.get_scripts()
 
-for name, command in scripts.items():
-    if name not in main.commands:
-        main.add_command(script_wrapper(command), name)
-    else:
-        raise ValueError(
-            f'The command "{name}" in local config has been already registered!'
-        )
+    for name, command in scripts.items():
+        if name not in main.commands:
+            main.add_command(script_wrapper(command), name)
+        else:
+            raise ValueError(
+                f'The command "{name}" in local config has been already registered!'
+            )
 
-from nb_cli.plugin import load_from_toml
+    from nb_cli.plugin import load_from_toml
 
-load_from_toml("pyproject.toml")
+    load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":
     main()

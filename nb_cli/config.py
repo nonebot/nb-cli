@@ -171,6 +171,8 @@ class Config(BaseSettings):
 class ConfigManager:
     GLOBAL_CONFIG_PATH = (Path(DATA_DIR) / "config.toml").resolve()
 
+    LOCAL_CONFIG_PATH = (Path(".") / "pyproject.toml").resolve()
+
     @classmethod
     def get_local_config(cls, file: str = "pyproject.toml"):
         return TOMLConfig(file)
