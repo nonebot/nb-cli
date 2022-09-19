@@ -150,6 +150,7 @@ def run_script(cmd: List[str], **kwargs: Any) -> Union[int, str, bytes, None]:
         return decode(output)
     except Exception as e:
         click.secho(repr(e), fg="red")
+        raise e
 
 
 def _get_win_folder_from_registry(csidl_name):
