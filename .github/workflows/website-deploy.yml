@@ -1,0 +1,44 @@
+name: Site Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: website-deploy-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python Environment
+        uses: ./.github/actions/setup-python
+
+      - name: Setup Node Environment
+        uses: ./.github/actions/setup-node
+
+      - name: Build API Doc
+        uses: ./.github/actions/build-api-doc
+
+      - name: Build Doc
+        run: yarn build
+
+      - name: Get Branch Name
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1
+        with:
+          publish-dir: "./website/build"
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy ${{ env.BRANCH_NAME }}@${{ github.sha }}"
+          enable-commit-comment: false
+          alias: ${{ env.BRANCH_NAME }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.SITE_ID }}

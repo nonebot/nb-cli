@@ -1,6 +1,6 @@
 import abc
 from dataclasses import dataclass
-from typing import Union, Generic, TypeVar, Optional
+from typing import Union, Generic, TypeVar, Optional, overload
 
 from prompt_toolkit.layout import Layout
 from prompt_toolkit.application import Application
@@ -9,6 +9,17 @@ from prompt_toolkit.styles import Attrs, Style, StyleTransformation
 
 DT = TypeVar("DT")
 RT = TypeVar("RT")
+
+
+class UndefinedType:
+    def __str__(self):
+        return "Undefined"
+
+    def __bool__(self):
+        return False
+
+
+UNDEFINED = UndefinedType()
 
 
 class BasePrompt(abc.ABC, Generic[RT]):
@@ -32,6 +43,24 @@ class BasePrompt(abc.ABC, Generic[RT]):
             key_bindings=self._build_keybindings(),
             mouse_support=True,
         )
+
+    @overload
+    def prompt(
+        self,
+        default: UndefinedType = UNDEFINED,
+        no_ansi: bool = False,
+        style: Optional[Style] = None,
+    ) -> RT:
+        ...
+
+    @overload
+    def prompt(
+        self,
+        default: DT,
+        no_ansi: bool = False,
+        style: Optional[Style] = None,
+    ) -> Union[DT, RT]:
+        ...
 
     def prompt(
         self,

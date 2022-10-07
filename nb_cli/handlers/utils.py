@@ -1,6 +1,7 @@
 import shutil
-from typing import List, Type, Union, TypeVar, Optional, cast
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, List, Type, TypeVar, Callable, Optional, cast
 
 import click
 import httpx
@@ -9,6 +10,7 @@ from pydantic import BaseModel
 
 from nb_cli.prompts import InputPrompt
 from nb_cli.utils import default_style
+from nb_cli.consts import PATH_CONFIGS, BOOLEAN_CONFIGS
 
 T = TypeVar("T", "Adapter", "Plugin", "Driver")
 
@@ -32,6 +34,27 @@ class Driver(BaseModel):
     project_link: str
     name: str
     desc: str
+
+
+def boolean_normalizer(val: str) -> bool:
+    return val in ["true", "1"]
+
+
+def int_normalizer(val: str) -> int:
+    return int(val)
+
+
+def path_normalizer(vals: List[str]):
+    return [str(Path(val)) for val in vals]
+
+
+def get_normalizer(name: str) -> Callable[[Any], Any]:
+    if name in BOOLEAN_CONFIGS:
+        return boolean_normalizer
+    elif name in PATH_CONFIGS:
+        return path_normalizer
+
+    return lambda val: val
 
 
 def print_package_results(

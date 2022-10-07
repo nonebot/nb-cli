@@ -1,28 +1,28 @@
 import os
-import importlib
 from typing import List, Callable, Iterable
 
-import click
-import nonebot
-
 from nb_cli.utils import default_style
+from nb_cli.config import ConfigManager
+from nb_cli.loader import NoneBotProcess
 from nb_cli.prompts import Choice, ListPrompt
+from nb_cli.loader.reloader import WatchFilesReload
 
 from ._docker import _call_docker_compose
 
 
-def run_bot(file: str = "bot.py", app: str = "app") -> bool:
-    if not os.path.isfile(file):
-        click.secho(f"Cannot find {file} in current folder!", fg="red")
-        return True
+def run_bot(script: str = "bot.py", file: str = "pyproject.toml") -> bool:
+    config = ConfigManager.get_local_config(file)
 
-    module_name, _ = os.path.splitext(file)
-    module = importlib.import_module(module_name)
-    _app = getattr(module, app, None)
-    if not _app:
-        nonebot.run()
+    if os.path.isfile(script):
+        process = NoneBotProcess(config, script)
     else:
-        nonebot.run(app=f"{module_name}:{app}")
+        process = NoneBotProcess(config)
+
+    if config.get("reload"):
+        WatchFilesReload(config, process).run()
+    else:
+        process.run()
+
     return True
 
 

@@ -36,8 +36,9 @@ pip install nb-cli[deploy]
 nb --help
 ```
 
-- `nb init (create)` 创建新的 Nonebot 项目
-- `nb run` 在当前目录启动 Nonebot
+- `nb init (create)` 创建新的 NoneBot 项目
+- `nb run` 在当前目录启动 NoneBot
+- `nb generate` 在当前目录生成启动脚本
 - `nb driver` 管理驱动器
   - `nb driver list` 查看驱动器列表
   - `nb driver search` 搜索驱动器
@@ -56,6 +57,11 @@ nb --help
   - `nb adapter install (add)` 安装适配器
   - `nb adapter update` 更新适配器
   - `nb adapter uninstall (remove)` 卸载适配器
+- `nb self` 管理 CLI 内部环境
+  - `nb self list` 列出 CLI 环境中所有包
+  - `nb self install (add)` 在 CLI 环境安装包
+  - `nb self update` 更新 CLI 环境包
+  - `nb self uninstall (remove)` 卸载 CLI 环境包
 
 #### 以下功能需要 [deploy] 依赖
 
@@ -80,17 +86,23 @@ pip install cookiecutter
 #### 创建项目
 
 ```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/project"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/project"
+```
+
+#### 创建最简项目
+
+```shell
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/bootstrap"
 ```
 
 #### 创建插件
 
 ```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/plugin"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/plugin"
 ```
 
 #### 创建适配器
 
 ```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/adapter"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/adapter"
 ```

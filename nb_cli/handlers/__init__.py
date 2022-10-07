@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, List, Callable
+from typing import List, Callable
 
 import click
 from pyfiglet import figlet_format
@@ -9,6 +9,7 @@ from nb_cli.prompts import Choice, ListPrompt
 
 from .project import create_project
 from .deploy import run_bot as run_bot
+from .config import update_config as update_config
 from .driver import search_driver as search_driver
 from .plugin import create_plugin as create_plugin
 from .plugin import search_plugin as search_plugin
@@ -20,9 +21,12 @@ from .adapter import search_adapter as search_adapter
 from .adapter import update_adapter as update_adapter
 from .adapter import install_adapter as install_adapter
 from .deploy import run_docker_image as run_docker_image
+from .generate import generate_script as generate_script
 from .plugin import uninstall_plugin as uninstall_plugin
 from .deploy import exit_docker_image as exit_docker_image
+from .self import self_no_subcommand as self_no_subcommand
 from .deploy import build_docker_image as build_docker_image
+from .config import config_no_subcommand as config_no_subcommand
 from .deploy import deploy_no_subcommand as deploy_no_subcommand
 from .driver import driver_no_subcommand as driver_no_subcommand
 from .plugin import plugin_no_subcommand as plugin_no_subcommand
@@ -50,6 +54,7 @@ def handle_no_subcommand():
             Choice("Plugin ->", partial(plugin_no_subcommand, True)),
             Choice("Adapter ->", partial(adapter_no_subcommand, True)),
             Choice("Deploy ->", partial(deploy_no_subcommand, True)),
+            Choice("Self ->", partial(self_no_subcommand, True)),
         ]
         subcommand = (
             ListPrompt("What do you want to do?", choices)

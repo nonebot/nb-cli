@@ -1,0 +1,11 @@
+name: Build API Doc
+description: Build API Doc
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        poetry run nb-autodoc nb_cli
+        cp -r ./build/nb_cli/* ./website/docs/api/
+        yarn prettier
+      shell: bash

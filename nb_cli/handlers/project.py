@@ -2,10 +2,10 @@ from typing import List
 from pathlib import Path
 
 import click
-import nonebot
 from cookiecutter.main import cookiecutter
 
-from nb_cli.utils import default_style
+from nb_cli.utils import run_script, default_style
+from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
 from nb_cli.prompts import (
     Choice,
     ListPrompt,
@@ -19,16 +19,18 @@ from ._pip import _call_pip_install
 
 
 def _get_builtin_plugins() -> List[str]:
-    try:
-        plugin_dir = Path(nonebot.__path__[0]) / "plugins"  # type: ignore
-        if not plugin_dir.is_dir():
-            return []
-        return [file.stem for file in plugin_dir.glob("*.py")]
-    except Exception:
+    nonebot_path: str = run_script(
+        ["python", "-W", "ignore", "-"],
+        input_=GET_BUILTIN_PLUGINS_SCRIPT,
+        capture_output=True,
+    )  # type: ignore
+    plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
+    if not plugin_dir.is_dir():
         return []
+    return [file.stem for file in plugin_dir.glob("*.py")]
 
 
-def create_project() -> bool:
+def create_project(type_: str = "project") -> bool:
     click.secho("Loading adapters...")
     adapters = {x.name: x for x in _get_adapters()}
     click.clear()
@@ -78,8 +80,17 @@ def create_project() -> bool:
             ).prompt(style=default_style)
         else:
             confirm = True
+
+    if type_ == "bootstrap":
+        template = str(
+            (Path(__file__).parent.parent / "template" / "bootstrap").resolve()
+        )
+    else:
+        template = str(
+            (Path(__file__).parent.parent / "template" / "project").resolve()
+        )
     cookiecutter(
-        str((Path(__file__).parent.parent / "project").resolve()),
+        template,
         no_input=True,
         extra_context=answers,
     )
