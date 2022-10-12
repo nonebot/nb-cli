@@ -25,14 +25,18 @@ def _get_builtin_plugins() -> List[str]:
         capture_output=True,
     )  # type: ignore
     if not nonebot_path:
-        raise RuntimeError("Failed to get builtin plugins. Has nonebot2 been installed?")
+        raise RuntimeError(
+            "Failed to get builtin plugins. Has nonebot2 been installed?"
+        )
     plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
     if not plugin_dir.is_dir():
         return []
     return [file.stem for file in plugin_dir.glob("*.py")]
 
+
 def create_bootstrap_project() -> bool:
     return create_project("bootstrap")
+
 
 def create_project(type_: str = "project") -> bool:
     click.secho("Loading adapters...")
@@ -58,13 +62,15 @@ def create_project(type_: str = "project") -> bool:
     )
 
     answers["plugins"] = {"builtin": []}
-    answers["plugins"]["builtin"] = [
-        choice.data
-        for choice in CheckboxPrompt(
-            "Which builtin plugin(s) would you like to use?",
-            [Choice(name, name) for name in _get_builtin_plugins()],
-        ).prompt(style=default_style)
-    ]
+    builtin_plugins = _get_builtin_plugins()
+    if builtin_plugins:
+        answers["plugins"]["builtin"] = [
+            choice.data
+            for choice in CheckboxPrompt(
+                "Which builtin plugin(s) would you like to use?",
+                [Choice(name, name) for name in builtin_plugins],
+            ).prompt(style=default_style)
+        ]
 
     answers["adapters"] = {"builtin": []}
 
