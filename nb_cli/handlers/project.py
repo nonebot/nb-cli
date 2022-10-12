@@ -31,6 +31,8 @@ def _get_builtin_plugins() -> List[str]:
         return []
     return [file.stem for file in plugin_dir.glob("*.py")]
 
+def create_bootstrap_project() -> bool:
+    return create_project("bootstrap")
 
 def create_project(type_: str = "project") -> bool:
     click.secho("Loading adapters...")

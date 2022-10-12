@@ -7,7 +7,7 @@ from pyfiglet import figlet_format
 from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
 
-from .project import create_project
+from .project import create_bootstrap_project, create_project
 from .deploy import run_bot as run_bot
 from .config import update_config as update_config
 from .driver import search_driver as search_driver
@@ -48,7 +48,8 @@ def handle_no_subcommand():
     while True:
         choices: List[Choice[Callable[[], bool]]] = [
             Choice("Show Logo", draw_logo),
-            Choice("Create a New Project", create_project),
+            Choice("Create a New Project", create_bootstrap_project),
+            Choice("Create a New Project for Development", create_project),
             Choice("Run the Bot in Current Folder", run_bot),
             Choice("Driver ->", partial(driver_no_subcommand, True)),
             Choice("Plugin ->", partial(plugin_no_subcommand, True)),
