@@ -57,7 +57,7 @@ def load_all_plugins(
     return manager.load_all_plugins()
 
 
-def load_from_toml(file_path: str, encoding: str = "utf-8") -> Set[Plugin]:
+def load_from_toml(file_path: str, encoding: str = "utf-8") -> Optional[Set[Plugin]]:
     """导入指定 toml 文件 `[tool.nonebot]` 中的 `cli_plugins` 以及 `cli_plugin_dirs` 下多个插件，以 `_` 开头的插件不会被导入!
 
     参数:
@@ -76,7 +76,7 @@ def load_from_toml(file_path: str, encoding: str = "utf-8") -> Set[Plugin]:
 
     nb_cli_data = data.get("tool", {}).get("nonebot")
     if nb_cli_data is None:
-        raise ValueError("Cannot find '[tool.nonebot]' in given toml file!")
+        return
     if not isinstance(nb_cli_data, dict):
         raise TypeError("'[tool.nonebot]' must be a Table!")
     cli_plugins = nb_cli_data.get("cli_plugins", [])
