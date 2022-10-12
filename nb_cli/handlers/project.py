@@ -24,6 +24,8 @@ def _get_builtin_plugins() -> List[str]:
         input_=GET_BUILTIN_PLUGINS_SCRIPT,
         capture_output=True,
     )  # type: ignore
+    if not nonebot_path:
+        raise RuntimeError("Failed to get builtin plugins. Has nonebot2 been installed?")
     plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
     if not plugin_dir.is_dir():
         return []
