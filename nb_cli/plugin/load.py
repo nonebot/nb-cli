@@ -57,7 +57,9 @@ def load_all_plugins(
     return manager.load_all_plugins()
 
 
-def load_from_toml(file_path: str, encoding: str = "utf-8") -> Optional[Set[Plugin]]:
+def load_from_toml(
+    file_path: str, encoding: str = "utf-8"
+) -> Optional[Set[Plugin]]:
     """导入指定 toml 文件 `[tool.nonebot]` 中的 `cli_plugins` 以及 `cli_plugin_dirs` 下多个插件，以 `_` 开头的插件不会被导入!
 
     参数:

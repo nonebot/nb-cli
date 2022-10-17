@@ -1,8 +1,8 @@
 import sys
+from pathlib import Path
 
 import click
 import pkg_resources
-from pathlib import Path
 
 from nb_cli.commands.self import self
 from nb_cli.config import ConfigManager
@@ -66,6 +66,7 @@ if ConfigManager.LOCAL_CONFIG_PATH.exists():
             )
 
     from nb_cli.plugin import load_from_toml
+
     load_from_toml("pyproject.toml")
 
 if __name__ == "__main__":

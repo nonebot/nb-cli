@@ -7,7 +7,6 @@ from pyfiglet import figlet_format
 from nb_cli.utils import default_style
 from nb_cli.prompts import Choice, ListPrompt
 
-from .project import create_bootstrap_project, create_project
 from .deploy import run_bot as run_bot
 from .config import update_config as update_config
 from .driver import search_driver as search_driver
@@ -26,6 +25,7 @@ from .plugin import uninstall_plugin as uninstall_plugin
 from .deploy import exit_docker_image as exit_docker_image
 from .self import self_no_subcommand as self_no_subcommand
 from .deploy import build_docker_image as build_docker_image
+from .project import create_project, create_bootstrap_project
 from .config import config_no_subcommand as config_no_subcommand
 from .deploy import deploy_no_subcommand as deploy_no_subcommand
 from .driver import driver_no_subcommand as driver_no_subcommand
