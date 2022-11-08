@@ -1,6 +1,8 @@
 import os
 from typing import List, TypeVar, Callable, Optional
+from time import time
 
+from prompt_toolkit.application import Application
 from prompt_toolkit.styles import Style
 from prompt_toolkit.layout import Layout
 from prompt_toolkit.filters import is_done
@@ -57,6 +59,8 @@ class ListPrompt(BasePrompt[Choice[RT]]):
         self._index: int = 0
         self._display_index: int = 0
         self._max_height: Optional[int] = max_height
+        self._app: Application = None  # type: ignore
+        self._last_mouse_up: float = 0
 
     @property
     def max_height(self) -> int:
@@ -114,8 +118,7 @@ class ListPrompt(BasePrompt[Choice[RT]]):
 
         @kb.add("enter", eager=True)
         def enter(event: KeyPressEvent):
-            self._answered = True
-            event.app.exit(result=self.choices[self._index])
+            self._finish()
 
         @kb.add("c-c", eager=True)
         @kb.add("c-q", eager=True)
@@ -123,6 +126,10 @@ class ListPrompt(BasePrompt[Choice[RT]]):
             event.app.exit(result=NoAnswer)
 
         return kb
+
+    def _finish(self) -> None:
+        self._answered = True
+        self._app.exit(result=self.choices[self._index])
 
     def _get_prompt(self) -> AnyFormattedText:
         prompts: AnyFormattedText = [
@@ -194,6 +201,10 @@ class ListPrompt(BasePrompt[Choice[RT]]):
                 and index is not None
             ):
                 self._jump_to(index)
+                if (time() - self._last_mouse_up) < 0.3:
+                    self._finish()
+                else:
+                    self._last_mouse_up = time()
             elif event.event_type == MouseEventType.SCROLL_UP:
                 self._handle_up()
             elif event.event_type == MouseEventType.SCROLL_DOWN:
