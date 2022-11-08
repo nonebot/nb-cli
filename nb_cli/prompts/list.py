@@ -1,11 +1,11 @@
 import os
-from typing import List, TypeVar, Callable, Optional
 from time import time
+from typing import List, TypeVar, Callable, Optional
 
-from prompt_toolkit.application import Application
 from prompt_toolkit.styles import Style
 from prompt_toolkit.layout import Layout
 from prompt_toolkit.filters import is_done
+from prompt_toolkit.application import Application
 from prompt_toolkit.layout.dimension import Dimension
 from prompt_toolkit.formatted_text import AnyFormattedText
 from prompt_toolkit.layout.controls import FormattedTextControl

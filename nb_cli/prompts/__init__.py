@@ -68,7 +68,9 @@ class BasePrompt(abc.ABC, Generic[RT]):
         no_ansi: bool = False,
         style: Optional[Style] = None,
     ) -> Union[DT, RT]:
-        self._app = self._build_application(no_ansi=no_ansi, style=style or Style([]))
+        self._app = self._build_application(
+            no_ansi=no_ansi, style=style or Style([])
+        )
         result: RT = self._app.run()
         if result is NoAnswer:
             if default is None:
