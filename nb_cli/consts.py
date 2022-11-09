@@ -53,8 +53,11 @@ nonebot.load_builtin_plugins("{name}")
 """
 
 GET_BUILTIN_PLUGINS_SCRIPT = """\
-import nonebot
-print(nonebot.__path__[0])
+try:
+    import nonebot
+    print(nonebot.__path__[0])
+except Exception:
+    print("")
 """
 
 SHELL = os.getenv("SHELL", "")
