@@ -3,9 +3,9 @@ from typing import List, Callable
 
 import click
 from pyfiglet import figlet_format
+from noneprompt import Choice, ListPrompt
 
 from nb_cli.utils import default_style
-from noneprompt import Choice, ListPrompt
 
 from .project import create_project
 from .deploy import run_bot as run_bot

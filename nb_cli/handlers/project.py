@@ -3,9 +3,6 @@ from pathlib import Path
 
 import click
 from cookiecutter.main import cookiecutter
-
-from nb_cli.utils import run_script, default_style
-from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
 from noneprompt import (
     Choice,
     ListPrompt,
@@ -13,6 +10,9 @@ from noneprompt import (
     ConfirmPrompt,
     CheckboxPrompt,
 )
+
+from nb_cli.utils import run_script, default_style
+from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
 
 from .adapter import _get_adapters
 from ._pip import _call_pip_install
