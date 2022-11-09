@@ -6,7 +6,7 @@ from cookiecutter.main import cookiecutter
 
 from nb_cli.utils import run_script, default_style
 from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
-from nb_cli.prompts import (
+from noneprompt import (
     Choice,
     ListPrompt,
     InputPrompt,

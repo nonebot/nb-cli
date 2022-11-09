@@ -5,7 +5,7 @@ import click
 from pyfiglet import figlet_format
 
 from nb_cli.utils import default_style
-from nb_cli.prompts import Choice, ListPrompt
+from noneprompt import Choice, ListPrompt
 
 from .project import create_project
 from .deploy import run_bot as run_bot

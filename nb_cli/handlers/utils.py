@@ -8,7 +8,7 @@ import httpx
 from wcwidth import wcswidth
 from pydantic import BaseModel
 
-from nb_cli.prompts import InputPrompt
+from noneprompt import InputPrompt
 from nb_cli.utils import default_style
 from nb_cli.consts import PATH_CONFIGS, BOOLEAN_CONFIGS
 

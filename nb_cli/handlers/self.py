@@ -2,7 +2,7 @@ import sys
 from typing import List, Callable, Optional
 
 from nb_cli.utils import default_style
-from nb_cli.prompts import Choice, ListPrompt, InputPrompt
+from noneprompt import Choice, ListPrompt, InputPrompt
 
 from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
 

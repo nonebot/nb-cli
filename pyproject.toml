@@ -26,10 +26,10 @@ colorama = "^0.4.3"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
 httpx = ">=0.18.0, <1.0.0"
-prompt-toolkit = "^3.0.19"
 docker-compose = { version = "~1.29.2", optional = true }
 watchfiles = "^0.16.1"
 pydantic = "^1.9.1"
+noneprompt = "^0.1.4"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.10.1"
