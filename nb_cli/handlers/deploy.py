@@ -1,10 +1,11 @@
 import os
 from typing import List, Callable, Iterable
 
+from noneprompt import Choice, ListPrompt
+
 from nb_cli.utils import default_style
 from nb_cli.config import ConfigManager
 from nb_cli.loader import NoneBotProcess
-from nb_cli.prompts import Choice, ListPrompt
 from nb_cli.loader.reloader import WatchFilesReload
 
 from ._docker import _call_docker_compose

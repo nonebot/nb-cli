@@ -1,7 +1,7 @@
 from functools import partial
 from typing import List, Callable, Optional
 
-from nb_cli.prompts import Choice, ListPrompt
+from noneprompt import Choice, ListPrompt
 
 from ._pip import _call_pip_install
 from .utils import (
