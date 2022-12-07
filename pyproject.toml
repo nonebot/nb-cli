@@ -18,9 +18,9 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7.3"
+python = "^3.8"
 click = "^8.0.0"
-tomlkit = "^0.10.0"
+tomlkit = ">=0.11.1,<1.0.0,!=0.11.2,!=0.11.3"
 wcwidth = "^0.2.5"
 colorama = "^0.4.3"
 pyfiglet = "^0.8.post1"
