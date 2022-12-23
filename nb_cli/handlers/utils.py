@@ -9,8 +9,14 @@ from wcwidth import wcswidth
 from pydantic import BaseModel
 from noneprompt import InputPrompt
 
+from nb_cli.config import Config
 from nb_cli.utils import default_style
-from nb_cli.consts import PATH_CONFIGS, BOOLEAN_CONFIGS
+from nb_cli.consts import (
+    BOT_LOAD_TEMPLATE,
+    ADAPTER_IMPORT_TEMPLATE,
+    ADAPTER_REGISTER_TEMPLATE,
+    LOAD_BUILTIN_PLUGIN_TEMPLATE,
+)
 
 T = TypeVar("T", "Adapter", "Plugin", "Driver")
 
@@ -36,25 +42,26 @@ class Driver(BaseModel):
     desc: str
 
 
-def boolean_normalizer(val: str) -> bool:
-    return val in ["true", "1"]
-
-
-def int_normalizer(val: str) -> int:
-    return int(val)
-
-
-def path_normalizer(vals: List[str]):
-    return [str(Path(val)) for val in vals]
-
-
-def get_normalizer(name: str) -> Callable[[Any], Any]:
-    if name in BOOLEAN_CONFIGS:
-        return boolean_normalizer
-    elif name in PATH_CONFIGS:
-        return path_normalizer
-
-    return lambda val: val
+def gen_load_script(config: Config) -> str:
+    return BOT_LOAD_TEMPLATE.format(
+        adapters_import="\n".join(
+            ADAPTER_IMPORT_TEMPLATE.format(
+                path=adapter, name=adapter.replace(".", "").upper()
+            )
+            for adapter in config.nonebot.adapters
+        ),
+        adapters_register="\n".join(
+            ADAPTER_REGISTER_TEMPLATE.format(
+                name=adapter.replace(".", "").upper()
+            )
+            for adapter in config.nonebot.adapters
+        ),
+        builtin_plugins_load=LOAD_BUILTIN_PLUGIN_TEMPLATE.format(
+            plugins=", ".join(
+                repr(plugin) for plugin in config.nonebot.builtin_plugins
+            )
+        ),
+    )
 
 
 def print_package_results(

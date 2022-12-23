@@ -1,20 +1,15 @@
 import os
-import subprocess
 from pathlib import Path
-from contextlib import suppress
-from typing import Any, List, Union, Optional, overload
+from functools import partial, lru_cache
+from typing import Any, Dict, List, Union, Optional, overload
 
 import click
 from prompt_toolkit.styles import Style
 
-from .consts import (
-    MACOS,
-    WINDOWS,
-    BOT_STARTUP_TEMPLATE,
-    ADAPTER_IMPORT_TEMPLATE,
-    ADAPTER_REGISTER_TEMPLATE,
-    LOAD_BUILTIN_PLUGIN_TEMPLATE,
-)
+from nb_cli.config import Config
+from nb_cli.handlers import run_script, list_scripts
+
+from .consts import MACOS, WINDOWS, CONFIG_KEY
 
 default_style = Style.from_dict(
     {
@@ -30,127 +25,11 @@ default_style = Style.from_dict(
 )
 
 
-def script_wrapper(command: str):
-    @click.command(
-        context_settings={
-            "ignore_unknown_options": True,
-        }
-    )
-    @click.argument("args", nargs=-1, type=click.UNPROCESSED)
-    def _func(args):
-        run_script(command.split(" ") + list(args), call=True)
-
-    return _func
-
-
-def gen_script(adapters: List[str], builtin_plugins: List[str]) -> str:
-    adapters_import: List[str] = []
-    adapters_register: List[str] = []
-    for adapter in adapters:
-        adapters_import.append(
-            ADAPTER_IMPORT_TEMPLATE.format(
-                path=adapter, name=adapter.replace(".", "").upper()
-            )
-        )
-        adapters_register.append(
-            ADAPTER_REGISTER_TEMPLATE.format(
-                name=adapter.replace(".", "").upper()
-            )
-        )
-
-    builtin_plugins_load: List[str] = [
-        LOAD_BUILTIN_PLUGIN_TEMPLATE.format(name=plugin)
-        for plugin in builtin_plugins
-    ]
-
-    return BOT_STARTUP_TEMPLATE.format(
-        adapters_import="\n".join(adapters_import),
-        adapters_register="\n".join(adapters_register),
-        builtin_plugins_load="\n".join(builtin_plugins_load),
-    )
-
-
 def list_to_shell_command(cmd: list[str]) -> str:
     return " ".join(
         f'"{token}"' if " " in token and token[0] not in {"'", '"'} else token
         for token in cmd
     )
-
-
-def decode(
-    string: Union[bytes, str], encodings: Union[List[str], None] = None
-) -> str:
-    if not isinstance(string, bytes):
-        return string
-
-    encodings = encodings or ["utf-8", "latin1", "ascii"]
-
-    for encoding in encodings:
-        with suppress(UnicodeEncodeError, UnicodeDecodeError):
-            return string.decode(encoding)
-
-    return string.decode(encodings[0], errors="ignore")
-
-
-def encode(string: str, encodings: Union[List[str], None] = None) -> bytes:
-    if isinstance(string, bytes):
-        return string
-
-    encodings = encodings or ["utf-8", "latin1", "ascii"]
-
-    for encoding in encodings:
-        with suppress(UnicodeEncodeError, UnicodeDecodeError):
-            return string.encode(encoding)
-
-    return string.encode(encodings[0], errors="ignore")
-
-
-@overload
-def run_script(cmd: List[str], *, call: bool, **kwargs: Any) -> int:
-    ...
-
-
-@overload
-def run_script(cmd: List[str], *, input_: Optional[str], **kwargs: Any) -> str:
-    ...
-
-
-def run_script(cmd: List[str], **kwargs: Any) -> Union[int, str, bytes, None]:
-    """
-    Run a command inside the Python environment.
-    """
-    call = kwargs.pop("call", False)
-    input_ = kwargs.pop("input_", None)
-    env = kwargs.pop("env", dict(os.environ))
-    capture_output = kwargs.pop("capture_output", False)
-    try:
-        if WINDOWS:
-            kwargs["shell"] = True
-        command: Union[str, list[str]]
-        if kwargs.get("shell", False):
-            command = list_to_shell_command(cmd)
-        else:
-            command = cmd
-        if input_:
-            output = subprocess.run(
-                command,
-                input=encode(input_),
-                capture_output=capture_output,
-                check=True,
-                **kwargs,
-            ).stdout
-        elif call:
-            return subprocess.call(
-                command, stderr=subprocess.STDOUT, env=env, **kwargs
-            )
-        else:
-            output = subprocess.check_output(
-                command, stderr=subprocess.STDOUT, env=env, **kwargs
-            )
-        return decode(output)
-    except Exception as e:
-        click.secho(repr(e), fg="red")
-        raise e
 
 
 def _get_win_folder_from_registry(csidl_name):
@@ -238,51 +117,53 @@ class ClickAliasedCommand(click.Command):
 class ClickAliasedGroup(click.Group):
     def __init__(self, *args, **kwargs):
         super(ClickAliasedGroup, self).__init__(*args, **kwargs)
-        self._commands = {}
-        self._aliases = {}
+        self._commands: Dict[str, List[str]] = {}
+        self._aliases: Dict[str, str] = {}
 
     def command(self, *args, **kwargs):
         cls = kwargs.pop("cls", ClickAliasedCommand)
         return super(ClickAliasedGroup, self).command(*args, cls=cls, **kwargs)
 
     def group(self, *args, **kwargs):
-        aliases = kwargs.pop("aliases", [])
+        aliases: Optional[List[str]] = kwargs.pop("aliases", None)
         decorator = super(ClickAliasedGroup, self).group(*args, **kwargs)
         if not aliases:
             return decorator
 
         def _decorator(f):
             cmd = decorator(f)
-            if aliases:
-                self._commands[cmd.name] = aliases
-                for alias in aliases:
-                    self._aliases[alias] = cmd.name
+            if cmd.name:
+                self.add_aliases(cmd.name, aliases)
             return cmd
 
         return _decorator
 
+    def add_aliases(self, cmd_name: str, aliases: List[str]) -> None:
+        self._commands[cmd_name] = aliases
+        for alias in aliases:
+            self._aliases[alias] = cmd_name
+
     def resolve_alias(self, cmd_name):
-        if cmd_name in self._aliases:
-            return self._aliases[cmd_name]
-        return cmd_name
+        return (
+            self._aliases[cmd_name] if cmd_name in self._aliases else cmd_name
+        )
 
     def add_command(
         self, cmd: click.Command, name: Optional[str] = None
     ) -> None:
         aliases: Optional[List[str]] = getattr(cmd, "_aliases", None)
-        if aliases and isinstance(cmd, ClickAliasedCommand):
-            self._commands[cmd.name] = aliases
-            for alias in aliases:
-                self._aliases[alias] = cmd.name
+        if aliases and isinstance(cmd, ClickAliasedCommand) and cmd.name:
+            self.add_aliases(cmd.name, aliases)
         return super(ClickAliasedGroup, self).add_command(cmd, name=name)
 
-    def get_command(self, ctx, cmd_name):
+    def get_command(self, ctx: click.Context, cmd_name: str):
         cmd_name = self.resolve_alias(cmd_name)
-        command = super(ClickAliasedGroup, self).get_command(ctx, cmd_name)
-        if command:
+        if command := super(ClickAliasedGroup, self).get_command(ctx, cmd_name):
             return command
 
-    def format_commands(self, ctx, formatter):
+    def format_commands(
+        self, ctx: click.Context, formatter: click.HelpFormatter
+    ):
         rows = []
 
         sub_commands = self.list_commands(ctx)
@@ -294,7 +175,7 @@ class ClickAliasedGroup(click.Group):
             cmd = self.get_command(ctx, sub_command)
             if cmd is None:
                 continue
-            if hasattr(cmd, "hidden") and cmd.hidden:
+            if cmd.hidden:
                 continue
             if sub_command in self._commands:
                 aliases = ",".join(sorted(self._commands[sub_command]))
@@ -305,3 +186,30 @@ class ClickAliasedGroup(click.Group):
         if rows:
             with formatter.section("Commands"):
                 formatter.write_dl(rows)
+
+
+class CLIMainGroup(ClickAliasedGroup):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @lru_cache
+    def _load_scripts(self, ctx: click.Context) -> List[click.Command]:
+        config: Config = ctx.meta[CONFIG_KEY]
+        scripts = list_scripts(python_path=config.nb_cli.python)
+        return [
+            self.command(name=script)(
+                partial(run_script, script_name=script, config=config)
+            )
+            for script in scripts
+        ]
+
+    def get_command(
+        self, ctx: click.Context, cmd_name: str
+    ) -> Optional[click.Command]:
+        if command := super().get_command(ctx, cmd_name):
+            return command
+        scripts = self._load_scripts(ctx)
+        return next(filter(lambda x: x.name == cmd_name, scripts), None)
+
+    def list_commands(self, ctx: click.Context) -> List[str]:
+        return super().list_commands(ctx)

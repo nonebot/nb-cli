@@ -8,6 +8,8 @@ from noneprompt import Choice, ListPrompt
 from nb_cli.utils import default_style
 
 from .deploy import run_bot as run_bot
+from .script import run_script as run_script
+from .script import list_scripts as list_scripts
 from .config import update_config as update_config
 from .driver import search_driver as search_driver
 from .plugin import create_plugin as create_plugin
@@ -19,15 +21,11 @@ from .adapter import create_adapter as create_adapter
 from .adapter import search_adapter as search_adapter
 from .adapter import update_adapter as update_adapter
 from .adapter import install_adapter as install_adapter
-from .deploy import run_docker_image as run_docker_image
 from .generate import generate_script as generate_script
 from .plugin import uninstall_plugin as uninstall_plugin
-from .deploy import exit_docker_image as exit_docker_image
 from .self import self_no_subcommand as self_no_subcommand
-from .deploy import build_docker_image as build_docker_image
 from .project import create_project, create_bootstrap_project
 from .config import config_no_subcommand as config_no_subcommand
-from .deploy import deploy_no_subcommand as deploy_no_subcommand
 from .driver import driver_no_subcommand as driver_no_subcommand
 from .plugin import plugin_no_subcommand as plugin_no_subcommand
 from .adapter import adapter_no_subcommand as adapter_no_subcommand
@@ -40,7 +38,7 @@ def draw_logo() -> bool:
     return True
 
 
-def handle_no_subcommand():
+def handle_no_subcommand(ctx: click.Context):
     draw_logo()
     click.echo("\n\b")
     click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
@@ -54,7 +52,6 @@ def handle_no_subcommand():
             Choice("Driver ->", partial(driver_no_subcommand, True)),
             Choice("Plugin ->", partial(plugin_no_subcommand, True)),
             Choice("Adapter ->", partial(adapter_no_subcommand, True)),
-            Choice("Deploy ->", partial(deploy_no_subcommand, True)),
             Choice("Self ->", partial(self_no_subcommand, True)),
         ]
         subcommand = (
