@@ -1,0 +1,41 @@
+{% macro _adapter_name(adapter) %}
+{{ adapter.name|replace(" ", "_")|upper }}Adapter
+{% endmacro %}
+
+{% macro _import_adapter(adapter) %}
+from {{ adapter.module_name }} import Adapter as {{ _adapter_name(adapter) }}
+{% endmacro %}
+
+{% macro _import_adapters(adapters) %}
+{% for adapter in adapters %}
+{{ _import_adapter(adapter) }}
+{% endfor %}
+{% endmacro %}
+
+{% macro _register_adapter(adapter) %}
+driver.register_adapter({{ _adapter_name(adapter) }})
+{% endmacro %}
+
+{% macro _register_adapters(adapters) %}
+{% for adapter in adapters %}
+{{ _register_adapter(adapter) }}
+{% endfor %}
+{% endmacro %}
+
+{% macro _load_builtin_plugins(builtin_plugins) %}
+nonebot.load_builtin_plugins({{ builtin_plugins|map(repr)|join(", ") }})
+{% endmacro %}
+
+{% macro prepare_bot(adapters, builtin_plugins) %}
+import nonebot
+{{ _import_adapters(adapters) }}
+
+nonebot.init()
+
+driver = nonebot.get_driver()
+{{ _register_adapters(adapters) }}
+
+{{ _load_builtin_plugins(builtin_plugins) }}
+
+nonebot.load_from_toml("pyproject.toml")
+{% endmacro %}

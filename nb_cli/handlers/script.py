@@ -1,59 +1,41 @@
 import sys
 import json
 import subprocess
-from functools import partial
-from typing import List, Literal, Callable
+from typing import List, Literal
 
-import click
-from noneprompt import Choice, ListPrompt
+from nb_cli.config import SimpleInfo
 
-from nb_cli.config import Config
-from nb_cli.utils import default_style
-from nb_cli.consts import CONFIG_KEY, GET_SCRIPTS_SCRIPT, RUN_SCRIPTS_SCRIPT
-
-from .utils import gen_load_script
-
-
-def script_no_subcommand(ctx: click.Context) -> bool:
-    config: Config = ctx.meta[CONFIG_KEY]
-    scripts = list_scripts(config.nb_cli.python)
-    choices: List[Choice[Callable[[], bool]]] = [
-        Choice(
-            f"Run script {script!r}",
-            partial(run_script, script_name=script, config=config),
-        )
-        for script in scripts
-    ]
-    choices.append(Choice("<- Back", lambda: False))
-    subcommand = (
-        ListPrompt("What do you want to do?", choices)
-        .prompt(style=default_style)
-        .data
-    )
-    return subcommand()
+from . import templates
 
 
 def list_scripts(python_path: str = "python") -> List[str]:
+    t = templates.get_template("script/list_scripts.py.jinja")
+
     output = subprocess.check_output(
-        [python_path, "-W", "ignore", "-c", GET_SCRIPTS_SCRIPT], text=True
+        [python_path, "-W", "ignore", "-c", t.render()], text=True
     )
     return json.loads(output)
 
 
-def run_script(script_name: str, config: Config) -> Literal[True]:
-    subprocess.run(
+def run_script(
+    script_name: str,
+    adapters: List[SimpleInfo],
+    builtin_plugins: List[str],
+    python_path: str = "python",
+) -> subprocess.CompletedProcess[bytes]:
+    t = templates.get_template("script/run_script.py.jinja")
+
+    return subprocess.run(
         [
-            config.nb_cli.python,
-            "-W",
-            "ignore",
+            python_path,
             "-c",
-            RUN_SCRIPTS_SCRIPT.format(
-                preload_bot=gen_load_script(config), script_name=script_name
+            t.render(
+                adapters=adapters,
+                builtin_plugins=builtin_plugins,
+                script_name=script_name,
             ),
         ],
-        check=True,
         stdin=sys.stdin,
         stdout=sys.stdout,
         stderr=sys.stderr,
     )
-    return True

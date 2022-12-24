@@ -1,0 +1,5 @@
+{% macro get_entrypoints() %}
+from importlib.metadata import entry_points
+
+entrypoints = entry_points(group="{{ ENTRYPOINT_GROUP }}")
+{% endmacro %}

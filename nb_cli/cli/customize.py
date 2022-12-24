@@ -1,17 +1,14 @@
-import os
-from pathlib import Path
+from typing import Dict, List, Optional
 from functools import partial, lru_cache
-from typing import Any, Dict, List, Union, Optional, overload
 
 import click
 from prompt_toolkit.styles import Style
 
 from nb_cli.config import Config
+from nb_cli.consts import CONFIG_KEY
 from nb_cli.handlers import run_script, list_scripts
 
-from .consts import MACOS, WINDOWS, CONFIG_KEY
-
-default_style = Style.from_dict(
+CLI_DEFAULT_STYLE = Style.from_dict(
     {
         "questionmark": "fg:#673AB7 bold",
         "question": "",
@@ -23,88 +20,6 @@ default_style = Style.from_dict(
         "answer": "bold",
     }
 )
-
-
-def list_to_shell_command(cmd: list[str]) -> str:
-    return " ".join(
-        f'"{token}"' if " " in token and token[0] not in {"'", '"'} else token
-        for token in cmd
-    )
-
-
-def _get_win_folder_from_registry(csidl_name):
-    import winreg as _winreg
-
-    shell_folder_name = {
-        "CSIDL_APPDATA": "AppData",
-        "CSIDL_COMMON_APPDATA": "Common AppData",
-        "CSIDL_LOCAL_APPDATA": "Local AppData",
-    }[csidl_name]
-
-    key = _winreg.OpenKey(
-        _winreg.HKEY_CURRENT_USER,
-        r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders",
-    )
-    dir, type = _winreg.QueryValueEx(key, shell_folder_name)
-
-    return dir
-
-
-def _get_win_folder_with_ctypes(csidl_name):
-    import ctypes
-
-    csidl_const = {
-        "CSIDL_APPDATA": 26,
-        "CSIDL_COMMON_APPDATA": 35,
-        "CSIDL_LOCAL_APPDATA": 28,
-    }[csidl_name]
-
-    buf = ctypes.create_unicode_buffer(1024)
-    ctypes.windll.shell32.SHGetFolderPathW(None, csidl_const, None, 0, buf)
-
-    # Downgrade to short path name if have highbit chars. See
-    # <http://bugs.activestate.com/show_bug.cgi?id=85099>.
-    has_high_char = False
-    for c in buf:
-        if ord(c) > 255:
-            has_high_char = True
-            break
-    if has_high_char:
-        buf2 = ctypes.create_unicode_buffer(1024)
-        if ctypes.windll.kernel32.GetShortPathNameW(buf.value, buf2, 1024):
-            buf = buf2
-
-    return buf.value
-
-
-def get_data_dir(version: Optional[str] = None) -> Path:
-    home = os.getenv("NONEBOT_CLI_HOME")
-    if home:
-        return Path(home).expanduser()
-
-    if WINDOWS:
-        try:
-            from ctypes import windll
-
-            _get_win_folder = _get_win_folder_with_ctypes
-        except ImportError:
-            _get_win_folder = _get_win_folder_from_registry
-        const = "CSIDL_APPDATA"
-        path = os.path.normpath(_get_win_folder(const))
-        path = os.path.join(path, "nonebot_cli")
-    elif MACOS:
-        path = os.path.expanduser("~/Library/Application Support/nonebot_cli")
-    else:
-        path = os.getenv("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
-        path = os.path.join(path, "nonebot_cli")
-
-    if version:
-        path = os.path.join(path, version)
-
-    return Path(path)
-
-
-DATA_DIR = get_data_dir()
 
 
 class ClickAliasedCommand(click.Command):
@@ -197,8 +112,14 @@ class CLIMainGroup(ClickAliasedGroup):
         config: Config = ctx.meta[CONFIG_KEY]
         scripts = list_scripts(python_path=config.nb_cli.python)
         return [
-            self.command(name=script)(
-                partial(run_script, script_name=script, config=config)
+            self.command(name=script, help=f"Run script {script!r}")(
+                partial(
+                    run_script,
+                    script_name=script,
+                    adapters=config.nonebot.adapters,
+                    builtin_plugins=config.nonebot.builtin_plugins,
+                    python_path=config.nb_cli.python,
+                )
             )
             for script in scripts
         ]
@@ -212,4 +133,6 @@ class CLIMainGroup(ClickAliasedGroup):
         return next(filter(lambda x: x.name == cmd_name, scripts), None)
 
     def list_commands(self, ctx: click.Context) -> List[str]:
-        return super().list_commands(ctx)
+        return super().list_commands(ctx) + [
+            cmd.name for cmd in self._load_scripts(ctx) if cmd.name
+        ]

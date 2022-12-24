@@ -5,4 +5,4 @@ try:
 except Exception:
     __version__ = None
 
-from .commands import cli as cli
+from .cli import cli as cli
