@@ -38,7 +38,7 @@ pre-commit = "^2.18.1"
 nb-autodoc = { git = "https://github.com/nonebot/nb-autodoc.git" }
 
 [tool.poetry.scripts]
-nb = "nb_cli.__main__:main"
+nb = "nb_cli.__main__:cli"
 
 [tool.pyright]
 reportPrivateImportUsage = false
