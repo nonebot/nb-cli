@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import tomlkit
 from tomlkit.items import SingleKey
@@ -15,8 +15,9 @@ class ConfigManager:
         self.file = config_file
         self.encoding = encoding
 
-    def _get_data(self) -> TOMLDocument:
-        return tomlkit.parse(self.file.read_text(encoding=self.encoding))
+    def _get_data(self) -> Optional[TOMLDocument]:
+        if self.file.is_file():
+            return tomlkit.parse(self.file.read_text(encoding=self.encoding))
 
     def _write_data(self, data: TOMLDocument) -> None:
         self.file.write_text(tomlkit.dumps(data), encoding=self.encoding)
@@ -34,4 +35,8 @@ class ConfigManager:
         }
 
     def get_config(self) -> Config:
-        return Config.parse_obj(self._get_config(self._get_data()))
+        return (
+            Config.parse_obj(self._get_config(data))
+            if (data := self._get_data())
+            else Config()
+        )

@@ -1,9 +1,7 @@
-import os
-import sys
-import sysconfig
-
 # consts
 ENTRYPOINT_GROUP = "nb"
+REQUIRES_PYTHON = (3, 8)
+DEFAULT_DRIVER = ("FastAPI",)
 # SHELL = os.getenv("SHELL", "")
 # WINDOWS = sys.platform.startswith("win") or (
 #     sys.platform == "cli" and os.name == "nt"
@@ -14,8 +12,3 @@ ENTRYPOINT_GROUP = "nb"
 # context keys
 MANAGER_KEY = "nb.config_manager"
 CONFIG_KEY = "nb.config"
-
-GET_BUILTIN_PLUGINS_SCRIPT = """
-import nonebot
-print(nonebot.__path__[0])
-""".strip()

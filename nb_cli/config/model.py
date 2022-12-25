@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import Extra, BaseModel
 
 
 # CLI Configs
@@ -9,7 +9,7 @@ class Filter(BaseModel):
     exclude: Optional[List[str]] = None
 
 
-class CLIConfig(BaseModel):
+class CLIConfig(BaseModel, extra=Extra.allow):
     python: str = "python"
     plugins: Filter = Filter()
     scripts: Filter = Filter()
@@ -25,18 +25,27 @@ class Adapter(SimpleInfo):
     project_link: str
     desc: str
 
+    class Config:
+        module_name = "adapters"
+
 
 class Plugin(SimpleInfo):
     project_link: str
     desc: str
+
+    class Config:
+        module_name = "plugins"
 
 
 class Driver(SimpleInfo):
     project_link: str
     desc: str
 
+    class Config:
+        module_name = "drivers"
 
-class NoneBotConfig(BaseModel):
+
+class NoneBotConfig(BaseModel, extra=Extra.allow):
     adapters: List[SimpleInfo] = []
     plugins: List[str] = []
     plugin_dirs: List[str] = []

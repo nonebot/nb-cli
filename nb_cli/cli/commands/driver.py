@@ -1,6 +1,6 @@
 import click
 
-from nb_cli.utils import ClickAliasedGroup
+from nb_cli.cli import ClickAliasedGroup
 from nb_cli.handlers import search_driver, install_driver, driver_no_subcommand
 
 
