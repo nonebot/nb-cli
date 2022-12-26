@@ -1,25 +1,14 @@
+from functools import partial
 from typing import Dict, List, Optional
-from functools import partial, lru_cache
 
 import click
-from prompt_toolkit.styles import Style
 
+from nb_cli import cache
 from nb_cli.config import Config
 from nb_cli.consts import CONFIG_KEY
 from nb_cli.handlers import run_script, list_scripts
 
-CLI_DEFAULT_STYLE = Style.from_dict(
-    {
-        "questionmark": "fg:#673AB7 bold",
-        "question": "",
-        "sign": "",
-        "unsign": "",
-        "selected": "",
-        "pointer": "bold",
-        "annotation": "",
-        "answer": "bold",
-    }
-)
+from .utils import run_async
 
 
 class ClickAliasedCommand(click.Command):
@@ -59,13 +48,9 @@ class ClickAliasedGroup(click.Group):
             self._aliases[alias] = cmd_name
 
     def resolve_alias(self, cmd_name):
-        return (
-            self._aliases[cmd_name] if cmd_name in self._aliases else cmd_name
-        )
+        return self._aliases[cmd_name] if cmd_name in self._aliases else cmd_name
 
-    def add_command(
-        self, cmd: click.Command, name: Optional[str] = None
-    ) -> None:
+    def add_command(self, cmd: click.Command, name: Optional[str] = None) -> None:
         aliases: Optional[List[str]] = getattr(cmd, "_aliases", None)
         if aliases and isinstance(cmd, ClickAliasedCommand) and cmd.name:
             self.add_aliases(cmd.name, aliases)
@@ -76,9 +61,7 @@ class ClickAliasedGroup(click.Group):
         if command := super(ClickAliasedGroup, self).get_command(ctx, cmd_name):
             return command
 
-    def format_commands(
-        self, ctx: click.Context, formatter: click.HelpFormatter
-    ):
+    def format_commands(self, ctx: click.Context, formatter: click.HelpFormatter):
         rows = []
 
         sub_commands = self.list_commands(ctx)
@@ -107,32 +90,29 @@ class CLIMainGroup(ClickAliasedGroup):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    @lru_cache
-    def _load_scripts(self, ctx: click.Context) -> List[click.Command]:
+    @run_async  # type: ignore
+    @cache(ttl=None)
+    async def _load_scripts(self, ctx: click.Context) -> List[click.Command]:
         config: Config = ctx.meta[CONFIG_KEY]
-        scripts = list_scripts(python_path=config.nb_cli.python)
+        scripts = await list_scripts(python_path=config.python)
         return [
             self.command(name=script, help=f"Run script {script!r}")(
                 partial(
                     run_script,
                     script_name=script,
-                    adapters=config.nonebot.adapters,
-                    builtin_plugins=config.nonebot.builtin_plugins,
-                    python_path=config.nb_cli.python,
+                    python_path=config.python,
                 )
             )
             for script in scripts
         ]
 
-    def get_command(
-        self, ctx: click.Context, cmd_name: str
-    ) -> Optional[click.Command]:
+    def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
         if command := super().get_command(ctx, cmd_name):
             return command
-        scripts = self._load_scripts(ctx)
+        scripts: List[click.Command] = self._load_scripts(ctx)
         return next(filter(lambda x: x.name == cmd_name, scripts), None)
 
     def list_commands(self, ctx: click.Context) -> List[str]:
         return super().list_commands(ctx) + [
-            cmd.name for cmd in self._load_scripts(ctx) if cmd.name
+            cmd.name for cmd in self._load_scripts(ctx) if cmd.name  # type: ignore
         ]

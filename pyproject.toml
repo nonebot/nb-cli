@@ -20,16 +20,18 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 click = "^8.0.0"
+anyio = "^3.6.2"
 jinja2 = "^3.0.0"
 wcwidth = "^0.2.5"
 tomlkit = "^0.10.0"
 pydantic = "^1.9.1"
-noneprompt = "^0.1.6"
+noneprompt = "^0.1.7"
 watchfiles = "^0.16.1"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
 httpx = ">=0.18.0, <1.0.0"
 typing-extensions = "^4.4.0"
+cashews = "^5.0.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
@@ -39,9 +41,10 @@ pre-commit = "^2.18.1"
 nb-autodoc = { git = "https://github.com/nonebot/nb-autodoc.git" }
 
 [tool.poetry.scripts]
-nb = "nb_cli.__main__:cli"
+nb = "nb_cli.__main__:main"
 
 [tool.pyright]
+pythonPlatform = "All"
 reportPrivateImportUsage = false
 reportShadowedImports = false
 

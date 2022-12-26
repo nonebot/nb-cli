@@ -1,21 +1,21 @@
 import json
 import shutil
-import contextlib
-import subprocess
+import asyncio
 from pathlib import Path
-from functools import wraps, lru_cache
+from functools import wraps
 from typing_extensions import ParamSpec
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import (
     TYPE_CHECKING,
+    Any,
     Dict,
     List,
-    Type,
     Union,
     Literal,
     TypeVar,
     Callable,
     Optional,
+    Coroutine,
     overload,
 )
 
@@ -24,8 +24,10 @@ import httpx
 from wcwidth import wcswidth
 from pyfiglet import figlet_format
 
-from nb_cli.consts import CONFIG_KEY, REQUIRES_PYTHON
-from nb_cli.config import Config, Driver, Plugin, Adapter, ConfigManager
+from nb_cli import cache
+from nb_cli.config.model import NoneBotConfig
+from nb_cli.consts import CONFIG_KEY, MANAGER_KEY, REQUIRES_PYTHON
+from nb_cli.config import Config, Driver, Plugin, Adapter, ConfigManager, NoneBotConfig
 from nb_cli.exceptions import (
     ModuleLoadFailed,
     PythonVersionError,
@@ -44,36 +46,53 @@ def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
 
 
+def get_config_manager() -> ConfigManager:
+    if ctx := click.get_current_context(silent=True):
+        return ctx.meta[MANAGER_KEY]
+    return ConfigManager(Path("pyproject.toml"))
+
+
 def get_config() -> Config:
     if ctx := click.get_current_context(silent=True):
         return ctx.meta[CONFIG_KEY]
     return ConfigManager(Path("pyproject.toml")).get_config()
 
 
+def get_nonebot_config() -> NoneBotConfig:
+    return get_config_manager().get_nonebot_config()
+
+
 if TYPE_CHECKING:
 
-    def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
+    async def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
         ...
 
 else:
 
-    @lru_cache()
-    def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
+    @cache(ttl=None)
+    async def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
         if python_path is None:
-            python_path = get_config().nb_cli.python
+            python_path = get_config().python
 
         t = templates.get_template("meta/python_version.py.jinja")
-        return json.loads(
-            subprocess.check_output([python_path, "-c", t.render()], text=True).strip()
+        proc = await asyncio.create_subprocess_exec(
+            python_path,
+            "-c",
+            await t.render_async(),
+            stdout=asyncio.subprocess.PIPE,
         )
+        stdout, _ = await proc.communicate()
+        return json.loads(stdout.strip())
 
 
-def requires_python(func: Callable[P, R]) -> Callable[P, R]:
+def requires_python(
+    func: Callable[P, Coroutine[Any, Any, R]]
+) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        version = get_python_version()
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        version = await get_python_version()
         if (version["major"], version["minor"]) >= REQUIRES_PYTHON:
-            return func(*args, **kwargs)
+            return await func(*args, **kwargs)
 
         raise PythonVersionError(
             f"Python {version['major']}.{version['minor']} is not supported."
@@ -84,28 +103,35 @@ def requires_python(func: Callable[P, R]) -> Callable[P, R]:
 
 if TYPE_CHECKING:
 
-    def get_nonebot_version(python_path: Optional[str] = None) -> str:
+    async def get_nonebot_version(python_path: Optional[str] = None) -> str:
         ...
 
 else:
 
-    @lru_cache()
-    def get_nonebot_version(python_path: Optional[str] = None) -> str:
+    @cache(ttl=None)
+    async def get_nonebot_version(python_path: Optional[str] = None) -> str:
         if python_path is None:
-            python_path = get_config().nb_cli.python
+            python_path = get_config().python
 
         t = templates.get_template("meta/nonebot_version.py.jinja")
-        return json.loads(
-            subprocess.check_output([python_path, "-c", t.render()], text=True).strip()
+        proc = await asyncio.create_subprocess_exec(
+            python_path,
+            "-c",
+            await t.render_async(),
+            stdout=asyncio.subprocess.PIPE,
         )
+        stdout, _ = await proc.communicate()
+        return json.loads(stdout.strip())
 
 
-def requires_nonebot(func: Callable[P, R]) -> Callable[P, R]:
+def requires_nonebot(
+    func: Callable[P, Coroutine[Any, Any, R]]
+) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     @requires_python
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if get_nonebot_version():
-            return func(*args, **kwargs)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        if await get_nonebot_version():
+            return await func(*args, **kwargs)
 
         raise NoneBotNotInstalledError("NoneBot is not installed.")
 
@@ -114,28 +140,35 @@ def requires_nonebot(func: Callable[P, R]) -> Callable[P, R]:
 
 if TYPE_CHECKING:
 
-    def get_pip_version(python_path: Optional[str] = None) -> str:
+    async def get_pip_version(python_path: Optional[str] = None) -> str:
         ...
 
 else:
 
-    @lru_cache()
-    def get_pip_version(python_path: Optional[str] = None) -> str:
+    @cache(ttl=None)
+    async def get_pip_version(python_path: Optional[str] = None) -> str:
         if python_path is None:
-            python_path = get_config().nb_cli.python
+            python_path = get_config().python
 
         t = templates.get_template("meta/pip_version.py.jinja")
-        return json.loads(
-            subprocess.check_output([python_path, "-c", t.render()], text=True).strip()
+        proc = await asyncio.create_subprocess_exec(
+            python_path,
+            "-c",
+            await t.render_async(),
+            stdout=asyncio.subprocess.PIPE,
         )
+        stdout, _ = await proc.communicate()
+        return json.loads(stdout.strip())
 
 
-def requires_pip(func: Callable[P, R]) -> Callable[P, R]:
+def requires_pip(
+    func: Callable[P, Coroutine[Any, Any, R]]
+) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     @requires_python
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if get_pip_version():
-            return func(*args, **kwargs)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        if await get_pip_version():
+            return await func(*args, **kwargs)
 
         raise PipNotInstalledError("pip is not installed.")
 
@@ -145,26 +178,26 @@ def requires_pip(func: Callable[P, R]) -> Callable[P, R]:
 if TYPE_CHECKING:
 
     @overload
-    def load_module_data(module_type: Literal["adapter"]) -> List[Adapter]:
+    async def load_module_data(module_type: Literal["adapter"]) -> List[Adapter]:
         ...
 
     @overload
-    def load_module_data(module_type: Literal["plugin"]) -> List[Plugin]:
+    async def load_module_data(module_type: Literal["plugin"]) -> List[Plugin]:
         ...
 
     @overload
-    def load_module_data(module_type: Literal["driver"]) -> List[Driver]:
+    async def load_module_data(module_type: Literal["driver"]) -> List[Driver]:
         ...
 
-    def load_module_data(
+    async def load_module_data(
         module_type: Literal["adapter", "plugin", "driver"]
     ) -> Union[List[Adapter], List[Plugin], List[Driver]]:
         ...
 
 else:
 
-    @lru_cache()
-    def load_module_data(
+    @cache(ttl=None)
+    async def load_module_data(
         module_type: Literal["adapter", "plugin", "driver"]
     ) -> Union[List[Adapter], List[Plugin], List[Driver]]:
         if module_type == "adapter":
@@ -197,13 +230,13 @@ else:
         raise ModuleLoadFailed(f"Failed to get {module_name} list.", exceptions)
 
 
-def print_package_results(
+def format_package_results(
     hits: List[T],
     name_column_width: Optional[int] = None,
     terminal_width: Optional[int] = None,
-):
+) -> str:
     if not hits:
-        return
+        return ""
 
     if name_column_width is None:
         name_column_width = (
@@ -212,6 +245,7 @@ def print_package_results(
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
+    lines: List[str] = []
     for hit in hits:
         name = f"{hit.name} ({hit.project_link})"
         summary = hit.desc
@@ -228,6 +262,6 @@ def print_package_results(
             summary_lines.append(summary)
             summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
 
-        line = f"{name + ' ' * (name_column_width - wcswidth(name))} - {summary}"
-        with contextlib.suppress(UnicodeEncodeError):
-            print(line)
+        lines.append(f"{name + ' ' * (name_column_width - wcswidth(name))} - {summary}")
+
+    return "\n".join(lines)

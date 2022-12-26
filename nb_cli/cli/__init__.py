@@ -10,7 +10,9 @@ from nb_cli.config import ConfigManager
 from nb_cli.consts import CONFIG_KEY, MANAGER_KEY
 
 from .customize import CLIMainGroup
-from .customize import CLI_DEFAULT_STYLE as CLI_DEFAULT_STYLE
+from .utils import run_sync as run_sync
+from .utils import run_async as run_async
+from .utils import CLI_DEFAULT_STYLE as CLI_DEFAULT_STYLE
 from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import ClickAliasedCommand as ClickAliasedCommand
 
@@ -19,7 +21,7 @@ def prepare_config(ctx: click.Context, param: click.Parameter, value: str):
     # prepare for cli context
     manager = ConfigManager(Path(ctx.params["config"]), ctx.params["encoding"])
     config_data = manager.get_config()
-    config_data.nb_cli.python = value
+    config_data.python = value
 
     ctx.meta[MANAGER_KEY] = manager
     ctx.meta[CONFIG_KEY] = config_data
@@ -60,7 +62,8 @@ def prepare_config(ctx: click.Context, param: click.Parameter, value: str):
     callback=prepare_config,
 )
 @click.pass_context
-def cli(ctx: click.Context, config: str, encoding: str, python: str):
+@run_async
+async def cli(ctx: click.Context, config: str, encoding: str, python: str):
     # postpone scripts discovery, only when needed (invoked)
     # see {ref}`CLIMainGroup.get_command <nb_cli.cli.customize.CLIMainGroup.get_command>`
 
@@ -71,8 +74,8 @@ def cli(ctx: click.Context, config: str, encoding: str, python: str):
 
     # auto discover sub commands and scripts
     choices: List[Choice[click.Command]] = []
-    for sub_cmd_name in command.list_commands(ctx):
-        if sub_cmd := command.get_command(ctx, sub_cmd_name):
+    for sub_cmd_name in await run_sync(command.list_commands)(ctx):
+        if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
                 Choice(
                     sub_cmd.help or f"Run subcommand {sub_cmd.name}",
@@ -86,18 +89,20 @@ def cli(ctx: click.Context, config: str, encoding: str, python: str):
 
     # prompt user to choose
     try:
-        result = ListPrompt("What do you want to do?", choices=choices).prompt(
-            style=CLI_DEFAULT_STYLE
-        )
+        result = await ListPrompt(
+            "What do you want to do?", choices=choices
+        ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit(0)
 
     sub_cmd = result.data
-    ctx.invoke(sub_cmd)
+    await run_sync(ctx.invoke)(sub_cmd)
 
 
-from .commands import run, create, generate
+from .commands import run, create, plugin, generate
 
 cli.add_command(run)
 cli.add_command(create)
 cli.add_command(generate)
+
+cli.add_command(plugin)

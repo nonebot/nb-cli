@@ -1,14 +1,17 @@
+import os
 import sys
-import subprocess
+import signal
+import asyncio
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import IO, Any, Dict, List, Union, Optional
 
 from cookiecutter.main import cookiecutter
 
+from nb_cli.consts import WINDOWS
 from nb_cli.config import SimpleInfo
 
 from . import templates
-from .meta import get_config, requires_nonebot
+from .meta import get_config, requires_nonebot, get_nonebot_config
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
@@ -34,50 +37,66 @@ def create_project(
     )
 
 
-def generate_run_script(
+async def generate_run_script(
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
 ) -> str:
+    bot_config = get_nonebot_config()
     if adapters is None:
-        adapters = get_config().nonebot.adapters
+        adapters = bot_config.adapters
     if builtin_plugins is None:
-        builtin_plugins = get_config().nonebot.builtin_plugins
+        builtin_plugins = bot_config.builtin_plugins
 
     t = templates.get_template("project/run_project.py.jinja")
-    return t.render(adapters=adapters, builtin_plugins=builtin_plugins)
+    return await t.render_async(adapters=adapters, builtin_plugins=builtin_plugins)
 
 
 @requires_nonebot
-def run_project(
+async def run_project(
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
     exist_bot: Path = Path("bot.py"),
     python_path: Optional[str] = None,
-) -> subprocess.CompletedProcess[str]:
+    cwd: Optional[Path] = None,
+    stdin: Optional[Union[IO[Any], int]] = None,
+    stdout: Optional[Union[IO[Any], int]] = None,
+    stderr: Optional[Union[IO[Any], int]] = None,
+) -> asyncio.subprocess.Process:
+    bot_config = get_nonebot_config()
     if adapters is None:
-        adapters = get_config().nonebot.adapters
+        adapters = bot_config.adapters
     if builtin_plugins is None:
-        builtin_plugins = get_config().nonebot.builtin_plugins
+        builtin_plugins = bot_config.builtin_plugins
     if python_path is None:
-        python_path = get_config().nb_cli.python
+        python_path = get_config().python
 
     if exist_bot.exists():
-        return subprocess.run(
-            [python_path, exist_bot],
-            text=True,
-            stdin=sys.stdin,
-            stdout=sys.stdout,
-            stderr=sys.stderr,
+        return await asyncio.create_subprocess_exec(
+            python_path,
+            exist_bot,
+            cwd=cwd,
+            stdin=stdin or sys.stdin,
+            stdout=stdout or sys.stdout,
+            stderr=stderr or sys.stderr,
         )
 
-    return subprocess.run(
-        [
-            python_path,
-            "-c",
-            generate_run_script(adapters=adapters, builtin_plugins=builtin_plugins),
-        ],
-        text=True,
-        stdin=sys.stdin,
-        stdout=sys.stdout,
-        stderr=sys.stderr,
+    return await asyncio.create_subprocess_exec(
+        python_path,
+        "-c",
+        await generate_run_script(adapters=adapters, builtin_plugins=builtin_plugins),
+        cwd=cwd,
+        stdin=stdin or sys.stdin,
+        stdout=stdout or sys.stdout,
+        stderr=stderr or sys.stderr,
     )
+
+
+async def terminate_project(process: asyncio.subprocess.Process) -> None:
+    if process.returncode is not None:
+        return
+    if WINDOWS:
+        os.kill(process.pid, signal.CTRL_C_EVENT)
+    else:
+        process.terminate()
+
+    await process.wait()

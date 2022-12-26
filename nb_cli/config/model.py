@@ -9,7 +9,7 @@ class Filter(BaseModel):
     exclude: Optional[List[str]] = None
 
 
-class CLIConfig(BaseModel, extra=Extra.allow):
+class Config(BaseModel, extra=Extra.allow):
     python: str = "python"
     plugins: Filter = Filter()
     scripts: Filter = Filter()
@@ -50,8 +50,3 @@ class NoneBotConfig(BaseModel, extra=Extra.allow):
     plugins: List[str] = []
     plugin_dirs: List[str] = []
     builtin_plugins: List[str] = []
-
-
-class Config(BaseModel):
-    nb_cli: CLIConfig = CLIConfig()
-    nonebot: NoneBotConfig = NoneBotConfig()

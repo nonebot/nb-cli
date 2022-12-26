@@ -15,9 +15,9 @@ TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
 
 @requires_nonebot
-def list_builtin_plugins(python_path: Optional[str] = None) -> List[str]:
+async def list_builtin_plugins(python_path: Optional[str] = None) -> List[str]:
     if python_path is None:
-        python_path = get_config().nb_cli.python
+        python_path = get_config().python
 
     t = templates.get_template("plugin/list_builtin_plugin.py.jinja")
 
@@ -41,8 +41,8 @@ def create_plugin(
     )
 
 
-def list_plugins(query: Optional[str] = None) -> List[Plugin]:
-    plugins = load_module_data("plugin")
+async def list_plugins(query: Optional[str] = None) -> List[Plugin]:
+    plugins = await load_module_data("plugin")
     if query is None:
         return plugins
 
