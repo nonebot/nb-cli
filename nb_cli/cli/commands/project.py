@@ -79,23 +79,7 @@ def prompt_common_context() -> Dict[str, Any]:
             ).prompt(style=CLI_DEFAULT_STYLE)
         )
 
-    try:
-        builtin_plugins = [
-            choice.data
-            for choice in CheckboxPrompt(
-                "Which builtin plugin(s) would you like to use?",
-                [Choice(name, name) for name in list_builtin_plugins()],
-            ).prompt(style=CLI_DEFAULT_STYLE)
-        ]
-    except NoneBotNotInstalledError:
-        builtin_plugins = []
-
-    return {
-        "project_name": project_name,
-        "drivers": drivers,
-        "adapters": adapters,
-        "builtin_plugins": builtin_plugins,
-    }
+    return {"project_name": project_name, "drivers": drivers, "adapters": adapters}
 
 
 def prompt_simple_context(context: Dict[str, Any]) -> Dict[str, Any]:

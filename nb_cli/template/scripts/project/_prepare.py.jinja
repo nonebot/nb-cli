@@ -1,5 +1,5 @@
 {% macro _adapter_name(adapter) %}
-{{ adapter.name|replace(" ", "_")|upper }}Adapter
+{{ adapter.name|replace(" ", "_")|replace("-", "_")|upper }}Adapter
 {% endmacro %}
 
 {% macro _import_adapter(adapter) %}

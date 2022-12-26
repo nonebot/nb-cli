@@ -12,4 +12,4 @@ def remove(filepath):
         shutil.rmtree(filepath)
 
 
-remove(os.path.join("{{cookiecutter.source_dir}}", "plugins", ".gitkeep"))
+remove(os.path.join("{{cookiecutter.computed.source_dir}}", "plugins", ".gitkeep"))

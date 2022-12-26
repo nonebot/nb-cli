@@ -1,4 +1,4 @@
-# {{ cookiecutter.project_name }}
+# {{ cookiecutter.nonebot.project_name }}
 
 ## How to start
 

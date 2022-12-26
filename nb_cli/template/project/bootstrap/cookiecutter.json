@@ -2,9 +2,10 @@
   "nonebot": {
     "project_name": "AwesomeBot",
     "drivers": [],
-    "adapters": [],
-    "builtin_plugins": []
+    "adapters": []
   },
-  "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
-  "project_desc": "{{ cookiecutter.nonebot.project_name }}"
+  "computed": {
+    "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
+    "project_desc": "{{ cookiecutter.nonebot.project_name }}"
+  }
 }
