@@ -1,3 +1,4 @@
+from pathlib import Path
 from functools import partial
 from typing import Dict, List, Optional
 
@@ -90,21 +91,34 @@ class CLIMainGroup(ClickAliasedGroup):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def _build_script_command(self, script_name: str) -> click.Command:
+        params = [
+            click.Option(
+                ["-d", "--cwd"], default=".", help="The working directory.", type=Path
+            )
+        ]
+        return self.command(
+            name=script_name, params=params, help=f"Run script {script_name!r}"
+        )(
+            partial(
+                run_script,
+                script_name=script_name,
+            )
+        )
+
     @run_async  # type: ignore
     @cache(ttl=None)
     async def _load_scripts(self, ctx: click.Context) -> List[click.Command]:
         config: Config = ctx.meta[CONFIG_KEY]
         scripts = await list_scripts(python_path=config.python)
-        return [
-            self.command(name=script, help=f"Run script {script!r}")(
-                partial(
-                    run_script,
-                    script_name=script,
-                    python_path=config.python,
-                )
-            )
+        includes = config.scripts.includes or scripts
+        excludes = config.scripts.excludes or []
+        scripts = [
+            script
             for script in scripts
+            if script in includes and script not in excludes
         ]
+        return [self._build_script_command(script) for script in scripts]
 
     def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
         if command := super().get_command(ctx, cmd_name):

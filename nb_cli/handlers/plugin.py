@@ -1,4 +1,3 @@
-import sys
 import json
 import subprocess
 from pathlib import Path
@@ -9,7 +8,7 @@ from cookiecutter.main import cookiecutter
 from nb_cli.config import Plugin
 
 from . import templates
-from .meta import get_config, requires_pip, load_module_data, requires_nonebot
+from .meta import get_config, load_module_data, requires_nonebot
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 

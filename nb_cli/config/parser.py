@@ -21,7 +21,7 @@ class ConfigManager:
         self.file.write_text(tomlkit.dumps(data), encoding=self.encoding)
 
     def _get_config(self, data: TOMLDocument) -> Dict[str, Any]:
-        return data.get(SingleKey("tool").concat(SingleKey("nb_cli")), {})
+        return data.get("tool", {}).get("nb_cli", {})
 
     def get_config(self) -> Config:
         return (
@@ -31,7 +31,7 @@ class ConfigManager:
         )
 
     def _get_nonebot_config(self, data: TOMLDocument) -> Dict[str, Any]:
-        return data.get(SingleKey("tool").concat(SingleKey("nonebot")), {})
+        return data.get("tool", {}).get("nonebot", {})
 
     def get_nonebot_config(self) -> NoneBotConfig:
         return (
@@ -43,9 +43,7 @@ class ConfigManager:
     def add_adapter(self, adapter: SimpleInfo) -> None:
         if not (data := self._get_data()):
             raise RuntimeError("Config file not found!")
-        table: Dict[str, Any] = data.setdefault(
-            SingleKey("tool").concat(SingleKey("nonebot")), {}
-        )
+        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
         if all(a["module_name"] != adapter.module_name for a in adapters):
             t = tomlkit.inline_table()
@@ -56,9 +54,7 @@ class ConfigManager:
     def remove_adapter(self, adapter: SimpleInfo) -> None:
         if not (data := self._get_data()):
             raise RuntimeError("Config file not found!")
-        table: Dict[str, Any] = data.setdefault(
-            SingleKey("tool").concat(SingleKey("nonebot")), {}
-        )
+        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
         if index := next(
             (
@@ -74,9 +70,7 @@ class ConfigManager:
     def add_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
             raise RuntimeError("Config file not found!")
-        table: Dict[str, Any] = data.setdefault(
-            SingleKey("tool").concat(SingleKey("nonebot")), {}
-        )
+        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("plugins", [])
         if plugin not in plugins:
             plugins.append(plugin)
@@ -85,9 +79,7 @@ class ConfigManager:
     def remove_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
             raise RuntimeError("Config file not found!")
-        table: Dict[str, Any] = data.setdefault(
-            SingleKey("tool").concat(SingleKey("nonebot")), {}
-        )
+        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("plugins", [])
         if plugin in plugins:
             plugins.remove(plugin)
@@ -96,9 +88,7 @@ class ConfigManager:
     def add_builtin_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
             raise RuntimeError("Config file not found!")
-        table: Dict[str, Any] = data.setdefault(
-            SingleKey("tool").concat(SingleKey("nonebot")), {}
-        )
+        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("builtin_plugins", [])
         if plugin not in plugins:
             plugins.append(plugin)
@@ -107,9 +97,7 @@ class ConfigManager:
     def remove_builtin_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
             raise RuntimeError("Config file not found!")
-        table: Dict[str, Any] = data.setdefault(
-            SingleKey("tool").concat(SingleKey("nonebot")), {}
-        )
+        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("builtin_plugins", [])
         if plugin in plugins:
             plugins.remove(plugin)

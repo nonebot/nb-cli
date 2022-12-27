@@ -1,6 +1,5 @@
 import sys
 import asyncio
-import threading
 from pathlib import Path
 from typing import IO, Any, List, Callable, Optional, Coroutine, cast
 
@@ -8,7 +7,7 @@ from watchfiles import awatch
 
 from nb_cli.consts import WINDOWS
 
-from .signal import register_signal_handler
+from .signal import remove_signal_handler, register_signal_handler
 
 
 class FileFilter:
@@ -132,6 +131,8 @@ class Reloader:
         print(f"Restarted process [{self.process.pid}].", file=self.stdout)
 
     async def shutdown(self) -> None:
+        remove_signal_handler(self.handle_exit)
+
         if self.process:
             print(f"Shutting down process [{self.process.pid}]...", file=self.stdout)
             await self.shutdown_func(self.process)

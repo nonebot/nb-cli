@@ -7,8 +7,8 @@ from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
-    list_plugins,
-    create_plugin,
+    list_adapters,
+    create_adapter,
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,
@@ -20,8 +20,8 @@ from nb_cli.handlers import (
 @click.group(cls=ClickAliasedGroup, invoke_without_command=True)
 @click.pass_context
 @run_async
-async def plugin(ctx: click.Context):
-    """Manage Bot Plugin."""
+async def adapter(ctx: click.Context):
+    """Manage Bot Adapter."""
 
     if ctx.invoked_subcommand is not None:
         return
@@ -49,77 +49,76 @@ async def plugin(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@plugin.command()
+@adapter.command()
 @run_async
 async def list():
-    """List nonebot plugins published on nonebot homepage."""
-    plugins = await list_plugins()
-    click.echo(format_package_results(plugins))
+    """List nonebot adapters published on nonebot homepage."""
+    adapters = await list_adapters()
+    click.echo(format_package_results(adapters))
 
 
-@plugin.command()
-@click.argument("name", nargs=1, required=False, default=None)
+@adapter.command()
+@click.argument("name", nargs=1, default=None)
 @run_async
 async def search(name: Optional[str]):
-    """Search for nonebot plugin published on nonebot homepage."""
+    """Search for nonebot adapter published on nonebot homepage."""
     if name is None:
-        name = await InputPrompt("Plugin name to search:").prompt_async(
+        name = await InputPrompt("Adapter name to search:").prompt_async(
             style=CLI_DEFAULT_STYLE
         )
-    plugins = await list_plugins(name)
-    click.echo(format_package_results(plugins))
+    adapters = await list_adapters(name)
+    click.echo(format_package_results(adapters))
 
 
-@plugin.command(aliases=["add"])
-@click.argument("name", nargs=1, required=False, default=None)
+@adapter.command(aliases=["add"])
+@click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def install(name: Optional[str], pip_args: Optional[List[str]]):
-    """Install nonebot plugin to current project."""
-    plugin = await find_exact_package(
-        "Plugin name to install:", name, await list_plugins()
+    """Install nonebot adapter to current project."""
+    adapter = await find_exact_package(
+        "Adapter name to install:", name, await list_adapters()
     )
     try:
-        get_config_manager().add_plugin(plugin.module_name)
+        get_config_manager().add_adapter(adapter)
     except RuntimeError as e:
-        click.echo(f"Failed to add plugin {plugin.name} to config: {e}")
+        click.echo(f"Failed to add adapter {adapter.name} to config: {e}")
 
-    await call_pip_install(plugin.project_link, pip_args)
+    await call_pip_install(adapter.project_link, pip_args)
 
 
-@plugin.command()
-@click.argument("name", nargs=1, required=False, default=None)
+@adapter.command()
+@click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(name: Optional[str], pip_args: Optional[List[str]]):
-    """Update nonebot plugin."""
-    plugin = await find_exact_package(
-        "Plugin name to update:", name, await list_plugins()
+    """Update nonebot adapter."""
+    adapter = await find_exact_package(
+        "Adapter name to update:", name, await list_adapters()
     )
-    await call_pip_update(plugin.project_link, pip_args)
+    await call_pip_update(adapter.project_link, pip_args)
 
 
-@plugin.command(aliases=["remove"])
-@click.argument("name", nargs=1, required=False, default=None)
+@adapter.command(aliases=["remove"])
+@click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
-    """Uninstall nonebot plugin from current project."""
-    plugin = await find_exact_package(
-        "Plugin name to uninstall:", name, await list_plugins()
+    """Uninstall nonebot adapter from current project."""
+    adapter = await find_exact_package(
+        "Adapter name to uninstall:", name, await list_adapters()
     )
 
     try:
-        get_config_manager().remove_plugin(plugin.module_name)
+        get_config_manager().remove_adapter(adapter)
     except RuntimeError as e:
-        click.echo(f"Failed to remove plugin {plugin.name} from config: {e}")
+        click.echo(f"Failed to remove adapter {adapter.name} from config: {e}")
 
-    await call_pip_uninstall(plugin.project_link, pip_args)
+    await call_pip_uninstall(adapter.project_link, pip_args)
 
 
-@plugin.command(aliases=["new"])
-@click.argument("name", nargs=1, required=False, default=None)
-@click.option("-s", "--sub-plugin", is_flag=True, default=False)
+@adapter.command(aliases=["new"])
+@click.argument("name", default=None)
 @click.option(
     "-o",
     "--output-dir",
@@ -130,20 +129,23 @@ async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
 @run_async
 async def create(
     name: Optional[str],
-    sub_plugin: bool,
     output_dir: Optional[str],
     template: Optional[str],
 ):
-    """Create a new nonebot plugin."""
+    """Create a new nonebot adapter."""
     if name is None:
-        name = await InputPrompt("Plugin name:").prompt_async(style=CLI_DEFAULT_STYLE)
+        name = await InputPrompt("Adapter name:").prompt_async(style=CLI_DEFAULT_STYLE)
     if output_dir is None:
         detected: List[Choice[None]] = [
-            Choice(str(d)) for d in Path(".").glob("**/plugins/") if d.is_dir()
+            Choice(str(x)) for x in Path(".").glob("**/adapters/") if x.is_dir()
+        ] or [
+            Choice(f"{x}/adapters/")
+            for x in Path(".").glob("*/")
+            if x.is_dir() and not x.name.startswith(".") and not x.name.startswith("_")
         ]
         output_dir = (
             await ListPrompt(
-                "Where to store the plugin?", detected + [Choice("Other")]
+                "Where to store the adapter?", detected + [Choice("Other")]
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         ).name
         if output_dir == "Other":
@@ -152,8 +154,8 @@ async def create(
                 validator=lambda x: len(x) > 0 and Path(x).is_dir(),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
     elif not Path(output_dir).is_dir():
-        click.secho("Output Dir is not a directory!", fg="yellow")
+        click.secho("Output dir is not a directory!", fg="yellow")
         output_dir = await InputPrompt(
-            "Output Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
+            "Adapter Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
         ).prompt_async(style=CLI_DEFAULT_STYLE)
-    create_plugin(name, output_dir, sub_plugin=sub_plugin, template=template)
+    create_adapter(name, output_dir, template=template)

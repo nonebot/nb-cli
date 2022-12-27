@@ -37,3 +37,7 @@ def register_signal_handler(
     handler: Callable[[int, Optional[FrameType]], None]
 ) -> None:
     handlers.append(handler)
+
+
+def remove_signal_handler(handler: Callable[[int, Optional[FrameType]], None]) -> None:
+    handlers.remove(handler)

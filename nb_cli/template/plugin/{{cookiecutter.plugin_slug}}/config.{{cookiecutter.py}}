@@ -1,8 +1,5 @@
-from pydantic import BaseSettings
+from pydantic import BaseModel, Extra
 
 
-class Config(BaseSettings):
-    # Your Config Here
-
-    class Config:
-        extra = "ignore"
+class Config(BaseModel, extra=Extra.ignore):
+    """Plugin Config Here"""

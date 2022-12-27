@@ -2,7 +2,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from nb_cli.consts import ENTRYPOINT_GROUP
+from nb_cli.consts import SCRIPTS_GROUP
 
 templates = Environment(
     trim_blocks=True,
@@ -11,7 +11,7 @@ templates = Environment(
     loader=FileSystemLoader(Path(__file__).parent.parent / "template" / "scripts"),
     enable_async=True,
 )
-templates.globals["ENTRYPOINT_GROUP"] = ENTRYPOINT_GROUP
+templates.globals["ENTRYPOINT_GROUP"] = SCRIPTS_GROUP
 templates.filters["repr"] = repr
 
 from .meta import draw_logo as draw_logo
@@ -28,6 +28,7 @@ from .plugin import create_plugin as create_plugin
 from .adapter import list_adapters as list_adapters
 from .pip import call_pip_update as call_pip_update
 from .meta import requires_python as requires_python
+from .adapter import create_adapter as create_adapter
 from .pip import call_pip_install as call_pip_install
 from .project import create_project as create_project
 from .meta import load_module_data as load_module_data
@@ -40,6 +41,7 @@ from .meta import get_nonebot_version as get_nonebot_version
 from .project import generate_run_script as generate_run_script
 from .plugin import list_builtin_plugins as list_builtin_plugins
 from .meta import format_package_results as format_package_results
+from .signal import remove_signal_handler as remove_signal_handler
 from .signal import install_signal_handler as install_signal_handler
 from .project import list_project_templates as list_project_templates
 from .signal import register_signal_handler as register_signal_handler

@@ -25,6 +25,7 @@ from nb_cli.handlers import (
     create_project,
     terminate_project,
     generate_run_script,
+    remove_signal_handler,
     list_project_templates,
     register_signal_handler,
 )
@@ -222,3 +223,4 @@ async def run(
         await proc.wait()
         should_exit.set()
         await task
+        remove_signal_handler(shutdown)

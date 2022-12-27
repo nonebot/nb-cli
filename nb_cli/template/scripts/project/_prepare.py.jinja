@@ -23,7 +23,7 @@ driver.register_adapter({{ _adapter_name(adapter) }})
 {% endmacro %}
 
 {% macro _load_builtin_plugins(builtin_plugins) %}
-nonebot.load_builtin_plugins({{ builtin_plugins|map(repr)|join(", ") }})
+nonebot.load_builtin_plugins({{ builtin_plugins|map("repr")|join(", ") }})
 {% endmacro %}
 
 {% macro prepare_bot(adapters, builtin_plugins) %}

@@ -5,13 +5,12 @@ from pydantic import Extra, BaseModel
 
 # CLI Configs
 class Filter(BaseModel):
-    include: Optional[List[str]] = None
-    exclude: Optional[List[str]] = None
+    includes: Optional[List[str]] = None
+    excludes: Optional[List[str]] = None
 
 
 class Config(BaseModel, extra=Extra.allow):
     python: str = "python"
-    plugins: Filter = Filter()
     scripts: Filter = Filter()
 
 

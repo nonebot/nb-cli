@@ -2,7 +2,8 @@ import os
 import sys
 
 # consts
-ENTRYPOINT_GROUP = "nb"
+PLUGINS_GROUP = "nb"
+SCRIPTS_GROUP = "nb_scripts"
 REQUIRES_PYTHON = (3, 8)
 DEFAULT_DRIVER = ("FastAPI",)
 # SHELL = os.getenv("SHELL", "")
