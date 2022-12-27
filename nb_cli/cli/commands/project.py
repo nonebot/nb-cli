@@ -109,10 +109,18 @@ TEMPLATE_PROMPTS = {
 
 
 @click.command(cls=ClickAliasedCommand, aliases=["init"])
+@click.option(
+    "-o",
+    "--output-dir",
+    default=None,
+    type=click.Path(exists=True, file_okay=False, writable=True),
+)
 @click.option("-t", "--template", default=None, help="The project template to use.")
 @click.pass_context
 @run_async
-async def create(ctx: click.Context, template: Optional[str]):
+async def create(
+    ctx: click.Context, output_dir: Optional[str], template: Optional[str]
+):
     """Create a NoneBot project."""
     if not template:
         templates = list_project_templates()
@@ -136,7 +144,7 @@ async def create(ctx: click.Context, template: Optional[str]):
     except CancelledError:
         ctx.exit()
 
-    create_project(template, {"nonebot": context})
+    create_project(template, {"nonebot": context}, output_dir)
 
     if not await ConfirmPrompt(
         "Install dependencies now?", default_choice=True

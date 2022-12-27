@@ -23,7 +23,7 @@ def list_project_templates() -> List[str]:
 def create_project(
     project_template: str,
     context: Optional[Dict[str, Any]] = None,
-    output_dir: str = ".",
+    output_dir: Optional[str] = None,
     no_input: bool = True,
 ) -> None:
     path = TEMPLATE_ROOT / project_template
@@ -33,7 +33,7 @@ def create_project(
         path,
         no_input=no_input,
         extra_context=context,
-        output_dir=output_dir,
+        output_dir=output_dir or ".",
     )
 
 
