@@ -62,6 +62,9 @@ class ClickAliasedGroup(click.Group):
         if command := super(ClickAliasedGroup, self).get_command(ctx, cmd_name):
             return command
 
+    def list_commands(self, ctx: click.Context) -> List[str]:
+        return list(self.commands.keys())
+
     def format_commands(self, ctx: click.Context, formatter: click.HelpFormatter):
         rows = []
 

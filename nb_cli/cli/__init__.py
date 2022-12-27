@@ -101,8 +101,8 @@ async def cli(ctx: click.Context, config: str, encoding: str, python: str):
 
 from .commands import run, self, create, plugin, adapter, generate
 
-cli.add_command(run)
 cli.add_command(create)
+cli.add_command(run)
 cli.add_command(generate)
 
 cli.add_command(plugin)
