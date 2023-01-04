@@ -1,5 +1,6 @@
 from pathlib import Path
 from functools import partial
+from collections import Counter
 from typing import Dict, List, Optional
 
 import click
@@ -104,7 +105,7 @@ class CLIMainGroup(ClickAliasedGroup):
             name=script_name, params=params, help=f"Run script {script_name!r}"
         )(
             partial(
-                run_script,
+                run_async(run_script),
                 script_name=script_name,
             )
         )
@@ -121,6 +122,21 @@ class CLIMainGroup(ClickAliasedGroup):
             for script in scripts
             if script in includes and script not in excludes
         ]
+        # check duplicate
+        elements = Counter(scripts).most_common()
+        if elements[0][1] > 1:
+            script_names = ", ".join(e[0] for e in elements if e[1] > 1)
+            raise ValueError(
+                f"Duplicate script names {script_names} found. "
+                "Please check your configuration."
+            )
+        # check command conflict
+        commands = super().list_commands(ctx)
+        if conflicts := set(scripts).intersection(commands):
+            raise ValueError(
+                f"Script names {', '.join(conflicts)} conflict with commands. "
+                "Please check your configuration."
+            )
         return [self._build_script_command(script) for script in scripts]
 
     def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
@@ -130,6 +146,5 @@ class CLIMainGroup(ClickAliasedGroup):
         return next(filter(lambda x: x.name == cmd_name, scripts), None)
 
     def list_commands(self, ctx: click.Context) -> List[str]:
-        return super().list_commands(ctx) + [
-            cmd.name for cmd in self._load_scripts(ctx) if cmd.name  # type: ignore
-        ]
+        scripts: List[click.Command] = self._load_scripts(ctx)
+        return super().list_commands(ctx) + [cmd.name for cmd in scripts if cmd.name]
