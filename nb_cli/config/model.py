@@ -1,20 +1,8 @@
-from typing import List, Optional
+from typing import List
 
 from pydantic import Extra, BaseModel
 
 
-# CLI Configs
-class Filter(BaseModel):
-    includes: Optional[List[str]] = None
-    excludes: Optional[List[str]] = None
-
-
-class Config(BaseModel, extra=Extra.allow):
-    python: str = "python"
-    scripts: Filter = Filter()
-
-
-# NoneBot Configs
 class SimpleInfo(BaseModel):
     name: str
     module_name: str

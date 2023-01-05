@@ -19,15 +19,14 @@ from typing import (
     overload,
 )
 
-import click
 import httpx
 from wcwidth import wcswidth
 from pyfiglet import figlet_format
 
 from nb_cli import cache
+from nb_cli.consts import REQUIRES_PYTHON
 from nb_cli.config.model import NoneBotConfig
-from nb_cli.consts import CONFIG_KEY, MANAGER_KEY, REQUIRES_PYTHON
-from nb_cli.config import Config, Driver, Plugin, Adapter, ConfigManager, NoneBotConfig
+from nb_cli.config import GLOBAL_CONFIG, Driver, Plugin, Adapter, NoneBotConfig
 from nb_cli.exceptions import (
     ModuleLoadFailed,
     PythonVersionError,
@@ -46,20 +45,8 @@ def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
 
 
-def get_config_manager() -> ConfigManager:
-    if ctx := click.get_current_context(silent=True):
-        return ctx.meta[MANAGER_KEY]
-    return ConfigManager(Path("pyproject.toml"))
-
-
-def get_config() -> Config:
-    if ctx := click.get_current_context(silent=True):
-        return ctx.meta[CONFIG_KEY]
-    return ConfigManager(Path("pyproject.toml")).get_config()
-
-
 def get_nonebot_config() -> NoneBotConfig:
-    return get_config_manager().get_nonebot_config()
+    return GLOBAL_CONFIG.get_nonebot_config()
 
 
 if TYPE_CHECKING:
@@ -72,7 +59,7 @@ else:
     @cache(ttl=None)
     async def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
         if python_path is None:
-            python_path = get_config().python
+            python_path = GLOBAL_CONFIG.python
 
         t = templates.get_template("meta/python_version.py.jinja")
         proc = await asyncio.create_subprocess_exec(
@@ -111,7 +98,7 @@ else:
     @cache(ttl=None)
     async def get_nonebot_version(python_path: Optional[str] = None) -> str:
         if python_path is None:
-            python_path = get_config().python
+            python_path = GLOBAL_CONFIG.python
 
         t = templates.get_template("meta/nonebot_version.py.jinja")
         proc = await asyncio.create_subprocess_exec(
@@ -148,7 +135,7 @@ else:
     @cache(ttl=None)
     async def get_pip_version(python_path: Optional[str] = None) -> str:
         if python_path is None:
-            python_path = get_config().python
+            python_path = GLOBAL_CONFIG.python
 
         t = templates.get_template("meta/pip_version.py.jinja")
         proc = await asyncio.create_subprocess_exec(

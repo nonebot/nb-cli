@@ -16,12 +16,10 @@ templates.filters["repr"] = repr
 
 # meta
 from .meta import draw_logo as draw_logo
-from .meta import get_config as get_config
 from .meta import requires_pip as requires_pip
 from .meta import requires_python as requires_python
 from .meta import load_module_data as load_module_data
 from .meta import requires_nonebot as requires_nonebot
-from .meta import get_config_manager as get_config_manager
 from .meta import get_python_version as get_python_version
 from .meta import get_nonebot_version as get_nonebot_version
 from .meta import format_package_results as format_package_results

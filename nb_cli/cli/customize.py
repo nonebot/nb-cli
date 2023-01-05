@@ -6,8 +6,7 @@ from typing import Dict, List, Optional
 import click
 
 from nb_cli import cache
-from nb_cli.config import Config
-from nb_cli.consts import CONFIG_KEY
+from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.handlers import run_script, list_scripts
 
 from .utils import run_async
@@ -113,15 +112,7 @@ class CLIMainGroup(ClickAliasedGroup):
     @run_async  # type: ignore
     @cache(ttl=None)
     async def _load_scripts(self, ctx: click.Context) -> List[click.Command]:
-        config: Config = ctx.meta[CONFIG_KEY]
-        scripts = await list_scripts(python_path=config.python)
-        includes = config.scripts.includes or scripts
-        excludes = config.scripts.excludes or []
-        scripts = [
-            script
-            for script in scripts
-            if script in includes and script not in excludes
-        ]
+        scripts = await list_scripts(python_path=GLOBAL_CONFIG.python)
         # check duplicate
         elements = Counter(scripts).most_common()
         if elements and elements[0][1] > 1:

@@ -2,14 +2,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import tomlkit
-from tomlkit.items import SingleKey
 from tomlkit.toml_document import TOMLDocument
 
-from .model import Config, SimpleInfo, NoneBotConfig
+from .model import SimpleInfo, NoneBotConfig
 
 
 class ConfigManager:
-    def __init__(self, config_file: Path, encoding: str = "utf-8"):
+    def __init__(self, python: str, config_file: Path, encoding: str = "utf-8"):
+        self.python = python
         self.file = config_file
         self.encoding = encoding
 
@@ -19,16 +19,6 @@ class ConfigManager:
 
     def _write_data(self, data: TOMLDocument) -> None:
         self.file.write_text(tomlkit.dumps(data), encoding=self.encoding)
-
-    def _get_config(self, data: TOMLDocument) -> Dict[str, Any]:
-        return data.get("tool", {}).get("nb_cli", {})
-
-    def get_config(self) -> Config:
-        return (
-            Config.parse_obj(self._get_config(data))
-            if (data := self._get_data())
-            else Config()
-        )
 
     def _get_nonebot_config(self, data: TOMLDocument) -> Dict[str, Any]:
         return data.get("tool", {}).get("nonebot", {})

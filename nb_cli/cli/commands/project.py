@@ -146,15 +146,21 @@ async def create(
 
     create_project(template, {"nonebot": context}, output_dir)
 
-    if not await ConfirmPrompt(
-        "Install dependencies now?", default_choice=True
-    ).prompt_async(style=CLI_DEFAULT_STYLE):
+    try:
+        if not await ConfirmPrompt(
+            "Install dependencies now?", default_choice=True
+        ).prompt_async(style=CLI_DEFAULT_STYLE):
+            ctx.exit()
+    except CancelledError:
         ctx.exit()
 
     project_dir = context["project_name"].replace(" ", "-")
-    use_venv = await ConfirmPrompt(
-        "Use virtual environment?", default_choice=True
-    ).prompt_async(style=CLI_DEFAULT_STYLE)
+    try:
+        use_venv = await ConfirmPrompt(
+            "Use virtual environment?", default_choice=True
+        ).prompt_async(style=CLI_DEFAULT_STYLE)
+    except CancelledError:
+        ctx.exit()
     # TODO: install dependencies
 
 

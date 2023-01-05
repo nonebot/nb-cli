@@ -10,7 +10,3 @@ DEFAULT_DRIVER = ("FastAPI",)
 WINDOWS = sys.platform.startswith("win") or (sys.platform == "cli" and os.name == "nt")
 # MINGW = sysconfig.get_platform().startswith("mingw")
 # MACOS = sys.platform == "darwin"
-
-# context keys
-MANAGER_KEY = "nb.config_manager"
-CONFIG_KEY = "nb.config"

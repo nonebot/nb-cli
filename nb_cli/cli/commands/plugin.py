@@ -4,6 +4,7 @@ from typing import List, Optional, cast
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
+from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
@@ -12,7 +13,6 @@ from nb_cli.handlers import (
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,
-    get_config_manager,
     format_package_results,
 )
 
@@ -43,7 +43,7 @@ async def plugin(ctx: click.Context):
             "What do you want to do?", choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
-        ctx.exit(0)
+        ctx.exit()
 
     sub_cmd = result.data
     await run_sync(ctx.invoke)(sub_cmd)
@@ -73,48 +73,77 @@ async def search(name: Optional[str]):
 @plugin.command(aliases=["add"])
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def install(name: Optional[str], pip_args: Optional[List[str]]):
+async def install(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Install nonebot plugin to current project."""
-    plugin = await find_exact_package(
-        "Plugin name to install:", name, await list_plugins()
-    )
     try:
-        get_config_manager().add_plugin(plugin.module_name)
+        plugin = await find_exact_package(
+            "Plugin name to install:", name, await list_plugins()
+        )
+    except CancelledError:
+        ctx.exit()
+    except Exception:
+        ctx.exit(1)
+
+    try:
+        GLOBAL_CONFIG.add_plugin(plugin.module_name)
     except RuntimeError as e:
         click.echo(f"Failed to add plugin {plugin.name} to config: {e}")
 
-    await call_pip_install(plugin.project_link, pip_args)
+    proc = await call_pip_install(plugin.project_link, pip_args)
+    await proc.wait()
 
 
 @plugin.command()
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def update(name: Optional[str], pip_args: Optional[List[str]]):
+async def update(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Update nonebot plugin."""
-    plugin = await find_exact_package(
-        "Plugin name to update:", name, await list_plugins()
-    )
-    await call_pip_update(plugin.project_link, pip_args)
+    try:
+        plugin = await find_exact_package(
+            "Plugin name to update:", name, await list_plugins()
+        )
+    except CancelledError:
+        ctx.exit()
+    except Exception:
+        ctx.exit(1)
+
+    proc = await call_pip_update(plugin.project_link, pip_args)
+    await proc.wait()
 
 
 @plugin.command(aliases=["remove"])
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
+async def uninstall(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Uninstall nonebot plugin from current project."""
-    plugin = await find_exact_package(
-        "Plugin name to uninstall:", name, await list_plugins()
-    )
+    try:
+        plugin = await find_exact_package(
+            "Plugin name to uninstall:", name, await list_plugins()
+        )
+    except CancelledError:
+        ctx.exit()
+    except Exception:
+        ctx.exit(1)
 
     try:
-        get_config_manager().remove_plugin(plugin.module_name)
+        GLOBAL_CONFIG.remove_plugin(plugin.module_name)
     except RuntimeError as e:
         click.echo(f"Failed to remove plugin {plugin.name} from config: {e}")
 
-    await call_pip_uninstall(plugin.project_link, pip_args)
+    proc = await call_pip_uninstall(plugin.project_link, pip_args)
+    await proc.wait()
 
 
 @plugin.command(aliases=["new"])
@@ -127,8 +156,10 @@ async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
 @click.option("-t", "--template", default=None)
+@click.pass_context
 @run_async
 async def create(
+    ctx: click.Context,
     name: Optional[str],
     sub_plugin: bool,
     output_dir: Optional[str],
@@ -136,24 +167,36 @@ async def create(
 ):
     """Create a new nonebot plugin."""
     if name is None:
-        name = await InputPrompt("Plugin name:").prompt_async(style=CLI_DEFAULT_STYLE)
+        try:
+            name = await InputPrompt("Plugin name:").prompt_async(
+                style=CLI_DEFAULT_STYLE
+            )
+        except CancelledError:
+            ctx.exit()
     if output_dir is None:
         detected: List[Choice[None]] = [
             Choice(str(d)) for d in Path(".").glob("**/plugins/") if d.is_dir()
         ]
-        output_dir = (
-            await ListPrompt(
-                "Where to store the plugin?", detected + [Choice("Other")]
-            ).prompt_async(style=CLI_DEFAULT_STYLE)
-        ).name
-        if output_dir == "Other":
-            output_dir = await InputPrompt(
-                "Output Dir:",
-                validator=lambda x: len(x) > 0 and Path(x).is_dir(),
-            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        try:
+            output_dir = (
+                await ListPrompt(
+                    "Where to store the plugin?", detected + [Choice("Other")]
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+            ).name
+            if output_dir == "Other":
+                output_dir = await InputPrompt(
+                    "Output Dir:",
+                    validator=lambda x: len(x) > 0 and Path(x).is_dir(),
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
     elif not Path(output_dir).is_dir():
         click.secho("Output Dir is not a directory!", fg="yellow")
-        output_dir = await InputPrompt(
-            "Output Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
+        try:
+            output_dir = await InputPrompt(
+                "Output Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
+
     create_plugin(name, output_dir, sub_plugin=sub_plugin, template=template)

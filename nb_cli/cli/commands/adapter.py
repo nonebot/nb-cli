@@ -4,6 +4,7 @@ from typing import List, Optional, cast
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
+from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
@@ -12,7 +13,6 @@ from nb_cli.handlers import (
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,
-    get_config_manager,
     format_package_results,
 )
 
@@ -43,7 +43,7 @@ async def adapter(ctx: click.Context):
             "What do you want to do?", choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
-        ctx.exit(0)
+        ctx.exit()
 
     sub_cmd = result.data
     await run_sync(ctx.invoke)(sub_cmd)
@@ -73,48 +73,77 @@ async def search(name: Optional[str]):
 @adapter.command(aliases=["add"])
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def install(name: Optional[str], pip_args: Optional[List[str]]):
+async def install(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Install nonebot adapter to current project."""
-    adapter = await find_exact_package(
-        "Adapter name to install:", name, await list_adapters()
-    )
     try:
-        get_config_manager().add_adapter(adapter)
+        adapter = await find_exact_package(
+            "Adapter name to install:", name, await list_adapters()
+        )
+    except CancelledError:
+        ctx.exit()
+    except Exception:
+        ctx.exit(1)
+
+    try:
+        GLOBAL_CONFIG.add_adapter(adapter)
     except RuntimeError as e:
         click.echo(f"Failed to add adapter {adapter.name} to config: {e}")
 
-    await call_pip_install(adapter.project_link, pip_args)
+    proc = await call_pip_install(adapter.project_link, pip_args)
+    await proc.wait()
 
 
 @adapter.command()
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def update(name: Optional[str], pip_args: Optional[List[str]]):
+async def update(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Update nonebot adapter."""
-    adapter = await find_exact_package(
-        "Adapter name to update:", name, await list_adapters()
-    )
-    await call_pip_update(adapter.project_link, pip_args)
+    try:
+        adapter = await find_exact_package(
+            "Adapter name to update:", name, await list_adapters()
+        )
+    except CancelledError:
+        ctx.exit()
+    except Exception:
+        ctx.exit(1)
+
+    proc = await call_pip_update(adapter.project_link, pip_args)
+    await proc.wait()
 
 
 @adapter.command(aliases=["remove"])
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
+async def uninstall(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Uninstall nonebot adapter from current project."""
-    adapter = await find_exact_package(
-        "Adapter name to uninstall:", name, await list_adapters()
-    )
+    try:
+        adapter = await find_exact_package(
+            "Adapter name to uninstall:", name, await list_adapters()
+        )
+    except CancelledError:
+        ctx.exit()
+    except Exception:
+        ctx.exit(1)
 
     try:
-        get_config_manager().remove_adapter(adapter)
+        GLOBAL_CONFIG.remove_adapter(adapter)
     except RuntimeError as e:
         click.echo(f"Failed to remove adapter {adapter.name} from config: {e}")
 
-    await call_pip_uninstall(adapter.project_link, pip_args)
+    proc = await call_pip_uninstall(adapter.project_link, pip_args)
+    await proc.wait()
 
 
 @adapter.command(aliases=["new"])
@@ -126,15 +155,22 @@ async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
 @click.option("-t", "--template", default=None)
+@click.pass_context
 @run_async
 async def create(
+    ctx: click.Context,
     name: Optional[str],
     output_dir: Optional[str],
     template: Optional[str],
 ):
     """Create a new nonebot adapter."""
     if name is None:
-        name = await InputPrompt("Adapter name:").prompt_async(style=CLI_DEFAULT_STYLE)
+        try:
+            name = await InputPrompt("Adapter name:").prompt_async(
+                style=CLI_DEFAULT_STYLE
+            )
+        except CancelledError:
+            ctx.exit()
     if output_dir is None:
         detected: List[Choice[None]] = [
             Choice(str(x)) for x in Path(".").glob("**/adapters/") if x.is_dir()
@@ -143,19 +179,25 @@ async def create(
             for x in Path(".").glob("*/")
             if x.is_dir() and not x.name.startswith(".") and not x.name.startswith("_")
         ]
-        output_dir = (
-            await ListPrompt(
-                "Where to store the adapter?", detected + [Choice("Other")]
-            ).prompt_async(style=CLI_DEFAULT_STYLE)
-        ).name
-        if output_dir == "Other":
-            output_dir = await InputPrompt(
-                "Output Dir:",
-                validator=lambda x: len(x) > 0 and Path(x).is_dir(),
-            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        try:
+            output_dir = (
+                await ListPrompt(
+                    "Where to store the adapter?", detected + [Choice("Other")]
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+            ).name
+            if output_dir == "Other":
+                output_dir = await InputPrompt(
+                    "Output Dir:",
+                    validator=lambda x: len(x) > 0 and Path(x).is_dir(),
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
     elif not Path(output_dir).is_dir():
         click.secho("Output dir is not a directory!", fg="yellow")
-        output_dir = await InputPrompt(
-            "Adapter Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
+        try:
+            output_dir = await InputPrompt(
+                "Adapter Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
     create_adapter(name, output_dir, template=template)

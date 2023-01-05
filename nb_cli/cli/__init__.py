@@ -6,8 +6,7 @@ from noneprompt import Choice, ListPrompt, CancelledError
 
 from nb_cli import __version__
 from nb_cli.handlers import draw_logo
-from nb_cli.config import ConfigManager
-from nb_cli.consts import CONFIG_KEY, MANAGER_KEY
+from nb_cli.config import GLOBAL_CONFIG
 
 from .customize import CLIMainGroup
 from .utils import run_sync as run_sync
@@ -17,14 +16,16 @@ from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import ClickAliasedCommand as ClickAliasedCommand
 
 
-def prepare_config(ctx: click.Context, param: click.Parameter, value: str):
-    # prepare for cli context
-    manager = ConfigManager(Path(ctx.params["config"]), ctx.params["encoding"])
-    config_data = manager.get_config()
-    config_data.python = value
+def prepare_config(ctx: click.Context, param: click.Option, value: str):
+    GLOBAL_CONFIG.file = Path(value)
 
-    ctx.meta[MANAGER_KEY] = manager
-    ctx.meta[CONFIG_KEY] = config_data
+
+def prepare_encoding(ctx: click.Context, param: click.Option, value: str):
+    GLOBAL_CONFIG.encoding = value
+
+
+def prepare_python(ctx: click.Context, param: click.Option, value: str):
+    GLOBAL_CONFIG.python = value
 
 
 @click.group(
@@ -44,7 +45,10 @@ def prepare_config(ctx: click.Context, param: click.Parameter, value: str):
     "--config",
     default="pyproject.toml",
     help="Config file path.",
+    type=click.Path(exists=True, dir_okay=False, readable=True),
     is_eager=True,
+    expose_value=False,
+    callback=prepare_config,
 )
 @click.option(
     "-e",
@@ -52,6 +56,8 @@ def prepare_config(ctx: click.Context, param: click.Parameter, value: str):
     default="utf-8",
     help="Config file encoding.",
     is_eager=True,
+    expose_value=False,
+    callback=prepare_encoding,
 )
 @click.option(
     "-py",
@@ -59,11 +65,12 @@ def prepare_config(ctx: click.Context, param: click.Parameter, value: str):
     default="python",
     help="Python executable path.",
     is_eager=True,
-    callback=prepare_config,
+    expose_value=False,
+    callback=prepare_python,
 )
 @click.pass_context
 @run_async
-async def cli(ctx: click.Context, config: str, encoding: str, python: str):
+async def cli(ctx: click.Context):
     # postpone scripts discovery, only when needed (invoked)
     # see {ref}`CLIMainGroup.get_command <nb_cli.cli.customize.CLIMainGroup.get_command>`
 
@@ -93,7 +100,7 @@ async def cli(ctx: click.Context, config: str, encoding: str, python: str):
             "What do you want to do?", choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
-        ctx.exit(0)
+        ctx.exit()
 
     sub_cmd = result.data
     await run_sync(ctx.invoke)(sub_cmd)

@@ -34,7 +34,7 @@ async def self(ctx: click.Context):
             "What do you want to do?", choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
-        ctx.exit(0)
+        ctx.exit()
 
     sub_cmd = result.data
     await run_sync(ctx.invoke)(sub_cmd)
@@ -43,14 +43,22 @@ async def self(ctx: click.Context):
 @self.command(aliases=["add"])
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def install(name: Optional[str], pip_args: Optional[List[str]]):
+async def install(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Install dependency to cli venv."""
     if name is None:
-        name = await InputPrompt("Package name you want to install?").prompt_async(
-            style=CLI_DEFAULT_STYLE
-        )
-    await call_pip_install(name, pip_args, sys.executable)
+        try:
+            name = await InputPrompt("Package name you want to install?").prompt_async(
+                style=CLI_DEFAULT_STYLE
+            )
+        except CancelledError:
+            ctx.exit()
+
+    proc = await call_pip_install(name, pip_args, sys.executable)
+    await proc.wait()
 
 
 @self.command()
@@ -58,17 +66,26 @@ async def install(name: Optional[str], pip_args: Optional[List[str]]):
 @run_async
 async def update(pip_args: Optional[List[str]]):
     """Update nonebot plugin."""
-    await call_pip_update("nb-cli", pip_args, sys.executable)
+    proc = await call_pip_update("nb-cli", pip_args, sys.executable)
+    await proc.wait()
 
 
 @self.command(aliases=["remove"])
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
 @run_async
-async def uninstall(name: Optional[str], pip_args: Optional[List[str]]):
+async def uninstall(
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+):
     """Uninstall nonebot cli dependency from cli venv."""
     if name is None:
-        name = await InputPrompt("Package name you want to uninstall?").prompt_async(
-            style=CLI_DEFAULT_STYLE
-        )
-    await call_pip_install(name, pip_args, sys.executable)
+        try:
+            name = await InputPrompt(
+                "Package name you want to uninstall?"
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
+
+    proc = await call_pip_install(name, pip_args, sys.executable)
+    await proc.wait()

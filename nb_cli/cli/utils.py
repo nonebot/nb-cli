@@ -51,7 +51,7 @@ async def find_exact_package(
     else:
         click.echo(f"Package {name} not found.")
 
-    click.get_current_context().exit(1)
+    raise RuntimeError("No or multiple packages found.")
 
 
 def run_sync(func: Callable[P, R]) -> Callable[P, Coroutine[Any, Any, R]]:
