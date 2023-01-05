@@ -4,4 +4,4 @@ import json
 
 {{ get_entrypoints() }}
 
-print(json.dumps(sorted(entrypoints.names)))
+print(json.dumps(sorted(e.name for e in entrypoints)))

@@ -139,7 +139,7 @@ class Reloader:
             print("Stopped reloader.", file=self.stdout)
 
     async def should_restart(self) -> Optional[List[Path]]:
-        changes = await anext(self.watcher)
+        changes = await self.watcher.__anext__()
         if changes:
             unique_paths = {Path(c[1]) for c in changes}
             return [p for p in unique_paths if self.watch_filter(p)]

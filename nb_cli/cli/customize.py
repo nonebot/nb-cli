@@ -124,7 +124,7 @@ class CLIMainGroup(ClickAliasedGroup):
         ]
         # check duplicate
         elements = Counter(scripts).most_common()
-        if elements[0][1] > 1:
+        if elements and elements[0][1] > 1:
             script_names = ", ".join(e[0] for e in elements if e[1] > 1)
             raise ValueError(
                 f"Duplicate script names {script_names} found. "

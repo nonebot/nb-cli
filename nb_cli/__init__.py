@@ -1,6 +1,5 @@
-from importlib.metadata import version, entry_points
-
 from cashews import Cache
+from importlib_metadata import EntryPoint, version, entry_points
 
 try:
     __version__ = version("nb-cli")
@@ -17,6 +16,7 @@ from .handlers import install_signal_handler
 
 
 def load_plugins():
+    entrypoint: EntryPoint
     for entrypoint in entry_points(group=PLUGINS_GROUP):
         entrypoint.load()()
 
