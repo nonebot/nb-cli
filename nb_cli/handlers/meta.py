@@ -63,7 +63,15 @@ else:
 
         t = templates.get_template("meta/python_executable.py.jinja")
         proc = await asyncio.create_subprocess_shell(
-            shlex.join(["python", "-W", "ignore", "-c", await t.render_async()]),
+            shlex.join(
+                [
+                    "python",
+                    "-W",
+                    "ignore",
+                    "-c",
+                    (await t.render_async()).replace("\n", "; "),
+                ]
+            ),
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()

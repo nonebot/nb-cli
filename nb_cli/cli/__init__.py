@@ -45,7 +45,7 @@ def prepare_python(ctx: click.Context, param: click.Option, value: str):
     "--config",
     default="pyproject.toml",
     help="Config file path.",
-    type=click.Path(exists=True, dir_okay=False, readable=True),
+    type=click.Path(exists=False, dir_okay=False, readable=True),
     is_eager=True,
     expose_value=False,
     callback=prepare_config,
