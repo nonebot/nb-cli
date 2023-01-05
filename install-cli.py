@@ -32,9 +32,7 @@ from urllib.request import Request, urlopen
 from contextlib import closing, contextmanager
 
 SHELL = os.getenv("SHELL", "")
-WINDOWS = sys.platform.startswith("win") or (
-    sys.platform == "cli" and os.name == "nt"
-)
+WINDOWS = sys.platform.startswith("win") or (sys.platform == "cli" and os.name == "nt")
 MINGW = sysconfig.get_platform().startswith("mingw")
 MACOS = sys.platform == "darwin"
 
@@ -281,9 +279,7 @@ class VirtualEnvironment:
         )
         # str is required for compatibility with subprocess run on CPython <= 3.7 on Windows
         self._python = str(
-            self._path.joinpath(
-                self._bin_path, "python.exe" if WINDOWS else "python"
-            )
+            self._path.joinpath(self._bin_path, "python.exe" if WINDOWS else "python")
         )
 
     @property
@@ -312,10 +308,10 @@ class VirtualEnvironment:
             builder.create(target)
         except ImportError:
             # fallback to using virtualenv package if venv is not available, eg: ubuntu
-            python_version = (
-                f"{sys.version_info.major}.{sys.version_info.minor}"
+            python_version = f"{sys.version_info.major}.{sys.version_info.minor}"
+            virtualenv_bootstrap_url = (
+                f"https://bootstrap.pypa.io/virtualenv/{python_version}/virtualenv.pyz"
             )
-            virtualenv_bootstrap_url = f"https://bootstrap.pypa.io/virtualenv/{python_version}/virtualenv.pyz"
 
             with tempfile.TemporaryDirectory(
                 prefix="nonebot-cli-installer"
@@ -525,18 +521,14 @@ class Installer:
                 )
             )
             if not self._accept_all:
-                continue_install = (
-                    input("Do you want to continue? ([y]/n) ") or "y"
-                )
+                continue_install = input("Do you want to continue? ([y]/n) ") or "y"
                 if continue_install.lower() in {"n", "no"}:
                     return 0
 
         try:
             self.install(version)
         except subprocess.CalledProcessError as e:
-            raise InstallationError(
-                return_code=e.returncode, log=e.output.decode()
-            )
+            raise InstallationError(return_code=e.returncode, log=e.output.decode())
 
         self._write("")
         self.display_post_message(version)
@@ -564,9 +556,7 @@ class Installer:
     def uninstall(self) -> int:
         if not self._data_dir.exists():
             self._write(
-                "{} is not currently installed.".format(
-                    colorize("info", "NoneBot CLI")
-                )
+                "{} is not currently installed.".format(colorize("info", "NoneBot CLI"))
             )
 
             return 1
@@ -701,9 +691,7 @@ class Installer:
         import winreg
 
         with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as root:
-            with winreg.OpenKey(
-                root, "Environment", 0, winreg.KEY_ALL_ACCESS
-            ) as key:
+            with winreg.OpenKey(root, "Environment", 0, winreg.KEY_ALL_ACCESS) as key:
                 path, _ = winreg.QueryValueEx(key, "PATH")
 
                 return path
@@ -757,9 +745,7 @@ class Installer:
     def get_version(self):
         current_version = None
         if self._data_dir.joinpath("VERSION").exists():
-            current_version = (
-                self._data_dir.joinpath("VERSION").read_text().strip()
-            )
+            current_version = self._data_dir.joinpath("VERSION").read_text().strip()
 
         self._write(colorize("info", "Retrieving NoneBot CLI metadata"))
 
@@ -842,9 +828,7 @@ def main():
         action="store_true",
         default=False,
     )
-    parser.add_argument(
-        "--version", help="install named version", dest="version"
-    )
+    parser.add_argument("--version", help="install named version", dest="version")
     parser.add_argument(
         "-f",
         "--force",
@@ -891,8 +875,7 @@ def main():
 
     installer = Installer(
         version=args.version or os.getenv("NONEBOT_CLI_VERSION"),
-        preview=args.preview
-        or string_to_bool(os.getenv("NONEBOT_CLI_PREVIEW", "0")),
+        preview=args.preview or string_to_bool(os.getenv("NONEBOT_CLI_PREVIEW", "0")),
         force=args.force,
         accept_all=args.accept_all
         or string_to_bool(os.getenv("NONEBOT_CLI_ACCEPT", "0"))
@@ -901,9 +884,7 @@ def main():
         git=args.git,
     )
 
-    if args.uninstall or string_to_bool(
-        os.getenv("NONEBOT_CLI_UNINSTALL", "0")
-    ):
+    if args.uninstall or string_to_bool(os.getenv("NONEBOT_CLI_UNINSTALL", "0")):
         return installer.uninstall()
 
     try:
