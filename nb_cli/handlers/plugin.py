@@ -1,11 +1,11 @@
 import json
-import subprocess
+import asyncio
 from pathlib import Path
 from typing import List, Optional
 
 from cookiecutter.main import cookiecutter
 
-from nb_cli.config import GLOBAL_CONFIG, Plugin
+from nb_cli.config import Plugin
 
 from . import templates
 from .meta import load_module_data, requires_nonebot, get_default_python
@@ -20,10 +20,16 @@ async def list_builtin_plugins(python_path: Optional[str] = None) -> List[str]:
 
     t = templates.get_template("plugin/list_builtin_plugin.py.jinja")
 
-    output = subprocess.check_output(
-        [python_path, "-W", "ignore", "-c", t.render()], text=True
+    proc = await asyncio.create_subprocess_exec(
+        python_path,
+        "-W",
+        "ignore",
+        "-c",
+        await t.render_async(),
+        stdout=asyncio.subprocess.PIPE,
     )
-    return json.loads(output)
+    stdout, _ = await proc.communicate()
+    return json.loads(stdout.strip())
 
 
 def create_plugin(

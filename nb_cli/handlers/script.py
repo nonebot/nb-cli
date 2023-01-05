@@ -57,7 +57,7 @@ async def run_script(
     return await asyncio.create_subprocess_exec(
         python_path,
         "-c",
-        t.render(
+        await t.render_async(
             adapters=adapters,
             builtin_plugins=builtin_plugins,
             script_name=script_name,
