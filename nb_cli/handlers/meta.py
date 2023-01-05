@@ -61,17 +61,8 @@ else:
         if GLOBAL_CONFIG.python is not None:
             return GLOBAL_CONFIG.python
 
-        t = templates.get_template("meta/python_executable.py.jinja")
         proc = await asyncio.create_subprocess_shell(
-            shlex.join(
-                [
-                    "python",
-                    "-W",
-                    "ignore",
-                    "-c",
-                    (await t.render_async()).replace("\n", "; "),
-                ]
-            ),
+            'python -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
