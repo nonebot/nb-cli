@@ -8,10 +8,10 @@ from typing import IO, Any, Dict, List, Union, Optional
 from cookiecutter.main import cookiecutter
 
 from nb_cli.consts import WINDOWS
-from nb_cli.config import GLOBAL_CONFIG, SimpleInfo
+from nb_cli.config import SimpleInfo
 
 from . import templates
-from .meta import requires_nonebot, get_nonebot_config
+from .meta import requires_nonebot, get_default_python, get_nonebot_config
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
@@ -68,7 +68,7 @@ async def run_project(
     if builtin_plugins is None:
         builtin_plugins = bot_config.builtin_plugins
     if python_path is None:
-        python_path = GLOBAL_CONFIG.python
+        python_path = await get_default_python()
 
     if exist_bot.exists():
         return await asyncio.create_subprocess_exec(

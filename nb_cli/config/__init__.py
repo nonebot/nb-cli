@@ -7,4 +7,4 @@ from .model import SimpleInfo as SimpleInfo
 from .model import NoneBotConfig as NoneBotConfig
 from .parser import ConfigManager as ConfigManager
 
-GLOBAL_CONFIG = ConfigManager("python", Path("pyproject.toml"), "utf-8")
+GLOBAL_CONFIG = ConfigManager()

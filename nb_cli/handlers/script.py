@@ -4,15 +4,20 @@ import asyncio
 from pathlib import Path
 from typing import IO, Any, List, Union, Optional
 
-from nb_cli.config import GLOBAL_CONFIG, SimpleInfo
+from nb_cli.config import SimpleInfo
 
 from . import templates
-from .meta import requires_python, requires_nonebot, get_nonebot_config
+from .meta import (
+    requires_python,
+    requires_nonebot,
+    get_default_python,
+    get_nonebot_config,
+)
 
 
 async def list_scripts(python_path: Optional[str] = None) -> List[str]:
     if python_path is None:
-        python_path = GLOBAL_CONFIG.python
+        python_path = await get_default_python()
 
     t = templates.get_template("script/list_scripts.py.jinja")
     proc = await asyncio.create_subprocess_exec(
@@ -45,7 +50,7 @@ async def run_script(
     if builtin_plugins is None:
         builtin_plugins = bot_config.builtin_plugins
     if python_path is None:
-        python_path = GLOBAL_CONFIG.python
+        python_path = await get_default_python()
 
     t = templates.get_template("script/run_script.py.jinja")
 

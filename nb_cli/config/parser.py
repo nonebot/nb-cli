@@ -8,7 +8,12 @@ from .model import SimpleInfo, NoneBotConfig
 
 
 class ConfigManager:
-    def __init__(self, python: str, config_file: Path, encoding: str = "utf-8"):
+    def __init__(
+        self,
+        python: Optional[str] = None,
+        config_file: Path = Path("pyproject.toml"),
+        encoding: str = "utf-8",
+    ):
         self.python = python
         self.file = config_file
         self.encoding = encoding

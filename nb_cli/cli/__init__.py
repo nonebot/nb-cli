@@ -62,7 +62,7 @@ def prepare_python(ctx: click.Context, param: click.Option, value: str):
 @click.option(
     "-py",
     "--python",
-    default="python",
+    default=None,
     help="Python executable path.",
     is_eager=True,
     expose_value=False,

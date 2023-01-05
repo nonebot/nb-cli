@@ -1,7 +1,7 @@
 import json
+import shlex
 import shutil
 import asyncio
-from pathlib import Path
 from functools import wraps
 from typing_extensions import ParamSpec
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -51,6 +51,27 @@ def get_nonebot_config() -> NoneBotConfig:
 
 if TYPE_CHECKING:
 
+    async def get_default_python() -> str:
+        ...
+
+else:
+
+    @cache(ttl=None)
+    async def get_default_python() -> str:
+        if GLOBAL_CONFIG.python is not None:
+            return GLOBAL_CONFIG.python
+
+        t = templates.get_template("meta/python_executable.py.jinja")
+        proc = await asyncio.create_subprocess_shell(
+            shlex.join(["python", "-W", "ignore", "-c", await t.render_async()]),
+            stdout=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await proc.communicate()
+        return json.loads(stdout.strip())
+
+
+if TYPE_CHECKING:
+
     async def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
         ...
 
@@ -59,11 +80,13 @@ else:
     @cache(ttl=None)
     async def get_python_version(python_path: Optional[str] = None) -> Dict[str, int]:
         if python_path is None:
-            python_path = GLOBAL_CONFIG.python
+            python_path = await get_default_python()
 
         t = templates.get_template("meta/python_version.py.jinja")
         proc = await asyncio.create_subprocess_exec(
             python_path,
+            "-W",
+            "ignore",
             "-c",
             await t.render_async(),
             stdout=asyncio.subprocess.PIPE,
@@ -98,11 +121,13 @@ else:
     @cache(ttl=None)
     async def get_nonebot_version(python_path: Optional[str] = None) -> str:
         if python_path is None:
-            python_path = GLOBAL_CONFIG.python
+            python_path = await get_default_python()
 
         t = templates.get_template("meta/nonebot_version.py.jinja")
         proc = await asyncio.create_subprocess_exec(
             python_path,
+            "-W",
+            "ignore",
             "-c",
             await t.render_async(),
             stdout=asyncio.subprocess.PIPE,
@@ -135,11 +160,13 @@ else:
     @cache(ttl=None)
     async def get_pip_version(python_path: Optional[str] = None) -> str:
         if python_path is None:
-            python_path = GLOBAL_CONFIG.python
+            python_path = await get_default_python()
 
         t = templates.get_template("meta/pip_version.py.jinja")
         proc = await asyncio.create_subprocess_exec(
             python_path,
+            "-W",
+            "ignore",
             "-c",
             await t.render_async(),
             stdout=asyncio.subprocess.PIPE,

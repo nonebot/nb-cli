@@ -2,9 +2,7 @@ import sys
 import asyncio
 from typing import IO, Any, List, Union, Optional
 
-from nb_cli.config import GLOBAL_CONFIG
-
-from .meta import requires_pip
+from .meta import requires_pip, get_default_python
 
 
 @requires_pip
@@ -19,7 +17,7 @@ async def call_pip_install(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = GLOBAL_CONFIG.python
+        python_path = await get_default_python()
 
     return await asyncio.create_subprocess_exec(
         python_path,
@@ -46,7 +44,7 @@ async def call_pip_update(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = GLOBAL_CONFIG.python
+        python_path = await get_default_python()
 
     return await asyncio.create_subprocess_exec(
         python_path,
@@ -74,7 +72,7 @@ async def call_pip_uninstall(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = GLOBAL_CONFIG.python
+        python_path = await get_default_python()
 
     return await asyncio.create_subprocess_exec(
         python_path,
