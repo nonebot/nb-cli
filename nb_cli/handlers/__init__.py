@@ -1,67 +1,75 @@
-from functools import partial
-from typing import List, Callable
+from pathlib import Path
 
-import click
-from pyfiglet import figlet_format
-from noneprompt import Choice, ListPrompt
+from jinja2 import Environment, FileSystemLoader
 
-from nb_cli.utils import default_style
+from nb_cli.consts import SCRIPTS_GROUP
 
-from .deploy import run_bot as run_bot
-from .config import update_config as update_config
-from .driver import search_driver as search_driver
+templates = Environment(
+    trim_blocks=True,
+    lstrip_blocks=True,
+    autoescape=False,
+    loader=FileSystemLoader(Path(__file__).parent.parent / "template" / "scripts"),
+    enable_async=True,
+)
+templates.globals["ENTRYPOINT_GROUP"] = SCRIPTS_GROUP
+templates.filters["repr"] = repr
+
+# meta
+from .meta import draw_logo as draw_logo
+from .meta import requires_pip as requires_pip
+from .meta import requires_python as requires_python
+from .meta import load_module_data as load_module_data
+from .meta import requires_nonebot as requires_nonebot
+from .meta import get_default_python as get_default_python
+from .meta import get_python_version as get_python_version
+from .meta import get_nonebot_version as get_nonebot_version
+from .meta import format_package_results as format_package_results
+
+# isort: split
+
+# pip
+from .pip import call_pip_update as call_pip_update
+from .pip import call_pip_install as call_pip_install
+from .pip import call_pip_uninstall as call_pip_uninstall
+
+# isort: split
+
+# signal
+from .signal import remove_signal_handler as remove_signal_handler
+from .signal import install_signal_handler as install_signal_handler
+from .signal import register_signal_handler as register_signal_handler
+
+# isort: split
+
+# plugin
+from .plugin import list_plugins as list_plugins
 from .plugin import create_plugin as create_plugin
-from .plugin import search_plugin as search_plugin
-from .plugin import update_plugin as update_plugin
-from .driver import install_driver as install_driver
-from .plugin import install_plugin as install_plugin
+from .plugin import list_builtin_plugins as list_builtin_plugins
+
+# isort: split
+
+# adapter
+from .adapter import list_adapters as list_adapters
 from .adapter import create_adapter as create_adapter
-from .adapter import search_adapter as search_adapter
-from .adapter import update_adapter as update_adapter
-from .adapter import install_adapter as install_adapter
-from .deploy import run_docker_image as run_docker_image
-from .generate import generate_script as generate_script
-from .plugin import uninstall_plugin as uninstall_plugin
-from .deploy import exit_docker_image as exit_docker_image
-from .self import self_no_subcommand as self_no_subcommand
-from .deploy import build_docker_image as build_docker_image
-from .project import create_project, create_bootstrap_project
-from .config import config_no_subcommand as config_no_subcommand
-from .deploy import deploy_no_subcommand as deploy_no_subcommand
-from .driver import driver_no_subcommand as driver_no_subcommand
-from .plugin import plugin_no_subcommand as plugin_no_subcommand
-from .adapter import adapter_no_subcommand as adapter_no_subcommand
 
+# isort: split
 
-def draw_logo() -> bool:
-    click.secho(
-        figlet_format("NoneBot", font="basic").strip(), fg="cyan", bold=True
-    )
-    return True
+# driver
+from .driver import list_drivers as list_drivers
 
+# isort: split
 
-def handle_no_subcommand():
-    draw_logo()
-    click.echo("\n\b")
-    click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
+# script
+from .script import run_script as run_script
+from .script import list_scripts as list_scripts
 
-    while True:
-        choices: List[Choice[Callable[[], bool]]] = [
-            Choice("Show Logo", draw_logo),
-            Choice("Create a New Project", create_bootstrap_project),
-            Choice("Create a New Project for Development", create_project),
-            Choice("Run the Bot in Current Folder", run_bot),
-            Choice("Driver ->", partial(driver_no_subcommand, True)),
-            Choice("Plugin ->", partial(plugin_no_subcommand, True)),
-            Choice("Adapter ->", partial(adapter_no_subcommand, True)),
-            Choice("Deploy ->", partial(deploy_no_subcommand, True)),
-            Choice("Self ->", partial(self_no_subcommand, True)),
-        ]
-        subcommand = (
-            ListPrompt("What do you want to do?", choices)
-            .prompt(style=default_style)
-            .data
-        )
-        result = subcommand()
-        if result:
-            break
+# isort: split
+
+# project
+from .reloader import Reloader as Reloader
+from .reloader import FileFilter as FileFilter
+from .project import run_project as run_project
+from .project import create_project as create_project
+from .project import terminate_project as terminate_project
+from .project import generate_run_script as generate_run_script
+from .project import list_project_templates as list_project_templates

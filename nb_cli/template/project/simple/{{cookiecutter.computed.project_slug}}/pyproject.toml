@@ -1,0 +1,16 @@
+[project]
+name = "{{ cookiecutter.nonebot.project_name }}"
+version = "0.1.0"
+description = "{{ cookiecutter.computed.project_desc }}"
+readme = "README.md"
+requires-python = "^3.8"
+
+[tool.nonebot]
+adapters = [
+    {% for adapter in cookiecutter.nonebot.adapters -%}
+    { name = "{{ adapter.name }}", module_name = "{{ adapter.module_name }}" }
+    {%- endfor %}
+]
+plugins = []
+plugin_dirs = ["{{ cookiecutter.computed.source_dir }}/plugins"]
+builtin_plugins = []

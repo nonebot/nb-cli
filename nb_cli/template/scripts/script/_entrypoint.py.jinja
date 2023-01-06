@@ -1,0 +1,6 @@
+{% macro get_entrypoints() %}
+from importlib.metadata import entry_points
+
+entrypoints = entry_points()
+entrypoints = entrypoints["{{ ENTRYPOINT_GROUP }}"] if "{{ ENTRYPOINT_GROUP }}" in entrypoints else []
+{% endmacro %}

@@ -1,0 +1,14 @@
+{
+  "py": "py",
+  "nonebot": {
+    "project_name": "AwesomeBot",
+    "drivers": [],
+    "adapters": [],
+    "use_src": false
+  },
+  "computed": {
+    "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
+    "project_desc": "{{ cookiecutter.nonebot.project_name }}",
+    "source_dir": "{{ 'src' if cookiecutter.nonebot.use_src else cookiecutter.computed.project_slug|lower|replace('-', '_') }}"
+  }
+}

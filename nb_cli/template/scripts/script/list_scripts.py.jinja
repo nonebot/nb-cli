@@ -1,0 +1,7 @@
+{% from "script/_entrypoint.py.jinja" import get_entrypoints %}
+
+import json
+
+{{ get_entrypoints() }}
+
+print(json.dumps(sorted(e.name for e in entrypoints)))

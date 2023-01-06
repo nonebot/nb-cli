@@ -1,0 +1,9 @@
+{% from "project/_prepare.py.jinja" import prepare_bot %}
+{% from "script/_entrypoint.py.jinja" import get_entrypoints %}
+
+{{ prepare_bot(adapters, builtin_plugins) }}
+
+{{ get_entrypoints() }}
+
+if __name__ == "__main__":
+    entrypoints.select(name={{ script_name|repr }})[0].load()()

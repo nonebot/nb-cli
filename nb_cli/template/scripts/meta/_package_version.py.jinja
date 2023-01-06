@@ -1,0 +1,9 @@
+{% macro get_package_version(package) %}
+import json
+from importlib.metadata import version
+try:
+    __version__ = version({{ package|repr }})
+except ImportError:
+    __version__ = None
+print(json.dumps(__version__))
+{% endmacro %}

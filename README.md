@@ -83,16 +83,16 @@ nb
 pip install cookiecutter
 ```
 
-#### 创建项目
+#### 创建简易项目
 
 ```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/project"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/project/bootstrap"
 ```
 
-#### 创建最简项目
+#### 创建普通项目
 
 ```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/bootstrap"
+cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/project/simple"
 ```
 
 #### 创建插件

@@ -1,110 +1,102 @@
-from typing import List
+import os
+import sys
+import signal
+import asyncio
 from pathlib import Path
+from typing import IO, Any, Dict, List, Union, Optional
 
-import click
 from cookiecutter.main import cookiecutter
-from noneprompt import (
-    Choice,
-    ListPrompt,
-    InputPrompt,
-    ConfirmPrompt,
-    CheckboxPrompt,
-)
 
-from nb_cli.utils import run_script, default_style
-from nb_cli.consts import GET_BUILTIN_PLUGINS_SCRIPT
+from nb_cli.consts import WINDOWS
+from nb_cli.config import SimpleInfo
 
-from .adapter import _get_adapters
-from ._pip import _call_pip_install
+from . import templates
+from .meta import requires_nonebot, get_default_python, get_nonebot_config
+
+TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
 
-def _get_builtin_plugins() -> List[str]:
-    nonebot_path: str = run_script(
-        ["python", "-W", "ignore", "-"],
-        input_=GET_BUILTIN_PLUGINS_SCRIPT,
-        capture_output=True,
-    )  # type: ignore
-    if not nonebot_path:
-        raise RuntimeError(
-            "Failed to get builtin plugins. Has nonebot2 been installed?"
-        )
-    plugin_dir = Path(nonebot_path.strip()) / "plugins"  # type: ignore
-    if not plugin_dir.is_dir():
-        return []
-    return [file.stem for file in plugin_dir.glob("*.py")]
+def list_project_templates() -> List[str]:
+    return [t.name for t in (TEMPLATE_ROOT).iterdir()]
 
 
-def create_bootstrap_project() -> bool:
-    return create_project("bootstrap")
+def create_project(
+    project_template: str,
+    context: Optional[Dict[str, Any]] = None,
+    output_dir: Optional[str] = None,
+    no_input: bool = True,
+) -> None:
+    path = TEMPLATE_ROOT / project_template
+    path = str(path.resolve()) if path.exists() else project_template
 
-
-def create_project(type_: str = "project") -> bool:
-    click.secho("Loading adapters...")
-    adapters = {x.name: x for x in _get_adapters()}
-    click.clear()
-    answers = {}
-
-    answers["project_name"] = InputPrompt(
-        "Project Name:", validator=lambda x: len(x) > 0
-    ).prompt(style=default_style)
-
-    dir_name = (
-        answers["project_name"].lower().replace(" ", "-").replace("-", "_")
-    )
-    src_choices: List[Choice[bool]] = [
-        Choice(f'1) In a "{dir_name}" folder', False),
-        Choice('2) In a "src" folder', True),
-    ]
-    answers["use_src"] = (
-        ListPrompt("Where to store the plugin?", src_choices)
-        .prompt(style=default_style)
-        .data
-    )
-
-    answers["plugins"] = {"builtin": []}
-    builtin_plugins = _get_builtin_plugins()
-    if builtin_plugins:
-        answers["plugins"]["builtin"] = [
-            choice.data
-            for choice in CheckboxPrompt(
-                "Which builtin plugin(s) would you like to use?",
-                [Choice(name, name) for name in builtin_plugins],
-            ).prompt(style=default_style)
-        ]
-
-    answers["adapters"] = {"builtin": []}
-
-    confirm = False
-    while not confirm:
-        answers["adapters"]["builtin"] = [
-            choice.data.dict()
-            for choice in CheckboxPrompt(
-                "Which adapter(s) would you like to use?",
-                [Choice(name, adapter) for name, adapter in adapters.items()],
-            ).prompt(style=default_style)
-        ]
-        if not answers["adapters"]["builtin"]:
-            confirm = ConfirmPrompt(
-                "You haven't chosen any adapter. Please confirm.",
-                default_choice=False,
-            ).prompt(style=default_style)
-        else:
-            confirm = True
-
-    if type_ == "bootstrap":
-        template = str(
-            (Path(__file__).parent.parent / "template" / "bootstrap").resolve()
-        )
-    else:
-        template = str(
-            (Path(__file__).parent.parent / "template" / "project").resolve()
-        )
     cookiecutter(
-        template,
-        no_input=True,
-        extra_context=answers,
+        path,
+        no_input=no_input,
+        extra_context=context,
+        output_dir=output_dir or ".",
     )
 
-    for adapter in answers["adapters"]["builtin"]:
-        _call_pip_install(adapter["project_link"])
-    return True
+
+async def generate_run_script(
+    adapters: Optional[List[SimpleInfo]] = None,
+    builtin_plugins: Optional[List[str]] = None,
+) -> str:
+    bot_config = get_nonebot_config()
+    if adapters is None:
+        adapters = bot_config.adapters
+    if builtin_plugins is None:
+        builtin_plugins = bot_config.builtin_plugins
+
+    t = templates.get_template("project/run_project.py.jinja")
+    return await t.render_async(adapters=adapters, builtin_plugins=builtin_plugins)
+
+
+@requires_nonebot
+async def run_project(
+    adapters: Optional[List[SimpleInfo]] = None,
+    builtin_plugins: Optional[List[str]] = None,
+    exist_bot: Path = Path("bot.py"),
+    python_path: Optional[str] = None,
+    cwd: Optional[Path] = None,
+    stdin: Optional[Union[IO[Any], int]] = None,
+    stdout: Optional[Union[IO[Any], int]] = None,
+    stderr: Optional[Union[IO[Any], int]] = None,
+) -> asyncio.subprocess.Process:
+    bot_config = get_nonebot_config()
+    if adapters is None:
+        adapters = bot_config.adapters
+    if builtin_plugins is None:
+        builtin_plugins = bot_config.builtin_plugins
+    if python_path is None:
+        python_path = await get_default_python()
+
+    if exist_bot.exists():
+        return await asyncio.create_subprocess_exec(
+            python_path,
+            exist_bot,
+            cwd=cwd,
+            stdin=stdin or sys.stdin,
+            stdout=stdout or sys.stdout,
+            stderr=stderr or sys.stderr,
+        )
+
+    return await asyncio.create_subprocess_exec(
+        python_path,
+        "-c",
+        await generate_run_script(adapters=adapters, builtin_plugins=builtin_plugins),
+        cwd=cwd,
+        stdin=stdin or sys.stdin,
+        stdout=stdout or sys.stdout,
+        stderr=stderr or sys.stderr,
+    )
+
+
+async def terminate_project(process: asyncio.subprocess.Process) -> None:
+    if process.returncode is not None:
+        return
+    if WINDOWS:
+        os.kill(process.pid, signal.CTRL_C_EVENT)
+    else:
+        process.terminate()
+
+    await process.wait()

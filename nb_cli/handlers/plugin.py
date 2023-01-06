@@ -1,143 +1,58 @@
+import json
+import asyncio
 from pathlib import Path
-from functools import partial
-from typing import List, Callable, Optional
+from typing import List, Optional
 
-import click
 from cookiecutter.main import cookiecutter
-from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt
 
-from nb_cli.config import ConfigManager
+from nb_cli.config import Plugin
 
-from ._pip import _call_pip_update, _call_pip_install, _call_pip_uninstall
-from .utils import (
-    Plugin,
-    _get_module,
-    _get_modules,
-    default_style,
-    _search_module,
-)
+from . import templates
+from .meta import load_module_data, requires_nonebot, get_default_python
+
+TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
 
-def plugin_no_subcommand(add_back: bool = False) -> bool:
-    choices: List[Choice[Callable[[], bool]]] = [
-        Choice("Create a New NoneBot Plugin", create_plugin),
-        Choice("List All Published Plugins", partial(search_plugin, "")),
-        Choice("Search for Published Plugin", search_plugin),
-        Choice("Install a Published Plugin", install_plugin),
-        Choice("Update a Published Plugin", update_plugin),
-        Choice("Remove an Installed Plugin", uninstall_plugin),
-    ]
-    if add_back:
-        choices.append(Choice("<- Back", lambda: False))
-    subcommand = (
-        ListPrompt("What do you want to do?", choices)
-        .prompt(style=default_style)
-        .data
+@requires_nonebot
+async def list_builtin_plugins(python_path: Optional[str] = None) -> List[str]:
+    if python_path is None:
+        python_path = await get_default_python()
+
+    t = templates.get_template("plugin/list_builtin_plugin.py.jinja")
+
+    proc = await asyncio.create_subprocess_exec(
+        python_path,
+        "-W",
+        "ignore",
+        "-c",
+        await t.render_async(),
+        stdout=asyncio.subprocess.PIPE,
     )
-    return subcommand()
+    stdout, _ = await proc.communicate()
+    return json.loads(stdout.strip())
 
 
 def create_plugin(
-    name: Optional[str] = None,
-    plugin_dir: Optional[str] = None,
+    plugin_name: str,
+    output_dir: str = ".",
+    sub_plugin: bool = False,
     template: Optional[str] = None,
-) -> bool:
-    if not name:
-        name = InputPrompt(
-            "Plugin Name:", validator=lambda x: len(x) > 0
-        ).prompt(style=default_style)
-
-    if not plugin_dir:
-        detected: List[Choice[None]] = [
-            Choice(str(x)) for x in Path(".").glob("**/plugins/") if x.is_dir()
-        ]
-        plugin_dir = (
-            ListPrompt(
-                "Where to store the plugin?", detected + [Choice("Other")]
-            )
-            .prompt(style=default_style)
-            .name
-        )
-        if plugin_dir == "Other":
-            plugin_dir = InputPrompt(
-                "Plugin Dir:",
-                validator=lambda x: len(x) > 0 and Path(x).is_dir(),
-            ).prompt(style=default_style)
-    elif not Path(plugin_dir).is_dir():
-        click.secho(f"Plugin Dir is not a directory!", fg="yellow")
-        plugin_dir = InputPrompt(
-            "Plugin Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
-        ).prompt(style=default_style)
-    if not template:
-        sub_plugin = ConfirmPrompt(
-            "Do you want to load sub plugins in current plugin?",
-            default_choice=False,
-        ).prompt(style=default_style)
-        cookiecutter(
-            str(
-                (Path(__file__).parent.parent / "template" / "plugin").resolve()
-            ),
-            no_input=True,
-            output_dir=plugin_dir,
-            extra_context={"plugin_name": name, "sub_plugin": sub_plugin},
-        )
-    else:
-        cookiecutter(
-            template, output_dir=plugin_dir, extra_context={"plugin_name": name}
-        )
-    return True
+):
+    cookiecutter(
+        str(TEMPLATE_ROOT.resolve()) if template is None else template,
+        no_input=True,
+        output_dir=output_dir,
+        extra_context={"plugin_name": plugin_name, "sub_plugin": sub_plugin},
+    )
 
 
-def _get_plugin(package: Optional[str], question: str) -> Optional[Plugin]:
-    return _get_module(Plugin, package, question)
+async def list_plugins(query: Optional[str] = None) -> List[Plugin]:
+    plugins = await load_module_data("plugin")
+    if query is None:
+        return plugins
 
-
-def search_plugin(package: Optional[str] = None) -> bool:
-    return _search_module(Plugin, package)
-
-
-def install_plugin(
-    package: Optional[str] = None,
-    file: str = "pyproject.toml",
-    index: Optional[str] = None,
-) -> bool:
-    plugin = _get_plugin(package, "Plugin name you want to install?")
-    if not plugin:
-        return True
-    status = _call_pip_install(plugin.project_link, index)
-    if status == 0:  # SUCCESS
-        try:
-            config = ConfigManager.get_local_config(file)
-            config.add_plugin(plugin.module_name)
-        except Exception as e:
-            click.secho(repr(e), fg="red")
-    return True
-
-
-def update_plugin(
-    package: Optional[str] = None, index: Optional[str] = None
-) -> bool:
-    plugin = _get_plugin(package, "Plugin name you want to update?")
-    if plugin:
-        _call_pip_update(plugin.project_link, index)
-    return True
-
-
-def uninstall_plugin(
-    package: Optional[str] = None, file: str = "pyproject.toml"
-) -> bool:
-    plugin = _get_plugin(package, "Plugin name you want to uninstall?")
-    if not plugin:
-        return True
-    status = _call_pip_uninstall(plugin.project_link)
-    if status == 0:  # SUCCESS
-        try:
-            config = ConfigManager.get_local_config(file)
-            config.remove_plugin(plugin.module_name)
-        except Exception as e:
-            click.secho(repr(e), fg="red")
-    return True
-
-
-def _get_plugins() -> List[Plugin]:
-    return _get_modules(Plugin)
+    return [
+        plugin
+        for plugin in plugins
+        if any(query in value for value in plugin.dict().values())
+    ]
