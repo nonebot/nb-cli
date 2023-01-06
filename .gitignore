@@ -154,3 +154,4 @@ dmypy.json
 !nb_cli/project/{{cookiecutter.project_slug}}/.env
 
 .idea
+node_modules
