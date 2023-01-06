@@ -48,5 +48,5 @@ def install_driver(
     if not driver:
         return True
     if driver.project_link:
-        _call_pip_install(f"nonebot2[{driver.project_link}]", index)
+        _call_pip_install(driver.project_link, index)
     return True
