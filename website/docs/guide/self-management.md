@@ -1,6 +1,11 @@
 ---
-sidebar_position: 6
+sidebar_position: 5
 description: CLI 自身管理
+
+options:
+  menu:
+    weight: 50
+    category: guide
 ---
 
 # CLI 自身管理
@@ -11,9 +16,9 @@ CLI 处于独立的虚拟环境中运行，由外界直接管理 CLI 的环境�
 
 - `nb self` 管理 CLI 内部环境
   - `nb self list` 列出 CLI 环境中所有包
-  - `nb self install (add)` 在 CLI 环境安装包
-  - `nb self update` 更新 CLI 环境包
-  - `nb self uninstall (remove)` 卸载 CLI 环境包
+  - `nb self install (add)` 安装 CLI 插件
+  - `nb self update` 更新 CLI
+  - `nb self uninstall (remove)` 卸载 CLI 插件
 
 :::warning 注意
 在一般情况下，CLI 的内部环境不需要额外的手动干预。

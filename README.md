@@ -1,108 +1,111 @@
-# nb-cli
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+  <a href="https://cli.nonebot.dev/"><img src="https://cli.nonebot.dev/logo.png" width="200" height="200" alt="nonebot"></a>
+</p>
 
-[English](./README_en.md) | **中文**
+<div align="center">
 
-NoneBot2 的命令行工具
+# NB CLI
+
+_✨ NoneBot2 命令行工具 ✨_
+
+</div>
+
+<p align="center">
+  <a href="https://raw.githubusercontent.com/nonebot/nb-cli/master/LICENSE">
+    <img src="https://img.shields.io/github/license/nonebot/nb-cli" alt="license">
+  </a>
+  <a href="https://pypi.python.org/pypi/nb-cli">
+    <img src="https://img.shields.io/pypi/v/nb-cli" alt="pypi">
+  </a>
+  <img src="https://img.shields.io/badge/python-3.8+-blue" alt="python">
+  <a href="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml">
+    <img src="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml/badge.svg?branch=master&event=push" alt="site"/>
+  </a>
+  <a href="https://results.pre-commit.ci/latest/github/nonebot/nb-cli/master">
+    <img src="https://results.pre-commit.ci/badge/github/nonebot/nb-cli/master.svg" alt="pre-commit" />
+  </a>
+  <br />
+  <a href="https://jq.qq.com/?_wv=1027&k=5OFifDh">
+    <img src="https://img.shields.io/badge/QQ%E7%BE%A4-768887710-orange?style=flat-square" alt="QQ Chat Group">
+  </a>
+  <a href="https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=7b4a3&appChannel=share&businessType=9&from=246610&biz=ka">
+    <img src="https://img.shields.io/badge/QQ%E9%A2%91%E9%81%93-NoneBot-5492ff?style=flat-square" alt="QQ Channel">
+  </a>
+  <a href="https://t.me/botuniverse">
+    <img src="https://img.shields.io/badge/telegram-botuniverse-blue?style=flat-square" alt="Telegram Channel">
+  </a>
+  <a href="https://discord.gg/VKtE6Gdc4h">
+    <img src="https://discordapp.com/api/guilds/847819937858584596/widget.png?style=shield" alt="Discord Server">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://cli.nonebot.dev/">文档</a>
+  ·
+  <a href="https://cli.nonebot.dev/docs/guide/installation">安装</a>
+  ·
+  <a href="https://v2.nonebot.dev/">NoneBot 文档</a>
+</p>
 
 ## 功能
 
 - 创建新的 Nonebot 项目
 - 启动 Nonebot
-- 部署 NoneBot 到 Docker
 - 管理插件
   - 创建新的插件
   - 搜索/安装/更新/卸载在官方商店上发布的插件
 - 管理适配器
   - 创建新的适配器
   - 搜索/安装/更新/卸载在官方商店上发布的适配器
+- 管理驱动器
+  - 搜索/安装/更新/卸载在官方商店上发布的驱动器
+- 支持 CLI 插件和运行脚本
 
 ## 使用
 
+完整使用文档请参考 [文档](https://cli.nonebot.dev/)。
+
 ### 安装
 
+使用 pipx 安装（推荐）
+
 ```shell
-pip install nb-cli
+pipx install nb-cli
 ```
 
-或者，带有可选的 `deploy` 依赖项
+使用安装脚本安装
+
+Linux, macOS, Windows (WSL):
 
 ```shell
-pip install nb-cli[deploy]
+curl -sSL https://cli.nonebot.dev/install-cli.py | python3 -
+```
+
+Windows (Powershell):
+
+```powershell
+(Invoke-WebRequest -Uri https://cli.nonebot.dev/install-cli.py -UseBasicParsing).Content | py -
 ```
 
 ### 命令行使用
 
 ```shell
 nb --help
+python -m nb_cli --help
 ```
 
-- `nb init (create)` 创建新的 NoneBot 项目
+- `nb create (init)` 创建新的 NoneBot 项目
 - `nb run` 在当前目录启动 NoneBot
 - `nb generate` 在当前目录生成启动脚本
 - `nb driver` 管理驱动器
-  - `nb driver list` 查看驱动器列表
-  - `nb driver search` 搜索驱动器
-  - `nb driver install (add)` 安装驱动器
 - `nb plugin` 管理插件
-  - `nb plugin new (create)` 创建新的插件
-  - `nb plugin list` 列出官方商店的所有插件
-  - `nb plugin search` 在官方商店搜索插件
-  - `nb plugin install (add)` 安装插件
-  - `nb plugin update` 更新插件
-  - `nb plugin uninstall (remove)` 卸载插件
 - `nb adapter` 管理适配器
-  - `nb adapter new (create)` 创建新的适配器
-  - `nb adapter list` 列出官方商店的所有适配器
-  - `nb adapter search` 在官方商店搜索适配器
-  - `nb adapter install (add)` 安装适配器
-  - `nb adapter update` 更新适配器
-  - `nb adapter uninstall (remove)` 卸载适配器
 - `nb self` 管理 CLI 内部环境
-  - `nb self list` 列出 CLI 环境中所有包
-  - `nb self install (add)` 在 CLI 环境安装包
-  - `nb self update` 更新 CLI 环境包
-  - `nb self uninstall (remove)` 卸载 CLI 环境包
-
-#### 以下功能需要 [deploy] 依赖
-
-- `nb build` 在当前目录构建 Docker 镜像
-- `nb deploy (up)` 在当前目录构建、创建并运行 Docker 容器
-- `nb exit (down)` 在当前目录停止并删除 Docker 容器
+- `nb <script>` 运行脚本
 
 ### 交互式使用
 
 ```shell
 nb
-```
-
-### CookieCutter 使用
-
-#### 安装 cookiecutter
-
-```shell
-pip install cookiecutter
-```
-
-#### 创建简易项目
-
-```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/project/bootstrap"
-```
-
-#### 创建普通项目
-
-```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/project/simple"
-```
-
-#### 创建插件
-
-```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/plugin"
-```
-
-#### 创建适配器
-
-```shell
-cookiecutter https://github.com/nonebot/nb-cli.git --directory="nb_cli/template/adapter"
 ```

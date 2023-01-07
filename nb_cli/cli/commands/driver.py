@@ -9,7 +9,6 @@ from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
     list_drivers,
-    create_adapter,
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,

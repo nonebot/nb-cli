@@ -1,6 +1,11 @@
 ---
 sidebar_position: 2
-description: 创建项目
+description: 创建 NoneBot 项目
+
+options:
+  menu:
+    weight: 20
+    category: guide
 ---
 
 # 创建项目
@@ -14,20 +19,23 @@ nb create
 跟随指引填入参数后，CLI 将在当前目录下，使用之前所填入的项目名，创建一个文件夹用于存放 NoneBot 项目。
 
 :::warning 注意
-新版本 CLI 在默认情况下会创建一个最简的 NoneBot 项目，以便用户进行部署。
+新版本 CLI 提供多种项目模板，包括 `bootstrap` 和 `simple` 等。
 
-对于开发者，应该使用 `nb create --full`。
+对于插件用户可以使用 `bootstrap` 模板，对于插件开发者可以使用 `simple`。
 :::
 
 CLI 所创建的项目目录结构可参考 [NoneBot 文档](https://v2.nonebot.dev/docs/tutorial/create-project#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84)
 
 ```shell
-nb create --help
-Usage: nb create [OPTIONS]
+$ nb create --help
+Usage: nb create [OPTIONS] [PIP_ARGS]...
 
-  Init a NoneBot Project.
+  Create a NoneBot project.
 
 Options:
-  -f, --full  Whether to use full project template or simplified one
-  --help      Show this message and exit.
+  -o, --output-dir DIRECTORY
+  -t, --template TEXT            The project template to use.
+  -p, --python-interpreter TEXT  The python interpreter virtualenv is
+                                 installed into.
+  -h, --help                     Show this message and exit.
 ```

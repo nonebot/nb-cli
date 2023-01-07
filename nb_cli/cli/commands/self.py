@@ -65,7 +65,7 @@ async def install(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(pip_args: Optional[List[str]]):
-    """Update nonebot plugin."""
+    """Update nonebot cli."""
     proc = await call_pip_update("nb-cli", pip_args, sys.executable)
     await proc.wait()
 
