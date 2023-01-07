@@ -61,7 +61,7 @@ async def list():
 @click.argument("name", nargs=1, default=None)
 @run_async
 async def search(name: Optional[str]):
-    """Search for nonebot adapter published on nonebot homepage."""
+    """Search for nonebot adapters published on nonebot homepage."""
     if name is None:
         name = await InputPrompt("Adapter name to search:").prompt_async(
             style=CLI_DEFAULT_STYLE

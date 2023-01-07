@@ -106,7 +106,7 @@ async def cli(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-from .commands import run, self, create, plugin, adapter, generate
+from .commands import run, self, create, driver, plugin, adapter, generate
 
 cli.add_command(create)
 cli.add_command(run)
@@ -115,5 +115,7 @@ cli.add_command(generate)
 cli.add_command(plugin)
 
 cli.add_command(adapter)
+
+cli.add_command(driver)
 
 cli.add_command(self)

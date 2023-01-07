@@ -36,7 +36,6 @@ from .pip import call_pip_uninstall as call_pip_uninstall
 
 # virtualenv
 from .venv import create_virtualenv as create_virtualenv
-from .venv import activate_virtualenv as activate_virtualenv
 
 # isort: split
 

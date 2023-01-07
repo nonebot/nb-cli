@@ -16,8 +16,8 @@ from noneprompt import (
     CheckboxPrompt,
 )
 
-from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.exceptions import ModuleLoadFailed
+from nb_cli.consts import WINDOWS, DEFAULT_DRIVER
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
@@ -29,7 +29,6 @@ from nb_cli.handlers import (
     call_pip_install,
     create_virtualenv,
     terminate_project,
-    activate_virtualenv,
     generate_run_script,
     remove_signal_handler,
     list_project_templates,
@@ -82,7 +81,9 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         ],
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["drivers"] = [d.data.dict() for d in drivers]
-    context.packages.extend([d.data.project_link for d in drivers])
+    context.packages.extend(
+        [d.data.project_link for d in drivers if d.data.project_link]
+    )
 
     confirm = False
     adapters = []
@@ -198,14 +199,18 @@ async def create(
     except CancelledError:
         ctx.exit()
 
-    env = None
+    path = None
     if use_venv:
         await create_virtualenv(
             venv_dir, prompt=project_dir, python_interpreter=python_interpreter
         )
-        env = activate_virtualenv(venv_dir)
+        path = (
+            venv_dir
+            / ("Scripts" if WINDOWS else "bin")
+            / ("python.exe" if WINDOWS else "python")
+        )
 
-    proc = await call_pip_install(context.packages, pip_args, env=env)
+    proc = await call_pip_install(context.packages, pip_args, python_path=path)
     await proc.wait()
 
 

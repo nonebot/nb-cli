@@ -10,7 +10,6 @@ async def call_pip_install(
     package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
     python_path: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -18,7 +17,7 @@ async def call_pip_install(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = await get_default_python(env)
+        python_path = await get_default_python()
 
     if isinstance(package, str):
         package = [package]
@@ -33,7 +32,6 @@ async def call_pip_install(
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
-        env=env,
     )
 
 
@@ -42,7 +40,6 @@ async def call_pip_update(
     package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
     python_path: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -50,7 +47,7 @@ async def call_pip_update(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = await get_default_python(env)
+        python_path = await get_default_python()
 
     if isinstance(package, str):
         package = [package]
@@ -66,7 +63,6 @@ async def call_pip_update(
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
-        env=env,
     )
 
 
@@ -75,7 +71,6 @@ async def call_pip_uninstall(
     package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
     python_path: Optional[str] = None,
-    env: Optional[Dict[str, str]] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -83,7 +78,7 @@ async def call_pip_uninstall(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = await get_default_python(env)
+        python_path = await get_default_python()
 
     if isinstance(package, str):
         package = [package]
@@ -98,5 +93,4 @@ async def call_pip_uninstall(
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
-        env=env,
     )
