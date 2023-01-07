@@ -1,15 +1,16 @@
 import sys
 import asyncio
-from typing import IO, Any, List, Union, Optional
+from typing import IO, Any, Dict, List, Union, Optional
 
 from .meta import requires_pip, get_default_python
 
 
 @requires_pip
 async def call_pip_install(
-    package: str,
+    package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
     python_path: Optional[str] = None,
+    env: Optional[Dict[str, str]] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -17,26 +18,31 @@ async def call_pip_install(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = await get_default_python()
+        python_path = await get_default_python(env)
+
+    if isinstance(package, str):
+        package = [package]
 
     return await asyncio.create_subprocess_exec(
         python_path,
         "-m",
         "pip",
         "install",
-        package,
+        *package,
         *pip_args,
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
+        env=env,
     )
 
 
 @requires_pip
 async def call_pip_update(
-    package: str,
+    package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
     python_path: Optional[str] = None,
+    env: Optional[Dict[str, str]] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -44,7 +50,10 @@ async def call_pip_update(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = await get_default_python()
+        python_path = await get_default_python(env)
+
+    if isinstance(package, str):
+        package = [package]
 
     return await asyncio.create_subprocess_exec(
         python_path,
@@ -52,19 +61,21 @@ async def call_pip_update(
         "pip",
         "install",
         "--upgrade",
-        package,
+        *package,
         *pip_args,
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
+        env=env,
     )
 
 
 @requires_pip
 async def call_pip_uninstall(
-    package: str,
+    package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
     python_path: Optional[str] = None,
+    env: Optional[Dict[str, str]] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -72,16 +83,20 @@ async def call_pip_uninstall(
     if pip_args is None:
         pip_args = []
     if python_path is None:
-        python_path = await get_default_python()
+        python_path = await get_default_python(env)
+
+    if isinstance(package, str):
+        package = [package]
 
     return await asyncio.create_subprocess_exec(
         python_path,
         "-m",
         "pip",
         "uninstall",
-        package,
+        *package,
         *pip_args,
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
+        env=env,
     )

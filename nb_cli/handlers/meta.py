@@ -51,19 +51,20 @@ def get_nonebot_config() -> NoneBotConfig:
 
 if TYPE_CHECKING:
 
-    async def get_default_python() -> str:
+    async def get_default_python(env: Optional[Dict[str, str]] = None) -> str:
         ...
 
 else:
 
     @cache(ttl=None)
-    async def get_default_python() -> str:
+    async def get_default_python(env: Optional[Dict[str, str]] = None) -> str:
         if GLOBAL_CONFIG.python is not None:
             return GLOBAL_CONFIG.python
 
         proc = await asyncio.create_subprocess_shell(
             'python -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
             stdout=asyncio.subprocess.PIPE,
+            env=env,
         )
         stdout, _ = await proc.communicate()
         return json.loads(stdout.strip())

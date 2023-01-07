@@ -1,6 +1,7 @@
 import asyncio
 from pathlib import Path
 from functools import partial
+from dataclasses import field, dataclass
 from typing import Any, Dict, List, Optional
 
 import click
@@ -23,6 +24,7 @@ from nb_cli.handlers import (
     list_drivers,
     list_adapters,
     create_project,
+    call_pip_install,
     terminate_project,
     generate_run_script,
     remove_signal_handler,
@@ -36,7 +38,13 @@ TEMPLATE_DESCRIPTION = {
 }
 
 
-async def prompt_common_context() -> Dict[str, Any]:
+@dataclass
+class ProjectContext:
+    variables: Dict[str, Any] = field(default_factory=dict)
+    packages: List[str] = field(default_factory=list)
+
+
+async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     click.secho("Loading adapters...")
     all_adapters = await list_adapters()
     click.secho("Loading drivers...")
@@ -46,36 +54,30 @@ async def prompt_common_context() -> Dict[str, Any]:
     project_name = await InputPrompt(
         "Project Name:", validator=lambda x: len(x.strip()) > 0
     ).prompt_async(style=CLI_DEFAULT_STYLE)
+    context.variables["project_name"] = project_name
 
-    drivers = [
-        choice.data.dict()
-        for choice in await CheckboxPrompt(
-            "Which driver(s) would you like to use?",
-            [
-                Choice(f"{driver.name} ({driver.desc})", driver)
-                for driver in all_drivers
-            ],
-            default_select=[
-                index
-                for index, driver in enumerate(all_drivers)
-                if driver.name in DEFAULT_DRIVER
-            ],
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
-    ]
+    drivers = await CheckboxPrompt(
+        "Which driver(s) would you like to use?",
+        [Choice(f"{driver.name} ({driver.desc})", driver) for driver in all_drivers],
+        default_select=[
+            index
+            for index, driver in enumerate(all_drivers)
+            if driver.name in DEFAULT_DRIVER
+        ],
+    ).prompt_async(style=CLI_DEFAULT_STYLE)
+    context.variables["drivers"] = [d.data.dict() for d in drivers]
+    context.packages.extend([d.data.project_link for d in drivers])
 
     confirm = False
     adapters = []
     while not confirm:
-        adapters = [
-            choice.data.dict()
-            for choice in await CheckboxPrompt(
-                "Which adapter(s) would you like to use?",
-                [
-                    Choice(f"{adapter.name} ({adapter.desc})", adapter)
-                    for adapter in all_adapters
-                ],
-            ).prompt_async(style=CLI_DEFAULT_STYLE)
-        ]
+        adapters = await CheckboxPrompt(
+            "Which adapter(s) would you like to use?",
+            [
+                Choice(f"{adapter.name} ({adapter.desc})", adapter)
+                for adapter in all_adapters
+            ],
+        ).prompt_async(style=CLI_DEFAULT_STYLE)
         confirm = (
             True
             if adapters
@@ -85,16 +87,21 @@ async def prompt_common_context() -> Dict[str, Any]:
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )
 
-    return {"project_name": project_name, "drivers": drivers, "adapters": adapters}
+    context.variables["adapters"] = [a.data.dict() for a in adapters]
+    context.packages.extend([a.data.project_link for a in adapters])
+
+    return context
 
 
-async def prompt_simple_context(context: Dict[str, Any]) -> Dict[str, Any]:
-    dir_name = context["project_name"].lower().replace(" ", "-").replace("-", "_")
+async def prompt_simple_context(context: ProjectContext) -> ProjectContext:
+    dir_name = (
+        context.variables["project_name"].lower().replace(" ", "-").replace("-", "_")
+    )
     src_choices: List[Choice[bool]] = [
         Choice(f'1) In a "{dir_name}" folder', False),
         Choice('2) In a "src" folder', True),
     ]
-    context["use_src"] = (
+    context.variables["use_src"] = (
         await ListPrompt("Where to store the plugin?", src_choices).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
@@ -116,10 +123,14 @@ TEMPLATE_PROMPTS = {
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
 @click.option("-t", "--template", default=None, help="The project template to use.")
+@click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def create(
-    ctx: click.Context, output_dir: Optional[str], template: Optional[str]
+    ctx: click.Context,
+    output_dir: Optional[str],
+    template: Optional[str],
+    pip_args: Optional[List[str]],
 ):
     """Create a NoneBot project."""
     if not template:
@@ -134,8 +145,9 @@ async def create(
         except CancelledError:
             ctx.exit()
 
+    context = ProjectContext()
     try:
-        context = await prompt_common_context()
+        context = await prompt_common_context(context)
         if inject_prompt := TEMPLATE_PROMPTS.get(template):
             context = await inject_prompt(context)
     except ModuleLoadFailed as e:
@@ -144,7 +156,7 @@ async def create(
     except CancelledError:
         ctx.exit()
 
-    create_project(template, {"nonebot": context}, output_dir)
+    create_project(template, {"nonebot": context.variables}, output_dir)
 
     try:
         if not await ConfirmPrompt(
@@ -154,14 +166,16 @@ async def create(
     except CancelledError:
         ctx.exit()
 
-    project_dir = context["project_name"].replace(" ", "-")
+    project_dir = context.variables["project_name"].replace(" ", "-")
+    venv_dir = Path(output_dir or ".") / project_dir / ".venv"
     try:
         use_venv = await ConfirmPrompt(
             "Use virtual environment?", default_choice=True
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()
-    # TODO: install dependencies
+
+    await call_pip_install(context.packages, pip_args)
 
 
 @click.command(cls=ClickAliasedCommand)
