@@ -1,3 +1,5 @@
+import re
+import sys
 import asyncio
 from pathlib import Path
 from functools import partial
@@ -32,16 +34,28 @@ from nb_cli.handlers import (
     register_signal_handler,
 )
 
+VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
+BLACKLISTED_PROJECT_NAME = {"nonebot", "bot"}
 TEMPLATE_DESCRIPTION = {
     "bootstrap": "bootstrap (for beginner or user)",
     "simple": "simple (for developer)",
 }
+
+if sys.version_info >= (3, 10):
+    BLACKLISTED_PROJECT_NAME.update(sys.stdlib_module_names)
 
 
 @dataclass
 class ProjectContext:
     variables: Dict[str, Any] = field(default_factory=dict)
     packages: List[str] = field(default_factory=list)
+
+
+def project_name_validator(name: str) -> bool:
+    return (
+        bool(re.match(VALID_PROJECT_NAME, name))
+        and name not in BLACKLISTED_PROJECT_NAME
+    )
 
 
 async def prompt_common_context(context: ProjectContext) -> ProjectContext:
@@ -52,7 +66,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     click.clear()
 
     project_name = await InputPrompt(
-        "Project Name:", validator=lambda x: len(x.strip()) > 0
+        "Project Name:", validator=project_name_validator
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["project_name"] = project_name
 
