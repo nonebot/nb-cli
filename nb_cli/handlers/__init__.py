@@ -28,6 +28,7 @@ from .meta import format_package_results as format_package_results
 # isort: split
 
 # pip
+from .pip import call_pip_list as call_pip_list
 from .pip import call_pip_update as call_pip_update
 from .pip import call_pip_install as call_pip_install
 from .pip import call_pip_uninstall as call_pip_uninstall

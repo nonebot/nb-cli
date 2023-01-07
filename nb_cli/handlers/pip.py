@@ -94,3 +94,28 @@ async def call_pip_uninstall(
         stdout=stdout or sys.stdout,
         stderr=stderr or sys.stderr,
     )
+
+
+@requires_pip
+async def call_pip_list(
+    pip_args: Optional[List[str]] = None,
+    python_path: Optional[str] = None,
+    stdin: Optional[Union[IO[Any], int]] = None,
+    stdout: Optional[Union[IO[Any], int]] = None,
+    stderr: Optional[Union[IO[Any], int]] = None,
+) -> asyncio.subprocess.Process:
+    if pip_args is None:
+        pip_args = []
+    if python_path is None:
+        python_path = await get_default_python()
+
+    return await asyncio.create_subprocess_exec(
+        python_path,
+        "-m",
+        "pip",
+        "list",
+        *pip_args,
+        stdin=stdin or sys.stdin,
+        stdout=stdout or sys.stdout,
+        stderr=stderr or sys.stderr,
+    )

@@ -5,7 +5,12 @@ import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
-from nb_cli.handlers import call_pip_update, call_pip_install, call_pip_uninstall
+from nb_cli.handlers import (
+    call_pip_list,
+    call_pip_update,
+    call_pip_install,
+    call_pip_uninstall,
+)
 
 
 @click.group(cls=ClickAliasedGroup, invoke_without_command=True)
@@ -87,5 +92,15 @@ async def uninstall(
         except CancelledError:
             ctx.exit()
 
-    proc = await call_pip_install(name, pip_args, sys.executable)
+    proc = await call_pip_uninstall(name, pip_args, sys.executable)
+    await proc.wait()
+
+
+@self.command()
+@click.argument("pip_args", nargs=-1, default=None)
+@click.pass_context
+@run_async
+async def list(ctx: click.Context, pip_args: Optional[List[str]]):
+    """List installed packages in cli venv."""
+    proc = await call_pip_list(pip_args, sys.executable)
     await proc.wait()
