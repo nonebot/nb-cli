@@ -34,6 +34,12 @@ from .pip import call_pip_uninstall as call_pip_uninstall
 
 # isort: split
 
+# virtualenv
+from .venv import create_virtualenv as create_virtualenv
+from .venv import activate_virtualenv as activate_virtualenv
+
+# isort: split
+
 # signal
 from .signal import remove_signal_handler as remove_signal_handler
 from .signal import install_signal_handler as install_signal_handler

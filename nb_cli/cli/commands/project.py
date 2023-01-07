@@ -27,7 +27,9 @@ from nb_cli.handlers import (
     list_adapters,
     create_project,
     call_pip_install,
+    create_virtualenv,
     terminate_project,
+    activate_virtualenv,
     generate_run_script,
     remove_signal_handler,
     list_project_templates,
@@ -137,6 +139,12 @@ TEMPLATE_PROMPTS = {
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
 @click.option("-t", "--template", default=None, help="The project template to use.")
+@click.option(
+    "-p",
+    "--python-interpreter",
+    default=None,
+    help="The python interpreter virtualenv is installed into.",
+)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
@@ -144,6 +152,7 @@ async def create(
     ctx: click.Context,
     output_dir: Optional[str],
     template: Optional[str],
+    python_interpreter: Optional[str],
     pip_args: Optional[List[str]],
 ):
     """Create a NoneBot project."""
@@ -189,7 +198,15 @@ async def create(
     except CancelledError:
         ctx.exit()
 
-    await call_pip_install(context.packages, pip_args)
+    env = None
+    if use_venv:
+        await create_virtualenv(
+            venv_dir, prompt=project_dir, python_interpreter=python_interpreter
+        )
+        env = activate_virtualenv(venv_dir)
+
+    proc = await call_pip_install(context.packages, pip_args, env=env)
+    await proc.wait()
 
 
 @click.command(cls=ClickAliasedCommand)

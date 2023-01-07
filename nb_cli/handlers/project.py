@@ -17,7 +17,7 @@ TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
 
 def list_project_templates() -> List[str]:
-    return [t.name for t in (TEMPLATE_ROOT).iterdir()]
+    return sorted(t.name for t in (TEMPLATE_ROOT).iterdir())
 
 
 def create_project(

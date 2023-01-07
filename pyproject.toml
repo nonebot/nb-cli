@@ -30,6 +30,7 @@ noneprompt = "^0.1.7"
 watchfiles = "^0.16.1"
 pyfiglet = "^0.8.post1"
 cookiecutter = "^1.7.2"
+virtualenv = "^20.17.1"
 httpx = ">=0.18.0, <1.0.0"
 typing-extensions = "^4.4.0"
 importlib-metadata = "^6.0.0"
@@ -45,6 +46,7 @@ nb-autodoc = { git = "https://github.com/nonebot/nb-autodoc.git" }
 nb = "nb_cli.__main__:main"
 
 [tool.pyright]
+pythonVersion = "3.8"
 pythonPlatform = "All"
 reportPrivateImportUsage = false
 reportShadowedImports = false

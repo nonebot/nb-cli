@@ -228,7 +228,7 @@ six = ">=1.10"
 name = "distlib"
 version = "0.3.6"
 description = "Distribution utilities"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -240,7 +240,7 @@ files = [
 name = "filelock"
 version = "3.8.2"
 description = "A platform independent file lock."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -553,7 +553,7 @@ files = [
 name = "platformdirs"
 version = "2.6.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -909,7 +909,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 name = "virtualenv"
 version = "20.17.1"
 description = "Virtual Python Environment builder"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -988,4 +988,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "9ab1f424254ec99cf8c1ad5fd2b226622a12809e9f4ddce4ff2b36a11819f1a7"
+content-hash = "43d3b0b5dc71b7c98dc338b3e0d0a91fa78831c06974677cf1d1f0cdbf7b214d"
