@@ -79,6 +79,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             for index, driver in enumerate(all_drivers)
             if driver.name in DEFAULT_DRIVER
         ],
+        validator=bool,
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["drivers"] = [d.data.dict() for d in drivers]
     context.packages.extend(
