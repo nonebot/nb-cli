@@ -93,6 +93,12 @@ class CLIMainGroup(ClickAliasedGroup):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @staticmethod
+    @run_async
+    async def _run_script_command(script_name: str, cwd: Path):
+        proc = await run_script(script_name, cwd=cwd)
+        await proc.wait()
+
     def _build_script_command(self, script_name: str) -> click.Command:
         params = [
             click.Option(
@@ -103,7 +109,7 @@ class CLIMainGroup(ClickAliasedGroup):
             name=script_name, params=params, help=f"Run script {script_name!r}"
         )(
             partial(
-                run_async(run_script),
+                self._run_script_command,
                 script_name=script_name,
             )
         )

@@ -6,4 +6,7 @@
 {{ get_entrypoints() }}
 
 if __name__ == "__main__":
-    entrypoints.select(name={{ script_name|repr }})[0].load()()
+    for e in entrypoints:
+        if e.name == {{ script_name|repr }}:
+            e.load()()
+            break
