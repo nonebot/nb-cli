@@ -6,10 +6,15 @@ readme = "README.md"
 requires-python = "^3.8"
 
 [tool.nonebot]
+{% set adapters = [] -%}
+{% for adapter in cookiecutter.nonebot.adapters -%}
+{% set name = adapter.name -%}
+{% set module_name = adapter.module_name -%}
+{% set adapter_str = '{ name = "%s", module_name = "%s" }'|format(name, module_name) -%}
+{% set _ = adapters.append(adapter_str) -%}
+{%- endfor -%}
 adapters = [
-    {% for adapter in cookiecutter.nonebot.adapters -%}
-    { name = "{{ adapter.name }}", module_name = "{{ adapter.module_name }}" }
-    {%- endfor %}
+    {{ adapters|join(",\n")|indent(4) }}
 ]
 plugins = []
 plugin_dirs = []
