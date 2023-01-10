@@ -68,6 +68,8 @@ class ClickAliasedGroup(click.Group):
         rows = []
 
         sub_commands = self.list_commands(ctx)
+        if not sub_commands:
+            return
 
         max_len = max(len(cmd) for cmd in sub_commands)
         limit = formatter.width - 6 - max_len
