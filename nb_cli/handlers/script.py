@@ -68,7 +68,7 @@ async def run_script(
         ),
         *script_args,
         cwd=cwd,
-        stdin=stdin or sys.stdin,
-        stdout=stdout or sys.stdout,
-        stderr=stderr or sys.stderr,
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
     )

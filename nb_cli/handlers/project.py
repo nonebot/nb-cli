@@ -75,9 +75,9 @@ async def run_project(
             python_path,
             exist_bot,
             cwd=cwd,
-            stdin=stdin or sys.stdin,
-            stdout=stdout or sys.stdout,
-            stderr=stderr or sys.stderr,
+            stdin=stdin,
+            stdout=stdout,
+            stderr=stderr,
         )
 
     return await asyncio.create_subprocess_exec(
@@ -85,9 +85,9 @@ async def run_project(
         "-c",
         await generate_run_script(adapters=adapters, builtin_plugins=builtin_plugins),
         cwd=cwd,
-        stdin=stdin or sys.stdin,
-        stdout=stdout or sys.stdout,
-        stderr=stderr or sys.stderr,
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
     )
 
 

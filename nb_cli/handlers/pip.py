@@ -29,9 +29,9 @@ async def call_pip_install(
         "install",
         *package,
         *pip_args,
-        stdin=stdin or sys.stdin,
-        stdout=stdout or sys.stdout,
-        stderr=stderr or sys.stderr,
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
     )
 
 
@@ -60,9 +60,9 @@ async def call_pip_update(
         "--upgrade",
         *package,
         *pip_args,
-        stdin=stdin or sys.stdin,
-        stdout=stdout or sys.stdout,
-        stderr=stderr or sys.stderr,
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
     )
 
 
@@ -90,9 +90,9 @@ async def call_pip_uninstall(
         "uninstall",
         *package,
         *pip_args,
-        stdin=stdin or sys.stdin,
-        stdout=stdout or sys.stdout,
-        stderr=stderr or sys.stderr,
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
     )
 
 
@@ -115,7 +115,7 @@ async def call_pip_list(
         "pip",
         "list",
         *pip_args,
-        stdin=stdin or sys.stdin,
-        stdout=stdout or sys.stdout,
-        stderr=stderr or sys.stderr,
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
     )
