@@ -18,6 +18,8 @@ NoneBot CLI 仅支持 Python 3.8 以上版本。
 
 pipx 是专为 Python CLI 应用设计的工具，实现了 CLI 应用的环境隔离。同时，pipx 也会接管 NoneBot CLI 及其依赖的升级与卸载。
 
+请参考 [pipx 文档](https://pypa.github.io/pipx/installation/) 来安装 pipx。
+
 ```shell title="安装 NoneBot CLI"
 pipx install nb-cli
 ```
@@ -28,14 +30,4 @@ pipx upgrade nb-cli
 
 ```shell title="卸载 NoneBot CLI"
 pipx uninstall nb-cli
-```
-
-## 通过安装脚本安装
-
-```shell title="Linux, macOS, Windows (WSL)"
-curl -sSL https://cli.nonebot.dev/install-cli.py | python3 -
-```
-
-```powershell title="Windows (Powershell)"
-(Invoke-WebRequest -Uri https://cli.nonebot.dev/install-cli.py -UseBasicParsing).Content | py -
 ```

@@ -68,32 +68,21 @@ _✨ NoneBot2 命令行工具 ✨_
 
 ### 安装
 
-使用 pipx 安装（推荐）
+使用 pipx 安装
 
 ```shell
 pipx install nb-cli
-```
-
-使用安装脚本安装
-
-Linux, macOS, Windows (WSL):
-
-```shell
-curl -sSL https://cli.nonebot.dev/install-cli.py | python3 -
-```
-
-Windows (Powershell):
-
-```powershell
-(Invoke-WebRequest -Uri https://cli.nonebot.dev/install-cli.py -UseBasicParsing).Content | py -
 ```
 
 ### 命令行使用
 
 ```shell
 nb --help
-python -m nb_cli --help
 ```
+
+> **Warning**
+>
+> 如果找不到 `nb` 命令，请尝试 `pipx ensurepath` 来添加路径到环境变量
 
 - `nb create (init)` 创建新的 NoneBot 项目
 - `nb run` 在当前目录启动 NoneBot

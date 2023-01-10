@@ -110,7 +110,7 @@ const config = {
             icon: ["fas", "user-friends"],
             items: [
               {
-                label: "Homepage",
+                label: "主页",
                 href: "https://nonebot.dev",
               },
               {
@@ -125,6 +125,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ["toml"],
       },
       algolia: {
         appId: "<empty>",
