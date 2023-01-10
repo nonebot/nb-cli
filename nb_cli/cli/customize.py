@@ -109,7 +109,10 @@ class CLIMainGroup(ClickAliasedGroup):
             click.Argument(["script_args"], nargs=-1),
         ]
         return click.command(
-            name=script_name, params=params, help=f"Run script {script_name!r}"
+            name=script_name,
+            params=params,
+            help=f"Run script {script_name!r}",
+            add_help_option=False,
         )(
             partial(
                 self._run_script_command,
