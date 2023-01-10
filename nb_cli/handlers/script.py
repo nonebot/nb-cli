@@ -36,6 +36,7 @@ async def list_scripts(python_path: Optional[str] = None) -> List[str]:
 @requires_nonebot
 async def run_script(
     script_name: str,
+    script_args: Optional[List[str]] = None,
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
     python_path: Optional[str] = None,
@@ -44,6 +45,9 @@ async def run_script(
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
 ) -> asyncio.subprocess.Process:
+    if script_args is None:
+        script_args = []
+
     bot_config = get_nonebot_config()
     if adapters is None:
         adapters = bot_config.adapters
@@ -62,6 +66,7 @@ async def run_script(
             builtin_plugins=builtin_plugins,
             script_name=script_name,
         ),
+        *script_args,
         cwd=cwd,
         stdin=stdin or sys.stdin,
         stdout=stdout or sys.stdout,

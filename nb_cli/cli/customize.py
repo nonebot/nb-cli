@@ -97,15 +97,16 @@ class CLIMainGroup(ClickAliasedGroup):
 
     @staticmethod
     @run_async
-    async def _run_script_command(script_name: str, cwd: Path):
-        proc = await run_script(script_name, cwd=cwd)
+    async def _run_script_command(script_name: str, cwd: Path, script_args: List[str]):
+        proc = await run_script(script_name, script_args, cwd=cwd)
         await proc.wait()
 
     def _build_script_command(self, script_name: str) -> click.Command:
         params = [
             click.Option(
                 ["-d", "--cwd"], default=".", help="The working directory.", type=Path
-            )
+            ),
+            click.Argument(["script_args"], nargs=-1),
         ]
         return click.command(
             name=script_name, params=params, help=f"Run script {script_name!r}"
