@@ -45,7 +45,7 @@ async def self(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@self.command(aliases=["add"])
+@self.command(aliases=["add"], context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -66,7 +66,7 @@ async def install(
     await proc.wait()
 
 
-@self.command()
+@self.command(context_settings={"ignore_unknown_options": True})
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(pip_args: Optional[List[str]]):
@@ -75,7 +75,7 @@ async def update(pip_args: Optional[List[str]]):
     await proc.wait()
 
 
-@self.command(aliases=["remove"])
+@self.command(aliases=["remove"], context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -96,7 +96,7 @@ async def uninstall(
     await proc.wait()
 
 
-@self.command()
+@self.command(context_settings={"ignore_unknown_options": True})
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async

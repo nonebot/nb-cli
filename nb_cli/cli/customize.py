@@ -113,6 +113,7 @@ class CLIMainGroup(ClickAliasedGroup):
             params=params,
             help=f"Run script {script_name!r}",
             add_help_option=False,
+            context_settings={"ignore_unknown_options": True},
         )(
             partial(
                 self._run_script_command,

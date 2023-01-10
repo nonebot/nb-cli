@@ -70,7 +70,7 @@ async def search(name: Optional[str]):
     click.echo(format_package_results(adapters))
 
 
-@adapter.command(aliases=["add"])
+@adapter.command(aliases=["add"], context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -97,7 +97,7 @@ async def install(
     await proc.wait()
 
 
-@adapter.command()
+@adapter.command(context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -119,7 +119,7 @@ async def update(
     await proc.wait()
 
 
-@adapter.command(aliases=["remove"])
+@adapter.command(aliases=["remove"], context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context

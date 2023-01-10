@@ -69,7 +69,7 @@ async def search(name: Optional[str]):
     click.echo(format_package_results(drivers))
 
 
-@driver.command(aliases=["add"])
+@driver.command(aliases=["add"], context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -92,7 +92,7 @@ async def install(
         await proc.wait()
 
 
-@driver.command()
+@driver.command(context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -115,7 +115,7 @@ async def update(
         await proc.wait()
 
 
-@driver.command(aliases=["remove"])
+@driver.command(aliases=["remove"], context_settings={"ignore_unknown_options": True})
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context

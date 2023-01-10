@@ -133,7 +133,11 @@ TEMPLATE_PROMPTS = {
 }
 
 
-@click.command(cls=ClickAliasedCommand, aliases=["init"])
+@click.command(
+    cls=ClickAliasedCommand,
+    aliases=["init"],
+    context_settings={"ignore_unknown_options": True},
+)
 @click.option(
     "-o",
     "--output-dir",
