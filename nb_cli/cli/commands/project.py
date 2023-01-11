@@ -101,7 +101,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             True
             if adapters
             else await ConfirmPrompt(
-                _("You haven't chosen any adapter. Please confirm."),
+                _("You haven't chosen any adapter! Please confirm."),
                 default_choice=False,
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )

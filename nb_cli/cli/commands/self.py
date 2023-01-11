@@ -72,7 +72,7 @@ async def install(
 
 
 @self.command(
-    context_settings={"ignore_unknown_options": True}, help=_("Update nonebot cli.")
+    context_settings={"ignore_unknown_options": True}, help=_("Update cli self.")
 )
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async

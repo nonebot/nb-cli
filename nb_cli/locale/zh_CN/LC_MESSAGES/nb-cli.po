@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-11 09:37+0000\n"
+"POT-Creation-Date: 2023-01-11 14:49+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -120,7 +120,7 @@ msgstr "适配器名称:"
 
 #: nb_cli/cli/commands/adapter.py:199
 msgid "Where to store the adapter?"
-msgstr "在哪里存储适配器?"
+msgstr "请输入适配器存储的位置:"
 
 #: nb_cli/cli/commands/adapter.py:199 nb_cli/cli/commands/adapter.py:202
 #: nb_cli/cli/commands/plugin.py:197 nb_cli/cli/commands/plugin.py:200
@@ -230,144 +230,144 @@ msgstr "创建一个新的插件."
 
 #: nb_cli/cli/commands/plugin.py:173
 msgid "The plugin template to use."
-msgstr ""
+msgstr "使用的插件模板."
 
 #: nb_cli/cli/commands/plugin.py:185
 msgid "Plugin name:"
-msgstr ""
+msgstr "插件名称:"
 
 #: nb_cli/cli/commands/plugin.py:197 nb_cli/cli/commands/project.py:124
 msgid "Where to store the plugin?"
-msgstr ""
+msgstr "请输入插件存储位置:"
 
 #: nb_cli/cli/commands/project.py:42
 msgid "bootstrap (for beginner or user)"
-msgstr ""
+msgstr "bootstap (初学者或用户)"
 
 #: nb_cli/cli/commands/project.py:43
 msgid "simple (for developer)"
-msgstr ""
+msgstr "simple (开发者)"
 
 #: nb_cli/cli/commands/project.py:64
 msgid "Loading adapters..."
-msgstr ""
+msgstr "正在加载适配器..."
 
 #: nb_cli/cli/commands/project.py:66
 msgid "Loading drivers..."
-msgstr ""
+msgstr "正在加载驱动器..."
 
 #: nb_cli/cli/commands/project.py:71
 msgid "Project Name:"
-msgstr ""
+msgstr "项目名称:"
 
 #: nb_cli/cli/commands/project.py:76
 msgid "Which driver(s) would you like to use?"
-msgstr ""
+msgstr "要使用哪些驱动器?"
 
 #: nb_cli/cli/commands/project.py:94
 msgid "Which adapter(s) would you like to use?"
-msgstr ""
+msgstr "要使用哪些适配器?"
 
 #: nb_cli/cli/commands/project.py:104
-msgid "You haven't chosen any adapter. Please confirm."
-msgstr ""
+msgid "You haven't chosen any adapter! Please confirm."
+msgstr "你没有选择任何适配器! 请确认."
 
 #: nb_cli/cli/commands/project.py:120
 msgid "1) In a \"{dir_name}\" folder"
-msgstr ""
+msgstr "1) 在 \"{dir_name}\" 文件夹中"
 
 #: nb_cli/cli/commands/project.py:121
 msgid "2) In a \"src\" folder"
-msgstr ""
+msgstr "2) 在 \"src\" 文件夹中"
 
 #: nb_cli/cli/commands/project.py:141
 msgid "Create a NoneBot project."
-msgstr ""
+msgstr "创建一个 NoneBot 项目."
 
 #: nb_cli/cli/commands/project.py:149
 msgid "The project template to use."
-msgstr ""
+msgstr "使用的项目模板."
 
 #: nb_cli/cli/commands/project.py:154
 msgid "The python interpreter virtualenv is installed into."
-msgstr ""
+msgstr "虚拟环境使用的 Python 解释器."
 
 #: nb_cli/cli/commands/project.py:171
 msgid "Select a template to use:"
-msgstr ""
+msgstr "选择一个要使用的模板:"
 
 #: nb_cli/cli/commands/project.py:193
 msgid "Install dependencies now?"
-msgstr ""
+msgstr "立即安装依赖?"
 
 #: nb_cli/cli/commands/project.py:205
 msgid "Create virtual environment?"
-msgstr ""
+msgstr "创建虚拟环境?"
 
 #: nb_cli/cli/commands/project.py:213
 msgid "Creating virtual environment in {venv_dir} ..."
-msgstr ""
+msgstr "在 {venv_dir} 中创建虚拟环境..."
 
 #: nb_cli/cli/commands/project.py:230
 msgid "Done!"
-msgstr ""
+msgstr "完成!"
 
 #: nb_cli/cli/commands/project.py:231
 msgid "Run the following command to start your bot:"
-msgstr ""
+msgstr "运行以下命令来启动你的机器人:"
 
 #: nb_cli/cli/commands/project.py:241
 msgid "Generate entry file of your bot."
-msgstr ""
+msgstr "生成机器人的入口文件."
 
 #: nb_cli/cli/commands/project.py:247
 msgid "The file script saved to."
-msgstr ""
+msgstr "脚本文件保存路径."
 
 #: nb_cli/cli/commands/project.py:256
 msgid "Run the bot in current folder."
-msgstr ""
+msgstr "在当前文件夹中运行机器人."
 
 #: nb_cli/cli/commands/project.py:264
 msgid "Exist entry file of your bot."
-msgstr ""
+msgstr "存在的机器人入口文件."
 
 #: nb_cli/cli/commands/project.py:271
 msgid "Reload the bot when file changed."
-msgstr ""
+msgstr "当文件发生变化时重新加载机器人."
 
 #: nb_cli/cli/commands/project.py:277
 msgid "Files to watch for changes."
-msgstr ""
+msgstr "要监视变化的文件."
 
 #: nb_cli/cli/commands/project.py:283
 msgid "Files to ignore for changes."
-msgstr ""
+msgstr "要忽略变化的文件."
 
 #: nb_cli/cli/commands/self.py:18
 msgid "Manage NB CLI."
-msgstr ""
+msgstr "管理 NB CLI."
 
 #: nb_cli/cli/commands/self.py:53
 msgid "Install package to cli venv."
-msgstr ""
+msgstr "在 cli 虚拟环境中安装包."
 
 #: nb_cli/cli/commands/self.py:65
 msgid "Package name you want to install?"
-msgstr ""
+msgstr "要安装的包名?"
 
 #: nb_cli/cli/commands/self.py:75
-msgid "Update nonebot cli."
-msgstr ""
+msgid "Update cli self."
+msgstr "更新 cli."
 
 #: nb_cli/cli/commands/self.py:87
 msgid "Uninstall package from cli venv."
-msgstr ""
+msgstr "从 cli 虚拟环境中卸载包."
 
 #: nb_cli/cli/commands/self.py:99
 msgid "Package name you want to uninstall?"
-msgstr ""
+msgstr "要卸载的包名?"
 
 #: nb_cli/cli/commands/self.py:110
 msgid "List installed packages in cli venv."
-msgstr ""
+msgstr "列出 cli 虚拟环境中已安装的包."
