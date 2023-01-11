@@ -20,14 +20,14 @@ options:
 
 例如 setuptools / pdm 等 PEP621 格式:
 
-```toml {2} title="pyproject.toml"
+```toml title="pyproject.toml"
 [project.entry-points.nb_scripts]
 foo = "awesome_bot.module:function"
 ```
 
 Poetry 格式:
 
-```toml {15} title="pyproject.toml"
+```toml title="pyproject.toml"
 [tool.poetry.plugins.nb_scripts]
 foo = "awesome_bot.module:function"
 ```
