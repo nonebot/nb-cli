@@ -1,3 +1,6 @@
+import gettext
+from pathlib import Path
+
 from cashews import Cache
 from importlib_metadata import EntryPoint, version, entry_points
 
@@ -5,6 +8,11 @@ try:
     __version__ = version("nb-cli")
 except Exception:
     __version__ = None
+
+t = gettext.translation(
+    "nb-cli", localedir=Path(__file__).parent / "locale", fallback=True
+)
+_ = t.gettext
 
 cache = Cache("nb")
 cache.setup("mem://")

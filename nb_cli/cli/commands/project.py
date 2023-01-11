@@ -16,6 +16,7 @@ from noneprompt import (
     CheckboxPrompt,
 )
 
+from nb_cli import _
 from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.consts import WINDOWS, DEFAULT_DRIVER
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
@@ -38,8 +39,8 @@ from nb_cli.handlers import (
 VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
 BLACKLISTED_PROJECT_NAME = {"nonebot", "bot"}
 TEMPLATE_DESCRIPTION = {
-    "bootstrap": "bootstrap (for beginner or user)",
-    "simple": "simple (for developer)",
+    "bootstrap": _("bootstrap (for beginner or user)"),
+    "simple": _("simple (for developer)"),
 }
 
 if sys.version_info >= (3, 10):
@@ -60,19 +61,19 @@ def project_name_validator(name: str) -> bool:
 
 
 async def prompt_common_context(context: ProjectContext) -> ProjectContext:
-    click.secho("Loading adapters...")
+    click.secho(_("Loading adapters..."))
     all_adapters = await list_adapters()
-    click.secho("Loading drivers...")
+    click.secho(_("Loading drivers..."))
     all_drivers = await list_drivers()
     click.clear()
 
     project_name = await InputPrompt(
-        "Project Name:", validator=project_name_validator
+        _("Project Name:"), validator=project_name_validator
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["project_name"] = project_name
 
     drivers = await CheckboxPrompt(
-        "Which driver(s) would you like to use?",
+        _("Which driver(s) would you like to use?"),
         [Choice(f"{driver.name} ({driver.desc})", driver) for driver in all_drivers],
         default_select=[
             index
@@ -90,7 +91,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     adapters = []
     while not confirm:
         adapters = await CheckboxPrompt(
-            "Which adapter(s) would you like to use?",
+            _("Which adapter(s) would you like to use?"),
             [
                 Choice(f"{adapter.name} ({adapter.desc})", adapter)
                 for adapter in all_adapters
@@ -100,7 +101,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             True
             if adapters
             else await ConfirmPrompt(
-                "You haven't chosen any adapter. Please confirm.",
+                _("You haven't chosen any adapter. Please confirm."),
                 default_choice=False,
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )
@@ -116,11 +117,11 @@ async def prompt_simple_context(context: ProjectContext) -> ProjectContext:
         context.variables["project_name"].lower().replace(" ", "-").replace("-", "_")
     )
     src_choices: List[Choice[bool]] = [
-        Choice(f'1) In a "{dir_name}" folder', False),
-        Choice('2) In a "src" folder', True),
+        Choice(_('1) In a "{dir_name}" folder').format(dir_name=dir_name), False),
+        Choice(_('2) In a "src" folder'), True),
     ]
     context.variables["use_src"] = (
-        await ListPrompt("Where to store the plugin?", src_choices).prompt_async(
+        await ListPrompt(_("Where to store the plugin?"), src_choices).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
     ).data
@@ -137,6 +138,7 @@ TEMPLATE_PROMPTS = {
     cls=ClickAliasedCommand,
     aliases=["init"],
     context_settings={"ignore_unknown_options": True},
+    help=_("Create a NoneBot project."),
 )
 @click.option(
     "-o",
@@ -144,12 +146,12 @@ TEMPLATE_PROMPTS = {
     default=None,
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
-@click.option("-t", "--template", default=None, help="The project template to use.")
+@click.option("-t", "--template", default=None, help=_("The project template to use."))
 @click.option(
     "-p",
     "--python-interpreter",
     default=None,
-    help="The python interpreter virtualenv is installed into.",
+    help=_("The python interpreter virtualenv is installed into."),
 )
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -161,13 +163,12 @@ async def create(
     python_interpreter: Optional[str],
     pip_args: Optional[List[str]],
 ):
-    """Create a NoneBot project."""
     if not template:
         templates = list_project_templates()
         try:
             template = (
                 await ListPrompt(
-                    "Select a template to use",
+                    _("Select a template to use:"),
                     [Choice(TEMPLATE_DESCRIPTION.get(t, t), t) for t in templates],
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
             ).data
@@ -189,7 +190,7 @@ async def create(
 
     try:
         install_dependencies = await ConfirmPrompt(
-            "Install dependencies now?", default_choice=True
+            _("Install dependencies now?"), default_choice=True
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()
@@ -201,14 +202,19 @@ async def create(
     if install_dependencies:
         try:
             use_venv = await ConfirmPrompt(
-                "Create virtual environment?", default_choice=True
+                _("Create virtual environment?"), default_choice=True
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()
 
         path = None
         if use_venv:
-            click.secho(f"Creating virtual environment in {venv_dir} ...", fg="yellow")
+            click.secho(
+                _("Creating virtual environment in {venv_dir} ...").format(
+                    venv_dir=venv_dir
+                ),
+                fg="yellow",
+            )
             await create_virtualenv(
                 venv_dir, prompt=project_dir, python_interpreter=python_interpreter
             )
@@ -221,8 +227,8 @@ async def create(
         proc = await call_pip_install(context.packages, pip_args, python_path=path)
         await proc.wait()
 
-    click.secho("Done!", fg="green")
-    click.secho("Run the following command to start your bot:", fg="green")
+    click.secho(_("Done!"), fg="green")
+    click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
     if use_venv:
         click.secho(
@@ -232,45 +238,49 @@ async def create(
     click.secho("  nb run --reload", fg="green")
 
 
-@click.command(cls=ClickAliasedCommand)
+@click.command(cls=ClickAliasedCommand, help=_("Generate entry file of your bot."))
 @click.option(
     "-f",
     "--file",
     default="bot.py",
     show_default=True,
-    help="The file script saved to.",
+    help=_("The file script saved to."),
 )
 @run_async
 async def generate(file: str):
-    """Generate entry file of your bot."""
     content = await generate_run_script()
     Path(file).write_text(content)
 
 
-@click.command(cls=ClickAliasedCommand, aliases=["start"])
-@click.option("-d", "--cwd", default=".", help="The working directory.")
+@click.command(
+    cls=ClickAliasedCommand, aliases=["start"], help=_("Run the bot in current folder.")
+)
+@click.option("-d", "--cwd", default=".", help=_("The working directory."))
 @click.option(
     "-f",
     "--file",
     default="bot.py",
     show_default=True,
-    help="Exist entry file of your bot.",
+    help=_("Exist entry file of your bot."),
 )
 @click.option(
     "-r",
     "--reload",
     is_flag=True,
     default=False,
-    help="Reload the bot when file changed.",
+    help=_("Reload the bot when file changed."),
 )
 @click.option(
-    "--reload-includes", multiple=True, default=None, help="Files to watch for changes."
+    "--reload-includes",
+    multiple=True,
+    default=None,
+    help=_("Files to watch for changes."),
 )
 @click.option(
     "--reload-excludes",
     multiple=True,
     default=None,
-    help="Files to ignore for changes.",
+    help=_("Files to ignore for changes."),
 )
 @run_async
 async def run(
@@ -280,7 +290,6 @@ async def run(
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
 ):
-    """Run the bot in current folder."""
     if reload:
         await Reloader(
             partial(run_project, exist_bot=Path(file)),

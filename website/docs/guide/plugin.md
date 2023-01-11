@@ -40,9 +40,9 @@ plugin_name = "cli_plugin.plugin:install"
    from typing import List, cast
 
    import click
+   from nb_cli import _
    from noneprompt import Choice, ListPrompt, CancelledError
    from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
-
 
    @click.group(cls=ClickAliasedGroup, invoke_without_command=True)
    @click.pass_context
@@ -60,20 +60,27 @@ plugin_name = "cli_plugin.plugin:install"
            if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
                choices.append(
                    Choice(
-                       sub_cmd.help or f"Run subcommand {sub_cmd.name}",
+                       sub_cmd.help
+                       or _("Run subcommand {sub_cmd.name!r}").format(sub_cmd=sub_cmd),
                        sub_cmd,
                    )
                )
 
        try:
            result = await ListPrompt(
-               "What do you want to do?", choices=choices
+               _("What do you want to do?"), choices=choices
            ).prompt_async(style=CLI_DEFAULT_STYLE)
        except CancelledError:
            ctx.exit()
 
        sub_cmd = result.data
        await run_sync(ctx.invoke)(sub_cmd)
+
+   @command_name.command()
+   @run_async
+   async def sub_command():
+       """Sub command help."""
+       # do something
    ```
 
 2. 编写 `install` 函数
@@ -84,7 +91,6 @@ plugin_name = "cli_plugin.plugin:install"
    from nb_cli.cli import CLIMainGroup, cli
 
    from .cli import command_name
-
 
    def install():
        cli_ = cast(CLIMainGroup, cli)

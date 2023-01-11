@@ -98,3 +98,31 @@ nb --help
 ```shell
 nb
 ```
+
+## 开发
+
+### 翻译
+
+生成模板
+
+```shell
+pybabel extract -o messages.pot --project nb-cli --version 1.0.0 nb_cli/
+```
+
+初始化语言翻译文件或者更新现有语言翻译文件
+
+```shell
+pybabel init -D nb-cli -i messages.pot -d nb_cli/locale/ -l zh_CN
+```
+
+更新语言翻译文件
+
+```shell
+pybabel update -D nb-cli -i messages.pot -d nb_cli/locale/
+```
+
+编译语言翻译文件
+
+```shell
+pybabel compile -D nb-cli -d nb_cli/locale/
+```

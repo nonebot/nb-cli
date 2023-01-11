@@ -4,6 +4,7 @@ from typing import List, Optional, cast
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
+from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
@@ -17,12 +18,12 @@ from nb_cli.handlers import (
 )
 
 
-@click.group(cls=ClickAliasedGroup, invoke_without_command=True)
+@click.group(
+    cls=ClickAliasedGroup, invoke_without_command=True, help=_("Manage Bot Adapter.")
+)
 @click.pass_context
 @run_async
 async def adapter(ctx: click.Context):
-    """Manage Bot Adapter."""
-
     if ctx.invoked_subcommand is not None:
         return
 
@@ -33,14 +34,15 @@ async def adapter(ctx: click.Context):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
                 Choice(
-                    sub_cmd.help or f"Run subcommand {sub_cmd.name}",
+                    sub_cmd.help
+                    or _("Run subcommand {sub_cmd.name!r}").format(sub_cmd=sub_cmd),
                     sub_cmd,
                 )
             )
 
     try:
         result = await ListPrompt(
-            "What do you want to do?", choices=choices
+            _("What do you want to do?"), choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()
@@ -49,28 +51,30 @@ async def adapter(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@adapter.command()
+@adapter.command(help=_("List nonebot adapters published on nonebot homepage."))
 @run_async
 async def list():
-    """List nonebot adapters published on nonebot homepage."""
     adapters = await list_adapters()
     click.echo(format_package_results(adapters))
 
 
-@adapter.command()
+@adapter.command(help=_("Search for nonebot adapters published on nonebot homepage."))
 @click.argument("name", nargs=1, default=None)
 @run_async
 async def search(name: Optional[str]):
-    """Search for nonebot adapters published on nonebot homepage."""
     if name is None:
-        name = await InputPrompt("Adapter name to search:").prompt_async(
+        name = await InputPrompt(_("Adapter name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
     adapters = await list_adapters(name)
     click.echo(format_package_results(adapters))
 
 
-@adapter.command(aliases=["add"], context_settings={"ignore_unknown_options": True})
+@adapter.command(
+    aliases=["add"],
+    context_settings={"ignore_unknown_options": True},
+    help=_("Install nonebot adapter to current project."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -78,10 +82,9 @@ async def search(name: Optional[str]):
 async def install(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Install nonebot adapter to current project."""
     try:
         adapter = await find_exact_package(
-            "Adapter name to install:", name, await list_adapters()
+            _("Adapter name to install:"), name, await list_adapters()
         )
     except CancelledError:
         ctx.exit()
@@ -91,13 +94,19 @@ async def install(
     try:
         GLOBAL_CONFIG.add_adapter(adapter)
     except RuntimeError as e:
-        click.echo(f"Failed to add adapter {adapter.name} to config: {e}")
+        click.echo(
+            _("Failed to add adapter {adapter.name} to config: {e}").format(
+                adapter=adapter, e=e
+            )
+        )
 
     proc = await call_pip_install(adapter.project_link, pip_args)
     await proc.wait()
 
 
-@adapter.command(context_settings={"ignore_unknown_options": True})
+@adapter.command(
+    context_settings={"ignore_unknown_options": True}, help=_("Update nonebot adapter.")
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -105,10 +114,9 @@ async def install(
 async def update(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Update nonebot adapter."""
     try:
         adapter = await find_exact_package(
-            "Adapter name to update:", name, await list_adapters()
+            _("Adapter name to update:"), name, await list_adapters()
         )
     except CancelledError:
         ctx.exit()
@@ -119,7 +127,11 @@ async def update(
     await proc.wait()
 
 
-@adapter.command(aliases=["remove"], context_settings={"ignore_unknown_options": True})
+@adapter.command(
+    aliases=["remove"],
+    context_settings={"ignore_unknown_options": True},
+    help=_("Uninstall nonebot adapter from current project."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -127,10 +139,9 @@ async def update(
 async def uninstall(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Uninstall nonebot adapter from current project."""
     try:
         adapter = await find_exact_package(
-            "Adapter name to uninstall:", name, await list_adapters()
+            _("Adapter name to uninstall:"), name, await list_adapters()
         )
     except CancelledError:
         ctx.exit()
@@ -140,13 +151,17 @@ async def uninstall(
     try:
         GLOBAL_CONFIG.remove_adapter(adapter)
     except RuntimeError as e:
-        click.echo(f"Failed to remove adapter {adapter.name} from config: {e}")
+        click.echo(
+            _("Failed to remove adapter {adapter.name} from config: {e}").format(
+                adapter=adapter, e=e
+            )
+        )
 
     proc = await call_pip_uninstall(adapter.project_link, pip_args)
     await proc.wait()
 
 
-@adapter.command(aliases=["new"])
+@adapter.command(aliases=["new"], help=_("Create a new nonebot adapter."))
 @click.argument("name", default=None)
 @click.option(
     "-o",
@@ -154,7 +169,7 @@ async def uninstall(
     default=None,
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
-@click.option("-t", "--template", default=None)
+@click.option("-t", "--template", default=None, help=_("The adapter template to use."))
 @click.pass_context
 @run_async
 async def create(
@@ -163,10 +178,9 @@ async def create(
     output_dir: Optional[str],
     template: Optional[str],
 ):
-    """Create a new nonebot adapter."""
     if name is None:
         try:
-            name = await InputPrompt("Adapter name:").prompt_async(
+            name = await InputPrompt(_("Adapter name:")).prompt_async(
                 style=CLI_DEFAULT_STYLE
             )
         except CancelledError:
@@ -182,21 +196,21 @@ async def create(
         try:
             output_dir = (
                 await ListPrompt(
-                    "Where to store the adapter?", detected + [Choice("Other")]
+                    _("Where to store the adapter?"), detected + [Choice(_("Other"))]
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
             ).name
-            if output_dir == "Other":
+            if output_dir == _("Other"):
                 output_dir = await InputPrompt(
-                    "Output Dir:",
+                    _("Output Dir:"),
                     validator=lambda x: len(x) > 0 and Path(x).is_dir(),
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()
     elif not Path(output_dir).is_dir():
-        click.secho("Output dir is not a directory!", fg="yellow")
+        click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
             output_dir = await InputPrompt(
-                "Adapter Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
+                _("Output Dir:"), validator=lambda x: len(x) > 0 and Path(x).is_dir()
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()

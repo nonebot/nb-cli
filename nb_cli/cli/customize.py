@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import click
 
-from nb_cli import cache
+from nb_cli import _, cache
 from nb_cli.handlers import run_script, list_scripts
 
 from .utils import run_async
@@ -104,14 +104,17 @@ class CLIMainGroup(ClickAliasedGroup):
     def _build_script_command(self, script_name: str) -> click.Command:
         params = [
             click.Option(
-                ["-d", "--cwd"], default=".", help="The working directory.", type=Path
+                ["-d", "--cwd"],
+                default=".",
+                help=_("The working directory."),
+                type=Path,
             ),
             click.Argument(["script_args"], nargs=-1),
         ]
         return click.command(
             name=script_name,
             params=params,
-            help=f"Run script {script_name!r}",
+            help=_("Run script {script_name!r}").format(script_name=script_name),
             add_help_option=False,
             context_settings={"ignore_unknown_options": True},
         )(

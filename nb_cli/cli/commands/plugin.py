@@ -4,6 +4,7 @@ from typing import List, Optional, cast
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
+from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
@@ -17,12 +18,12 @@ from nb_cli.handlers import (
 )
 
 
-@click.group(cls=ClickAliasedGroup, invoke_without_command=True)
+@click.group(
+    cls=ClickAliasedGroup, invoke_without_command=True, help=_("Manage Bot Plugin.")
+)
 @click.pass_context
 @run_async
 async def plugin(ctx: click.Context):
-    """Manage Bot Plugin."""
-
     if ctx.invoked_subcommand is not None:
         return
 
@@ -33,14 +34,15 @@ async def plugin(ctx: click.Context):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
                 Choice(
-                    sub_cmd.help or f"Run subcommand {sub_cmd.name}",
+                    sub_cmd.help
+                    or _("Run subcommand {sub_cmd.name!r}").format(sub_cmd=sub_cmd),
                     sub_cmd,
                 )
             )
 
     try:
         result = await ListPrompt(
-            "What do you want to do?", choices=choices
+            _("What do you want to do?"), choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()
@@ -49,28 +51,30 @@ async def plugin(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@plugin.command()
+@plugin.command(help=_("List nonebot plugins published on nonebot homepage."))
 @run_async
 async def list():
-    """List nonebot plugins published on nonebot homepage."""
     plugins = await list_plugins()
     click.echo(format_package_results(plugins))
 
 
-@plugin.command()
+@plugin.command(help=_("Search for nonebot plugins published on nonebot homepage."))
 @click.argument("name", nargs=1, required=False, default=None)
 @run_async
 async def search(name: Optional[str]):
-    """Search for nonebot plugins published on nonebot homepage."""
     if name is None:
-        name = await InputPrompt("Plugin name to search:").prompt_async(
+        name = await InputPrompt(_("Plugin name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
     plugins = await list_plugins(name)
     click.echo(format_package_results(plugins))
 
 
-@plugin.command(aliases=["add"], context_settings={"ignore_unknown_options": True})
+@plugin.command(
+    aliases=["add"],
+    context_settings={"ignore_unknown_options": True},
+    help=_("Install nonebot plugin to current project."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -78,10 +82,9 @@ async def search(name: Optional[str]):
 async def install(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Install nonebot plugin to current project."""
     try:
         plugin = await find_exact_package(
-            "Plugin name to install:", name, await list_plugins()
+            _("Plugin name to install:"), name, await list_plugins()
         )
     except CancelledError:
         ctx.exit()
@@ -91,13 +94,19 @@ async def install(
     try:
         GLOBAL_CONFIG.add_plugin(plugin.module_name)
     except RuntimeError as e:
-        click.echo(f"Failed to add plugin {plugin.name} to config: {e}")
+        click.echo(
+            _("Failed to add plugin {plugin.name} to config: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
     proc = await call_pip_install(plugin.project_link, pip_args)
     await proc.wait()
 
 
-@plugin.command(context_settings={"ignore_unknown_options": True})
+@plugin.command(
+    context_settings={"ignore_unknown_options": True}, help=_("Update nonebot plugin.")
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -105,10 +114,9 @@ async def install(
 async def update(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Update nonebot plugin."""
     try:
         plugin = await find_exact_package(
-            "Plugin name to update:", name, await list_plugins()
+            _("Plugin name to update:"), name, await list_plugins()
         )
     except CancelledError:
         ctx.exit()
@@ -119,7 +127,11 @@ async def update(
     await proc.wait()
 
 
-@plugin.command(aliases=["remove"], context_settings={"ignore_unknown_options": True})
+@plugin.command(
+    aliases=["remove"],
+    context_settings={"ignore_unknown_options": True},
+    help=_("Uninstall nonebot plugin from current project."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -127,10 +139,9 @@ async def update(
 async def uninstall(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Uninstall nonebot plugin from current project."""
     try:
         plugin = await find_exact_package(
-            "Plugin name to uninstall:", name, await list_plugins()
+            _("Plugin name to uninstall:"), name, await list_plugins()
         )
     except CancelledError:
         ctx.exit()
@@ -140,13 +151,17 @@ async def uninstall(
     try:
         GLOBAL_CONFIG.remove_plugin(plugin.module_name)
     except RuntimeError as e:
-        click.echo(f"Failed to remove plugin {plugin.name} from config: {e}")
+        click.echo(
+            _("Failed to remove plugin {plugin.name} from config: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
     proc = await call_pip_uninstall(plugin.project_link, pip_args)
     await proc.wait()
 
 
-@plugin.command(aliases=["new"])
+@plugin.command(aliases=["new"], help=_("Create a new nonebot plugin."))
 @click.argument("name", nargs=1, required=False, default=None)
 @click.option("-s", "--sub-plugin", is_flag=True, default=False)
 @click.option(
@@ -155,7 +170,7 @@ async def uninstall(
     default=None,
     type=click.Path(exists=True, file_okay=False, writable=True),
 )
-@click.option("-t", "--template", default=None)
+@click.option("-t", "--template", default=None, help=_("The plugin template to use."))
 @click.pass_context
 @run_async
 async def create(
@@ -165,10 +180,9 @@ async def create(
     output_dir: Optional[str],
     template: Optional[str],
 ):
-    """Create a new nonebot plugin."""
     if name is None:
         try:
-            name = await InputPrompt("Plugin name:").prompt_async(
+            name = await InputPrompt(_("Plugin name:")).prompt_async(
                 style=CLI_DEFAULT_STYLE
             )
         except CancelledError:
@@ -180,21 +194,21 @@ async def create(
         try:
             output_dir = (
                 await ListPrompt(
-                    "Where to store the plugin?", detected + [Choice("Other")]
+                    _("Where to store the plugin?"), detected + [Choice(_("Other"))]
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
             ).name
-            if output_dir == "Other":
+            if output_dir == _("Other"):
                 output_dir = await InputPrompt(
-                    "Output Dir:",
+                    _("Output Dir:"),
                     validator=lambda x: len(x) > 0 and Path(x).is_dir(),
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()
     elif not Path(output_dir).is_dir():
-        click.secho("Output Dir is not a directory!", fg="yellow")
+        click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
             output_dir = await InputPrompt(
-                "Output Dir:", validator=lambda x: len(x) > 0 and Path(x).is_dir()
+                _("Output Dir:"), validator=lambda x: len(x) > 0 and Path(x).is_dir()
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()

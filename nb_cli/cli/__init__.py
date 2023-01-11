@@ -4,7 +4,7 @@ from typing import List, cast
 import click
 from noneprompt import Choice, ListPrompt, CancelledError
 
-from nb_cli import __version__
+from nb_cli import _, __version__
 from nb_cli.handlers import draw_logo
 from nb_cli.config import GLOBAL_CONFIG
 
@@ -44,7 +44,7 @@ def prepare_python(ctx: click.Context, param: click.Option, value: str):
     "-c",
     "--config",
     default="pyproject.toml",
-    help="Config file path.",
+    help=_("Config file path."),
     type=click.Path(exists=False, dir_okay=False, readable=True),
     is_eager=True,
     expose_value=False,
@@ -54,7 +54,7 @@ def prepare_python(ctx: click.Context, param: click.Option, value: str):
     "-e",
     "--encoding",
     default="utf-8",
-    help="Config file encoding.",
+    help=_("Config file encoding."),
     is_eager=True,
     expose_value=False,
     callback=prepare_encoding,
@@ -63,7 +63,7 @@ def prepare_python(ctx: click.Context, param: click.Option, value: str):
     "-py",
     "--python",
     default=None,
-    help="Python executable path.",
+    help=_("Python executable path."),
     is_eager=True,
     expose_value=False,
     callback=prepare_python,
@@ -85,19 +85,20 @@ async def cli(ctx: click.Context):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
                 Choice(
-                    sub_cmd.help or f"Run subcommand {sub_cmd.name}",
+                    sub_cmd.help
+                    or _("Run subcommand {sub_cmd.name!r}").format(sub_cmd=sub_cmd),
                     sub_cmd,
                 )
             )
 
     click.secho(draw_logo(), fg="cyan", bold=True)
     click.echo("\n\b")
-    click.secho("Welcome to NoneBot CLI!", fg="green", bold=True)
+    click.secho(_("Welcome to NoneBot CLI!"), fg="green", bold=True)
 
     # prompt user to choose
     try:
         result = await ListPrompt(
-            "What do you want to do?", choices=choices
+            _("What do you want to do?"), choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()

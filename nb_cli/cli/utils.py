@@ -7,6 +7,7 @@ import click
 from noneprompt import InputPrompt
 from prompt_toolkit.styles import Style
 
+from nb_cli import _
 from nb_cli.config import Driver, Plugin, Adapter
 from nb_cli.handlers import format_package_results
 
@@ -49,7 +50,7 @@ async def find_exact_package(
     elif len(packages) > 1:
         click.echo(format_package_results(packages))
     else:
-        click.echo(f"Package {name} not found.")
+        click.echo(_("Package {name} not found.").format(name=name))
 
     raise RuntimeError("No or multiple packages found.")
 

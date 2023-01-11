@@ -20,5 +20,5 @@ runs:
         architecture: "x64"
         cache: "poetry"
 
-    - run: poetry install
+    - run: poetry install && poetry run pybabel compile -D nb-cli -d nb_cli/locale/
       shell: bash

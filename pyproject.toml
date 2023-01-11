@@ -36,6 +36,7 @@ typing-extensions = "^4.4.0"
 importlib-metadata = "^6.0.0"
 
 [tool.poetry.group.dev.dependencies]
+babel = "^2.11.0"
 isort = "^5.10.1"
 black = "^22.3.0"
 nonemoji = "^0.1.2"

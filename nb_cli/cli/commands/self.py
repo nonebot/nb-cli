@@ -4,6 +4,7 @@ from typing import List, Optional, cast
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
+from nb_cli import _
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
     call_pip_list,
@@ -13,12 +14,12 @@ from nb_cli.handlers import (
 )
 
 
-@click.group(cls=ClickAliasedGroup, invoke_without_command=True)
+@click.group(
+    cls=ClickAliasedGroup, invoke_without_command=True, help=_("Manage NB CLI.")
+)
 @click.pass_context
 @run_async
 async def self(ctx: click.Context):
-    """Manage NB CLI."""
-
     if ctx.invoked_subcommand is not None:
         return
 
@@ -29,14 +30,15 @@ async def self(ctx: click.Context):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
                 Choice(
-                    sub_cmd.help or f"Run subcommand {sub_cmd.name}",
+                    sub_cmd.help
+                    or _("Run subcommand {sub_cmd.name!r}").format(sub_cmd=sub_cmd),
                     sub_cmd,
                 )
             )
 
     try:
         result = await ListPrompt(
-            "What do you want to do?", choices=choices
+            _("What do you want to do?"), choices=choices
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()
@@ -45,7 +47,11 @@ async def self(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@self.command(aliases=["add"], context_settings={"ignore_unknown_options": True})
+@self.command(
+    aliases=["add"],
+    context_settings={"ignore_unknown_options": True},
+    help=_("Install package to cli venv."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -53,12 +59,11 @@ async def self(ctx: click.Context):
 async def install(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Install dependency to cli venv."""
     if name is None:
         try:
-            name = await InputPrompt("Package name you want to install?").prompt_async(
-                style=CLI_DEFAULT_STYLE
-            )
+            name = await InputPrompt(
+                _("Package name you want to install?")
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()
 
@@ -66,16 +71,21 @@ async def install(
     await proc.wait()
 
 
-@self.command(context_settings={"ignore_unknown_options": True})
+@self.command(
+    context_settings={"ignore_unknown_options": True}, help=_("Update nonebot cli.")
+)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(pip_args: Optional[List[str]]):
-    """Update nonebot cli."""
     proc = await call_pip_update("nb-cli", pip_args, sys.executable)
     await proc.wait()
 
 
-@self.command(aliases=["remove"], context_settings={"ignore_unknown_options": True})
+@self.command(
+    aliases=["remove"],
+    context_settings={"ignore_unknown_options": True},
+    help=_("Uninstall package from cli venv."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -83,11 +93,10 @@ async def update(pip_args: Optional[List[str]]):
 async def uninstall(
     ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
-    """Uninstall nonebot cli dependency from cli venv."""
     if name is None:
         try:
             name = await InputPrompt(
-                "Package name you want to uninstall?"
+                _("Package name you want to uninstall?")
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()
@@ -96,11 +105,12 @@ async def uninstall(
     await proc.wait()
 
 
-@self.command(context_settings={"ignore_unknown_options": True})
+@self.command(
+    context_settings={"ignore_unknown_options": True},
+    help=_("List installed packages in cli venv."),
+)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def list(ctx: click.Context, pip_args: Optional[List[str]]):
-    """List installed packages in cli venv."""
+async def list(pip_args: Optional[List[str]]):
     proc = await call_pip_list(pip_args, sys.executable)
     await proc.wait()

@@ -1,0 +1,373 @@
+# Chinese (Simplified, China) translations for nb-cli.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the nb-cli project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: nb-cli 1.0.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-01-11 09:37+0000\n"
+"PO-Revision-Date: 2023-01-11 08:56+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_Hans_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.11.0\n"
+
+#: nb_cli/cli/__init__.py:47
+msgid "Config file path."
+msgstr "配置文件路径."
+
+#: nb_cli/cli/__init__.py:57
+msgid "Config file encoding."
+msgstr "配置文件编码."
+
+#: nb_cli/cli/__init__.py:66
+msgid "Python executable path."
+msgstr "Python 可执行文件路径."
+
+#: nb_cli/cli/__init__.py:89 nb_cli/cli/commands/adapter.py:38
+#: nb_cli/cli/commands/driver.py:35 nb_cli/cli/commands/plugin.py:38
+#: nb_cli/cli/commands/self.py:34
+msgid "Run subcommand {sub_cmd.name!r}"
+msgstr "运行子命令 {sub_cmd.name!r}"
+
+#: nb_cli/cli/__init__.py:96
+msgid "Welcome to NoneBot CLI!"
+msgstr "欢迎使用 NoneBot CLI!"
+
+#: nb_cli/cli/__init__.py:101 nb_cli/cli/commands/adapter.py:45
+#: nb_cli/cli/commands/driver.py:42 nb_cli/cli/commands/plugin.py:45
+#: nb_cli/cli/commands/self.py:41
+msgid "What do you want to do?"
+msgstr "你想要进行什么操作?"
+
+#: nb_cli/cli/commands/project.py:258 nb_cli/cli/customize.py:109
+msgid "The working directory."
+msgstr "工作目录."
+
+#: nb_cli/cli/customize.py:117
+msgid "Run script {script_name!r}"
+msgstr "运行脚本 {script_name!r}"
+
+#: nb_cli/cli/utils.py:53
+msgid "Package {name} not found."
+msgstr "包 {name} 未找到."
+
+#: nb_cli/cli/commands/adapter.py:22
+msgid "Manage Bot Adapter."
+msgstr "管理 Bot 适配器."
+
+#: nb_cli/cli/commands/adapter.py:54
+msgid "List nonebot adapters published on nonebot homepage."
+msgstr "列出 NoneBot 官网上发布的适配器."
+
+#: nb_cli/cli/commands/adapter.py:61
+msgid "Search for nonebot adapters published on nonebot homepage."
+msgstr "搜索 NoneBot 官网上发布的适配器."
+
+#: nb_cli/cli/commands/adapter.py:66
+msgid "Adapter name to search:"
+msgstr "想要搜索的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:76
+msgid "Install nonebot adapter to current project."
+msgstr "安装适配器到当前项目."
+
+#: nb_cli/cli/commands/adapter.py:87
+msgid "Adapter name to install:"
+msgstr "想要安装的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:98
+msgid "Failed to add adapter {adapter.name} to config: {e}"
+msgstr "添加适配器 {adapter.name} 到配置文件失败: {e}"
+
+#: nb_cli/cli/commands/adapter.py:108
+msgid "Update nonebot adapter."
+msgstr "更新适配器."
+
+#: nb_cli/cli/commands/adapter.py:119
+msgid "Adapter name to update:"
+msgstr "想要更新的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:133
+msgid "Uninstall nonebot adapter from current project."
+msgstr "移除当前项目中的适配器."
+
+#: nb_cli/cli/commands/adapter.py:144
+msgid "Adapter name to uninstall:"
+msgstr "想要移除的适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:155
+msgid "Failed to remove adapter {adapter.name} from config: {e}"
+msgstr "从配置文件移除适配器 {adapter.name} 失败: {e}"
+
+#: nb_cli/cli/commands/adapter.py:164
+msgid "Create a new nonebot adapter."
+msgstr "新建适配器"
+
+#: nb_cli/cli/commands/adapter.py:172
+msgid "The adapter template to use."
+msgstr "使用的适配器模板."
+
+#: nb_cli/cli/commands/adapter.py:183
+msgid "Adapter name:"
+msgstr "适配器名称:"
+
+#: nb_cli/cli/commands/adapter.py:199
+msgid "Where to store the adapter?"
+msgstr "在哪里存储适配器?"
+
+#: nb_cli/cli/commands/adapter.py:199 nb_cli/cli/commands/adapter.py:202
+#: nb_cli/cli/commands/plugin.py:197 nb_cli/cli/commands/plugin.py:200
+msgid "Other"
+msgstr "其他"
+
+#: nb_cli/cli/commands/adapter.py:204 nb_cli/cli/commands/adapter.py:213
+#: nb_cli/cli/commands/plugin.py:202 nb_cli/cli/commands/plugin.py:211
+msgid "Output Dir:"
+msgstr "输出目录:"
+
+#: nb_cli/cli/commands/adapter.py:210 nb_cli/cli/commands/plugin.py:208
+msgid "Output dir is not a directory!"
+msgstr "输出目录不是一个文件夹!"
+
+#: nb_cli/cli/commands/driver.py:19
+msgid "Manage Bot Driver."
+msgstr "管理 Bot 驱动器."
+
+#: nb_cli/cli/commands/driver.py:51
+msgid "List nonebot drivers published on nonebot homepage."
+msgstr "列出 NoneBot 官网上发布的驱动器."
+
+#: nb_cli/cli/commands/driver.py:58
+msgid "Search for nonebot drivers published on nonebot homepage."
+msgstr "搜索 NoneBot 官网上发布的驱动器."
+
+#: nb_cli/cli/commands/driver.py:63
+msgid "Driver name to search:"
+msgstr "想要搜索的驱动器名称:"
+
+#: nb_cli/cli/commands/driver.py:73
+msgid "Install nonebot driver to current project."
+msgstr "安装驱动器到当前项目."
+
+#: nb_cli/cli/commands/driver.py:84
+msgid "Driver name to install:"
+msgstr "想要安装的驱动器名称:"
+
+#: nb_cli/cli/commands/driver.py:97
+msgid "Update nonebot driver."
+msgstr "更新驱动器."
+
+#: nb_cli/cli/commands/driver.py:108
+msgid "Driver name to update:"
+msgstr "想要更新的驱动器名称:"
+
+#: nb_cli/cli/commands/driver.py:123
+msgid "Uninstall nonebot driver from current project."
+msgstr "移除当前项目中的驱动器."
+
+#: nb_cli/cli/commands/driver.py:134
+msgid "Driver name to uninstall:"
+msgstr "想要移除的驱动器名称:"
+
+#: nb_cli/cli/commands/plugin.py:22
+msgid "Manage Bot Plugin."
+msgstr "管理 Bot 插件."
+
+#: nb_cli/cli/commands/plugin.py:54
+msgid "List nonebot plugins published on nonebot homepage."
+msgstr "列出 NoneBot 官网上发布的插件."
+
+#: nb_cli/cli/commands/plugin.py:61
+msgid "Search for nonebot plugins published on nonebot homepage."
+msgstr "搜索 NoneBot 官网上发布的插件."
+
+#: nb_cli/cli/commands/plugin.py:66
+msgid "Plugin name to search:"
+msgstr "想要搜索的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:76
+msgid "Install nonebot plugin to current project."
+msgstr "安装插件到当前项目."
+
+#: nb_cli/cli/commands/plugin.py:87
+msgid "Plugin name to install:"
+msgstr "想要安装的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:98
+msgid "Failed to add plugin {plugin.name} to config: {e}"
+msgstr "添加插件 {plugin.name} 到配置文件失败: {e}"
+
+#: nb_cli/cli/commands/plugin.py:108
+msgid "Update nonebot plugin."
+msgstr "更新插件."
+
+#: nb_cli/cli/commands/plugin.py:119
+msgid "Plugin name to update:"
+msgstr "想要更新的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:133
+msgid "Uninstall nonebot plugin from current project."
+msgstr "移除当前项目中的插件."
+
+#: nb_cli/cli/commands/plugin.py:144
+msgid "Plugin name to uninstall:"
+msgstr "想要移除的插件名称:"
+
+#: nb_cli/cli/commands/plugin.py:155
+msgid "Failed to remove plugin {plugin.name} from config: {e}"
+msgstr "从配置文件中移除插件 {plugin.name} 失败: {e}"
+
+#: nb_cli/cli/commands/plugin.py:164
+msgid "Create a new nonebot plugin."
+msgstr "创建一个新的插件."
+
+#: nb_cli/cli/commands/plugin.py:173
+msgid "The plugin template to use."
+msgstr ""
+
+#: nb_cli/cli/commands/plugin.py:185
+msgid "Plugin name:"
+msgstr ""
+
+#: nb_cli/cli/commands/plugin.py:197 nb_cli/cli/commands/project.py:124
+msgid "Where to store the plugin?"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:42
+msgid "bootstrap (for beginner or user)"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:43
+msgid "simple (for developer)"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:64
+msgid "Loading adapters..."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:66
+msgid "Loading drivers..."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:71
+msgid "Project Name:"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:76
+msgid "Which driver(s) would you like to use?"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:94
+msgid "Which adapter(s) would you like to use?"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:104
+msgid "You haven't chosen any adapter. Please confirm."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:120
+msgid "1) In a \"{dir_name}\" folder"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:121
+msgid "2) In a \"src\" folder"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:141
+msgid "Create a NoneBot project."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:149
+msgid "The project template to use."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:154
+msgid "The python interpreter virtualenv is installed into."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:171
+msgid "Select a template to use:"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:193
+msgid "Install dependencies now?"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:205
+msgid "Create virtual environment?"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:213
+msgid "Creating virtual environment in {venv_dir} ..."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:230
+msgid "Done!"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:231
+msgid "Run the following command to start your bot:"
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:241
+msgid "Generate entry file of your bot."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:247
+msgid "The file script saved to."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:256
+msgid "Run the bot in current folder."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:264
+msgid "Exist entry file of your bot."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:271
+msgid "Reload the bot when file changed."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:277
+msgid "Files to watch for changes."
+msgstr ""
+
+#: nb_cli/cli/commands/project.py:283
+msgid "Files to ignore for changes."
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:18
+msgid "Manage NB CLI."
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:53
+msgid "Install package to cli venv."
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:65
+msgid "Package name you want to install?"
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:75
+msgid "Update nonebot cli."
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:87
+msgid "Uninstall package from cli venv."
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:99
+msgid "Package name you want to uninstall?"
+msgstr ""
+
+#: nb_cli/cli/commands/self.py:110
+msgid "List installed packages in cli venv."
+msgstr ""
