@@ -188,35 +188,48 @@ async def create(
     create_project(template, {"nonebot": context.variables}, output_dir)
 
     try:
-        if not await ConfirmPrompt(
+        install_dependencies = await ConfirmPrompt(
             "Install dependencies now?", default_choice=True
-        ).prompt_async(style=CLI_DEFAULT_STYLE):
-            ctx.exit()
-    except CancelledError:
-        ctx.exit()
-
-    project_dir = context.variables["project_name"].replace(" ", "-")
-    venv_dir = Path(output_dir or ".") / project_dir / ".venv"
-    try:
-        use_venv = await ConfirmPrompt(
-            "Use virtual environment?", default_choice=True
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
         ctx.exit()
 
-    path = None
-    if use_venv:
-        await create_virtualenv(
-            venv_dir, prompt=project_dir, python_interpreter=python_interpreter
-        )
-        path = (
-            venv_dir
-            / ("Scripts" if WINDOWS else "bin")
-            / ("python.exe" if WINDOWS else "python")
-        )
+    use_venv = False
+    project_dir = context.variables["project_name"].replace(" ", "-")
+    venv_dir = Path(output_dir or ".") / project_dir / ".venv"
 
-    proc = await call_pip_install(context.packages, pip_args, python_path=path)
-    await proc.wait()
+    if install_dependencies:
+        try:
+            use_venv = await ConfirmPrompt(
+                "Create virtual environment?", default_choice=True
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
+
+        path = None
+        if use_venv:
+            click.secho(f"Creating virtual environment in {venv_dir} ...", fg="yellow")
+            await create_virtualenv(
+                venv_dir, prompt=project_dir, python_interpreter=python_interpreter
+            )
+            path = (
+                venv_dir
+                / ("Scripts" if WINDOWS else "bin")
+                / ("python.exe" if WINDOWS else "python")
+            )
+
+        proc = await call_pip_install(context.packages, pip_args, python_path=path)
+        await proc.wait()
+
+    click.secho("Done!", fg="green")
+    click.secho("Run the following command to start your bot:", fg="green")
+    click.secho(f"  cd {project_dir}", fg="green")
+    if use_venv:
+        click.secho(
+            f"  {'' if WINDOWS else 'source '}./.venv/{'Scripts' if WINDOWS else 'bin'}/activate",
+            fg="green",
+        )
+    click.secho("  nb run --reload", fg="green")
 
 
 @click.command(cls=ClickAliasedCommand)
