@@ -1,12 +1,10 @@
-import os
-import sys
 import locale
 import gettext
 import contextlib
 from pathlib import Path
 from typing import Optional
 
-WINDOWS = sys.platform.startswith("win") or (sys.platform == "cli" and os.name == "nt")
+from .consts import WINDOWS
 
 
 def _get_win_locale_with_ctypes() -> Optional[str]:
@@ -24,7 +22,8 @@ def _get_win_locale_from_registry() -> Optional[str]:
         with winreg.OpenKey(
             winreg.HKEY_CURRENT_USER, r"Control Panel\International"
         ) as key:
-            return winreg.QueryValueEx(key, "LocaleName")[0]
+            if name := winreg.QueryValueEx(key, "LocaleName")[0]:
+                return name.replace("-", "_")
 
 
 if WINDOWS:
