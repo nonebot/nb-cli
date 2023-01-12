@@ -1,22 +1,12 @@
-import locale
-import gettext
-from pathlib import Path
-
 from cashews import Cache
 from importlib_metadata import EntryPoint, version, entry_points
+
+from .i18n import _ as _
 
 try:
     __version__ = version("nb-cli")
 except Exception:
     __version__ = None
-
-t = gettext.translation(
-    "nb-cli",
-    localedir=Path(__file__).parent / "locale",
-    languages=[lang] if (lang := locale.getlocale()[0]) else None,
-    fallback=True,
-)
-_ = t.gettext
 
 cache = Cache("nb")
 cache.setup("mem://")
