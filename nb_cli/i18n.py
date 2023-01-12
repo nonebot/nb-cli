@@ -22,8 +22,8 @@ def _get_win_locale_from_registry() -> Optional[str]:
         with winreg.OpenKey(
             winreg.HKEY_CURRENT_USER, r"Control Panel\International"
         ) as key:
-            if name := winreg.QueryValueEx(key, "LocaleName")[0]:
-                return name.replace("-", "_")
+            if lcid := winreg.QueryValueEx(key, "Locale")[0]:
+                return locale.windows_locale.get(int(lcid, 16))
 
 
 if WINDOWS:
