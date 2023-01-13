@@ -14,7 +14,7 @@ export function Hero(): JSX.Element {
         <Logo imageClassName="max-h-48" />
         <h1 className="text-5xl tracking-tight font-light sm:text-5xl md:text-5xl">
           <span className="text-hero">N</span>one
-          <span className="text-hero">B</span>ot
+          <span className="text-hero">B</span>ot CLI
         </h1>
         <p className="my-3 max-w-md mx-auto text-sm font-medium tracking-wide uppercase opacity-70 md:mt-5 md:max-w-3xl">
           {siteConfig.tagline}

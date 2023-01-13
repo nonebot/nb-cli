@@ -19,7 +19,7 @@ from nb_cli.handlers import (
 
 
 @click.group(
-    cls=ClickAliasedGroup, invoke_without_command=True, help=_("Manage Bot Plugin.")
+    cls=ClickAliasedGroup, invoke_without_command=True, help=_("Manage bot plugins.")
 )
 @click.pass_context
 @run_async

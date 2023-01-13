@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-11 14:49+0000\n"
+"POT-Creation-Date: 2023-01-13 08:06+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -59,8 +59,8 @@ msgid "Package {name} not found."
 msgstr "包 {name} 未找到."
 
 #: nb_cli/cli/commands/adapter.py:22
-msgid "Manage Bot Adapter."
-msgstr "管理 Bot 适配器."
+msgid "Manage bot adapters."
+msgstr "管理 bot 适配器."
 
 #: nb_cli/cli/commands/adapter.py:54
 msgid "List nonebot adapters published on nonebot homepage."
@@ -137,8 +137,8 @@ msgid "Output dir is not a directory!"
 msgstr "输出目录不是一个文件夹!"
 
 #: nb_cli/cli/commands/driver.py:19
-msgid "Manage Bot Driver."
-msgstr "管理 Bot 驱动器."
+msgid "Manage bot driver."
+msgstr "管理 bot 驱动器."
 
 #: nb_cli/cli/commands/driver.py:51
 msgid "List nonebot drivers published on nonebot homepage."
@@ -177,8 +177,8 @@ msgid "Driver name to uninstall:"
 msgstr "想要移除的驱动器名称:"
 
 #: nb_cli/cli/commands/plugin.py:22
-msgid "Manage Bot Plugin."
-msgstr "管理 Bot 插件."
+msgid "Manage bot plugins."
+msgstr "管理 bot 插件."
 
 #: nb_cli/cli/commands/plugin.py:54
 msgid "List nonebot plugins published on nonebot homepage."
