@@ -8,9 +8,9 @@ from nb_cli import _, __version__
 from nb_cli.handlers import draw_logo
 from nb_cli.config import GLOBAL_CONFIG
 
-from .customize import CLIMainGroup
 from .utils import run_sync as run_sync
 from .utils import run_async as run_async
+from .customize import CLIMainGroup as CLIMainGroup
 from .utils import CLI_DEFAULT_STYLE as CLI_DEFAULT_STYLE
 from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import ClickAliasedCommand as ClickAliasedCommand
