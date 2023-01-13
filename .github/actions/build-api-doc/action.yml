@@ -5,7 +5,6 @@ runs:
   using: "composite"
   steps:
     - run: |
-        poetry run nb-autodoc nb_cli
-        cp -r ./build/nb_cli/* ./website/docs/api/
+        pdm run autodoc
         yarn prettier
       shell: bash
