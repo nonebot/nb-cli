@@ -10,15 +10,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install poetry
-      run: pipx install poetry
-      shell: bash
-
-    - uses: actions/setup-python@v4
+    - uses: pdm-project/setup-pdm@v3
+      name: Setup PDM
       with:
         python-version: ${{ inputs.python-version }}
         architecture: "x64"
-        cache: "poetry"
+        cache: true
 
-    - run: poetry install && poetry run pybabel compile -D nb-cli -d nb_cli/locale/
+    - run: pdm sync && pdm run compile
       shell: bash
