@@ -106,23 +106,23 @@ nb
 生成模板
 
 ```shell
-pybabel extract -o messages.pot --project nb-cli --version 1.0.0 nb_cli/
+pdm run extract
 ```
 
 初始化语言翻译文件或者更新现有语言翻译文件
 
 ```shell
-pybabel init -D nb-cli -i messages.pot -d nb_cli/locale/ -l zh_CN
+pdm run init en_US
 ```
 
 更新语言翻译文件
 
 ```shell
-pybabel update -D nb-cli -i messages.pot -d nb_cli/locale/
+pdm run update
 ```
 
 编译语言翻译文件
 
 ```shell
-pybabel compile -D nb-cli -d nb_cli/locale/
+pdm run compile
 ```

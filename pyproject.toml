@@ -1,13 +1,13 @@
-[tool.poetry]
+[project]
 name = "nb-cli"
-version = "0.6.7"
+version = "1.0.0"
 description = "CLI for nonebot2"
-authors = ["yanyongyu <yyy@nonebot.dev>"]
-license = "MIT"
+authors = [
+  { name = "yanyongyu", email = "yyy@nonebot.dev" }
+]
+license = { text = "MIT" }
 readme = "README.md"
-homepage = "https://cli.nonebot.dev/"
-repository = "https://github.com/nonebot/nb-cli"
-keywords = ["bot", "qq", "nonebot"]
+keywords = ["bot", "qq", "nonebot", "bot", "qq", "nonebot"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Robot Framework",
@@ -17,33 +17,44 @@ classifiers = [
   "Programming Language :: Python :: 3"
 ]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-click = "^8.0.0"
-anyio = "^3.6.2"
-jinja2 = "^3.0.0"
-cashews = "^5.0.0"
-wcwidth = "^0.2.5"
-tomlkit = "^0.10.0"
-pydantic = "^1.9.1"
-noneprompt = "^0.1.7"
-watchfiles = "^0.16.1"
-pyfiglet = "^0.8.post1"
-cookiecutter = "^1.7.2"
-virtualenv = "^20.17.1"
-httpx = ">=0.18.0, <1.0.0"
-typing-extensions = "^4.4.0"
-importlib-metadata = "^6.0.0"
+requires-python = ">=3.8, <4.0"
+dependencies = [
+  "click ~=8.0",
+  "anyio ~=3.6",
+  "jinja2 ~=3.0",
+  "cashews ~=5.0",
+  "wcwidth ~=0.2",
+  "tomlkit ~=0.10",
+  "pydantic ~=1.9",
+  "noneprompt >=0.1.7, <1.0.0",
+  "watchfiles ~=0.16",
+  "pyfiglet >=0.8.post1, <1.0.0",
+  "cookiecutter ~=1.7.2",
+  "virtualenv ~=20.17.1",
+  "httpx ~=0.18",
+  "typing-extensions ~=4.4",
+  "importlib-metadata ~=6.0",
+]
 
-[tool.poetry.group.dev.dependencies]
-babel = "^2.11.0"
-isort = "^5.10.1"
-black = "^22.3.0"
-nonemoji = "^0.1.2"
-pre-commit = "^2.18.1"
-nb-autodoc = { git = "https://github.com/nonebot/nb-autodoc.git" }
+[project.urls]
+homepage = "https://cli.nonebot.dev/"
+repository = "https://github.com/nonebot/nb-cli"
 
-[tool.poetry.scripts]
+[tool.pdm.dev-dependencies]
+i18n = [
+  "babel ~=2.11"
+]
+dev = [
+  "isort ~=5.10",
+  "black >=22.3.0",
+  "nonemoji ~=0.1",
+  "pre-commit ~=2.18"
+]
+docs = [
+  "nb-autodoc @ git+https://github.com/nonebot/nb-autodoc.git"
+]
+
+[project.scripts]
 nb = "nb_cli.__main__:main"
 
 [tool.pyright]
@@ -67,6 +78,18 @@ force_sort_within_sections = true
 extra_standard_library = ["typing_extensions"]
 extend_skip = ["nb_cli/template/"]
 
+[tool.pdm.scripts]
+extract = "pybabel extract -o messages.pot --project nb-cli --version 1.0.0 nb_cli/"
+_init = "pybabel init -D nb-cli -i messages.pot -d nb_cli/locale/ -l {args}"
+init = { composite = ["extract", "_init {args}"] }
+_update = "pybabel update -D nb-cli -i messages.pot -d nb_cli/locale/"
+update = { composite = ["extract", "_update"] }
+compile = "pybabel compile -D nb-cli -d nb_cli/locale/"
+
+[tool.pdm.build]
+setup-script = "build.py"
+run-setuptools = false
+
 [build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517>=1.0.0", "babel~=2.11"]
+build-backend = "pdm.pep517.api"

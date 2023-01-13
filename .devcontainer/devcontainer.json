@@ -2,9 +2,9 @@
   "name": "Default Linux Universal",
   "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/poetry:1": {}
+    "ghcr.io/devcontainers-contrib/features/pdm:2": {}
   },
-  "postCreateCommand": "poetry config virtualenvs.in-project true && poetry install && poetry run pre-commit install && poetry run pybabel compile -D nb-cli -d nb_cli/locale/ && yarn install",
+  "postCreateCommand": "pdm config venv.in_project true && pdm sync && pdm run pre-commit install && pdm run compile && yarn install",
   "customizations": {
     "vscode": {
       "settings": {
