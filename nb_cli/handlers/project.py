@@ -1,13 +1,10 @@
-import os
 import sys
-import signal
 import asyncio
 from pathlib import Path
 from typing import IO, Any, Dict, List, Union, Optional
 
 from cookiecutter.main import cookiecutter
 
-from nb_cli.consts import WINDOWS
 from nb_cli.config import SimpleInfo
 
 from . import templates
@@ -89,14 +86,3 @@ async def run_project(
         stdout=stdout,
         stderr=stderr,
     )
-
-
-async def terminate_project(process: asyncio.subprocess.Process) -> None:
-    if process.returncode is not None:
-        return
-    if WINDOWS:
-        os.kill(process.pid, signal.CTRL_C_EVENT)
-    else:
-        process.terminate()
-
-    await process.wait()

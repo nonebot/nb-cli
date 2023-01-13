@@ -29,7 +29,7 @@ from nb_cli.handlers import (
     create_project,
     call_pip_install,
     create_virtualenv,
-    terminate_project,
+    terminate_process,
     generate_run_script,
     remove_signal_handler,
     list_project_templates,
@@ -293,7 +293,7 @@ async def run(
     if reload:
         await Reloader(
             partial(run_project, exist_bot=Path(file)),
-            terminate_project,
+            terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
             cwd=Path(cwd),
         ).run()
@@ -307,7 +307,7 @@ async def run(
 
         async def wait_for_exit():
             await should_exit.wait()
-            await terminate_project(proc)
+            await terminate_process(proc)
 
         proc = await run_project(exist_bot=Path(file), cwd=Path(cwd))
         task = asyncio.create_task(wait_for_exit())

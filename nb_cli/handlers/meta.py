@@ -1,6 +1,8 @@
+import os
 import json
 import shlex
 import shutil
+import signal
 import asyncio
 from functools import wraps
 from typing_extensions import ParamSpec
@@ -24,8 +26,8 @@ from wcwidth import wcswidth
 from pyfiglet import figlet_format
 
 from nb_cli import cache
-from nb_cli.consts import REQUIRES_PYTHON
 from nb_cli.config.model import NoneBotConfig
+from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
 from nb_cli.config import GLOBAL_CONFIG, Driver, Plugin, Adapter, NoneBotConfig
 from nb_cli.exceptions import (
     ModuleLoadFailed,
@@ -278,3 +280,14 @@ def format_package_results(
         lines.append(f"{name + ' ' * (name_column_width - wcswidth(name))} - {summary}")
 
     return "\n".join(lines)
+
+
+async def terminate_process(process: asyncio.subprocess.Process) -> None:
+    if process.returncode is not None:
+        return
+    if WINDOWS:
+        os.kill(process.pid, signal.CTRL_C_EVENT)
+    else:
+        process.terminate()
+
+    await process.wait()

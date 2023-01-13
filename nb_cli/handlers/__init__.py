@@ -21,6 +21,7 @@ from .meta import get_pip_version as get_pip_version
 from .meta import requires_python as requires_python
 from .meta import load_module_data as load_module_data
 from .meta import requires_nonebot as requires_nonebot
+from .meta import terminate_process as terminate_process
 from .meta import get_default_python as get_default_python
 from .meta import get_nonebot_config as get_nonebot_config
 from .meta import get_python_version as get_python_version
@@ -78,6 +79,5 @@ from .reloader import Reloader as Reloader
 from .reloader import FileFilter as FileFilter
 from .project import run_project as run_project
 from .project import create_project as create_project
-from .project import terminate_project as terminate_project
 from .project import generate_run_script as generate_run_script
 from .project import list_project_templates as list_project_templates
