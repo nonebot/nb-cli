@@ -9,12 +9,6 @@ function FooterCopyright() {
       <OriginCopyright />
       <div>
         <p className="flex flex-col text-base opacity-60 md:items-center md:justify-center xl:text-center">
-          {/* <Link to="https://www.netlify.com">
-            <img
-              src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg"
-              alt="Deploys by Netlify"
-            />
-          </Link> */}
           <span className="flex items-center justify-start md:justify-center">
             Deployed by
             <Link to="https://www.netlify.com" className="ml-1 opacity-100">

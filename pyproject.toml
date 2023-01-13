@@ -58,10 +58,13 @@ docs = [
 nb = "nb_cli.__main__:main"
 
 [tool.pyright]
-pythonVersion = "3.8"
 pythonPlatform = "All"
 reportPrivateImportUsage = false
 reportShadowedImports = false
+executionEnvironments = [
+  { root = "./website", pythonVersion = "3.10" },
+  { root = "./", pythonVersion = "3.8" }
+]
 
 [tool.black]
 line-length = 88
