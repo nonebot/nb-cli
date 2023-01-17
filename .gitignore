@@ -7,6 +7,7 @@ docs_build/_build
 !tests/.env
 .docusaurus
 website/docs/api/**/*.md
+website/static/packages/*.whl
 !nb_cli/project/{{cookiecutter.project_slug}}/.env
 
 # Created by https://www.toptal.com/developers/gitignore/api/node,macos,linux,python,windows,jetbrains,visualstudiocode
@@ -148,7 +149,6 @@ fabric.properties
 
 # Icon must end with two \r
 Icon
-
 
 # Thumbnails
 ._*

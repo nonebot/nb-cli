@@ -1,0 +1,8 @@
+[project]
+name = "watchfiles"
+version = "0.999.0"
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=66.0.0"]
+build-backend = "setuptools.build_meta"

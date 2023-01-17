@@ -1,3 +1,5 @@
-from importlib.metadata import entry_points
+from nb_cli import cli_main
 
-entry_points(name="nb", group="console_scripts")[0].load()(["nb", "create", "--help"])
+print("$ nb create --help")
+
+await cli_main(["nb", "create", "--help"])
