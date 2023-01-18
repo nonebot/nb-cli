@@ -242,7 +242,7 @@ msgstr "请输入插件存储位置:"
 
 #: nb_cli/cli/commands/project.py:42
 msgid "bootstrap (for beginner or user)"
-msgstr "bootstap (初学者或用户)"
+msgstr "bootstrap (初学者或用户)"
 
 #: nb_cli/cli/commands/project.py:43
 msgid "simple (for developer)"
