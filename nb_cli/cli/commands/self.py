@@ -67,7 +67,7 @@ async def install(
         except CancelledError:
             ctx.exit()
 
-    proc = await call_pip_install(name, pip_args, sys.executable)
+    proc = await call_pip_install(name, pip_args, python_path=sys.executable)
     await proc.wait()
 
 
@@ -77,7 +77,7 @@ async def install(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(pip_args: Optional[List[str]]):
-    proc = await call_pip_update("nb-cli", pip_args, sys.executable)
+    proc = await call_pip_update("nb-cli", pip_args, python_path=sys.executable)
     await proc.wait()
 
 
@@ -101,7 +101,7 @@ async def uninstall(
         except CancelledError:
             ctx.exit()
 
-    proc = await call_pip_uninstall(name, pip_args, sys.executable)
+    proc = await call_pip_uninstall(name, pip_args, python_path=sys.executable)
     await proc.wait()
 
 
@@ -112,5 +112,5 @@ async def uninstall(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def list(pip_args: Optional[List[str]]):
-    proc = await call_pip_list(pip_args, sys.executable)
+    proc = await call_pip_list(pip_args, python_path=sys.executable)
     await proc.wait()

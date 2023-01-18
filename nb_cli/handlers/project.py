@@ -53,6 +53,7 @@ async def run_project(
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
     exist_bot: Path = Path("bot.py"),
+    *,
     python_path: Optional[str] = None,
     cwd: Optional[Path] = None,
     stdin: Optional[Union[IO[Any], int]] = None,

@@ -9,6 +9,7 @@ from .meta import requires_pip, get_default_python
 async def call_pip_install(
     package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
+    *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
@@ -39,6 +40,7 @@ async def call_pip_install(
 async def call_pip_update(
     package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
+    *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
@@ -70,6 +72,7 @@ async def call_pip_update(
 async def call_pip_uninstall(
     package: Union[str, List[str]],
     pip_args: Optional[List[str]] = None,
+    *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
@@ -99,6 +102,7 @@ async def call_pip_uninstall(
 @requires_pip
 async def call_pip_list(
     pip_args: Optional[List[str]] = None,
+    *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,

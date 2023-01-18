@@ -18,6 +18,7 @@ from typing import (
     Callable,
     Optional,
     Coroutine,
+    cast,
     overload,
 )
 
@@ -101,7 +102,9 @@ def requires_python(
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        version = await get_python_version()
+        version = await get_python_version(
+            cast(Union[str, None], kwargs.get("python_path"))
+        )
         if (version["major"], version["minor"]) >= REQUIRES_PYTHON:
             return await func(*args, **kwargs)
 
@@ -143,7 +146,7 @@ def requires_nonebot(
     @wraps(func)
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if await get_nonebot_version():
+        if await get_nonebot_version(cast(Union[str, None], kwargs.get("python_path"))):
             return await func(*args, **kwargs)
 
         raise NoneBotNotInstalledError("NoneBot is not installed.")
@@ -182,7 +185,7 @@ def requires_pip(
     @wraps(func)
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if await get_pip_version():
+        if await get_pip_version(cast(Union[str, None], kwargs.get("python_path"))):
             return await func(*args, **kwargs)
 
         raise PipNotInstalledError("pip is not installed.")

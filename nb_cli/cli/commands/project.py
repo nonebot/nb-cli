@@ -17,6 +17,7 @@ from noneprompt import (
 )
 
 from nb_cli import _
+from nb_cli.config import ConfigManager
 from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.consts import WINDOWS, DEFAULT_DRIVER
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
@@ -31,6 +32,7 @@ from nb_cli.handlers import (
     create_virtualenv,
     terminate_process,
     generate_run_script,
+    list_builtin_plugins,
     remove_signal_handler,
     list_project_templates,
     register_signal_handler,
@@ -217,7 +219,7 @@ async def create(
                 fg="yellow",
             )
             await create_virtualenv(
-                venv_dir, prompt=project_dir_name, python_interpreter=python_interpreter
+                venv_dir, prompt=project_dir_name, python_path=python_interpreter
             )
             path = (
                 venv_dir
@@ -225,8 +227,35 @@ async def create(
                 / ("python.exe" if WINDOWS else "python")
             )
 
-        proc = await call_pip_install(context.packages, pip_args, python_path=path)
+        proc = await call_pip_install(
+            ["nonebot2", *context.packages], pip_args, python_path=path
+        )
         await proc.wait()
+
+        builtin_plugins = await list_builtin_plugins(python_path=path)
+        try:
+            loaded_builtin_plugins = [
+                c.data
+                for c in await CheckboxPrompt(
+                    _("Which builtin plugin(s) would you like to use?"),
+                    [Choice(p, p) for p in builtin_plugins],
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+            ]
+        except CancelledError:
+            ctx.exit()
+
+        try:
+            m = ConfigManager(python=path, config_file=project_dir / "pyproject.toml")
+            for plugin in loaded_builtin_plugins:
+                m.add_builtin_plugin(plugin)
+        except Exception as e:
+            click.secho(
+                _(
+                    "Failed to add builtin plugins {builtin_plugins} to config: {e}"
+                ).format(builtin_plugin=loaded_builtin_plugins, e=e),
+                fg="red",
+            )
+            ctx.exit()
 
     click.secho(_("Done!"), fg="green")
     click.secho(

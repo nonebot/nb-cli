@@ -14,7 +14,7 @@ TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
 
 @requires_nonebot
-async def list_builtin_plugins(python_path: Optional[str] = None) -> List[str]:
+async def list_builtin_plugins(*, python_path: Optional[str] = None) -> List[str]:
     if python_path is None:
         python_path = await get_default_python()
 

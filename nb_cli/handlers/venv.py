@@ -10,12 +10,13 @@ from .meta import requires_python, get_default_python
 async def create_virtualenv(
     venv_dir: Path,
     prompt: Optional[str] = None,
-    python_interpreter: Optional[str] = None,
+    *,
+    python_path: Optional[str] = None,
 ):
-    if python_interpreter is None:
-        python_interpreter = await get_default_python()
+    if python_path is None:
+        python_path = await get_default_python()
 
-    args = ["--no-download", "--no-periodic-update", "--python", python_interpreter]
+    args = ["--no-download", "--no-periodic-update", "--python", python_path]
 
     if prompt is not None:
         args.extend(["--prompt", prompt])

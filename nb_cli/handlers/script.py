@@ -16,7 +16,7 @@ from .meta import (
 
 
 @requires_python
-async def list_scripts(python_path: Optional[str] = None) -> List[str]:
+async def list_scripts(*, python_path: Optional[str] = None) -> List[str]:
     if python_path is None:
         python_path = await get_default_python()
 
@@ -39,6 +39,7 @@ async def run_script(
     script_args: Optional[List[str]] = None,
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
+    *,
     python_path: Optional[str] = None,
     cwd: Optional[Path] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
