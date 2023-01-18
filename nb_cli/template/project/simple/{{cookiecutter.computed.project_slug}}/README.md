@@ -4,8 +4,8 @@
 
 1. generate project using `nb create` .
 2. create your plugin using `nb plugin create` .
-3. writing your plugins under `{{ cookiecutter.computed.source_dir }}/plugins` folder.
-4. run your bot using `nb run` .
+3. writing your plugins under `{{ cookiecutter.custom.source_dir }}/plugins` folder.
+4. run your bot using `nb run --reload` .
 
 ## Documentation
 
