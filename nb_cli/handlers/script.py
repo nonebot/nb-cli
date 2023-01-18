@@ -15,6 +15,7 @@ from .meta import (
 )
 
 
+@requires_python
 async def list_scripts(python_path: Optional[str] = None) -> List[str]:
     if python_path is None:
         python_path = await get_default_python()
@@ -32,7 +33,6 @@ async def list_scripts(python_path: Optional[str] = None) -> List[str]:
     return json.loads(stdout.strip())
 
 
-@requires_python
 @requires_nonebot
 async def run_script(
     script_name: str,

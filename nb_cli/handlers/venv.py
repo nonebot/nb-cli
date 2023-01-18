@@ -3,9 +3,10 @@ from typing import Optional
 
 import virtualenv
 
-from .meta import get_default_python
+from .meta import requires_python, get_default_python
 
 
+@requires_python
 async def create_virtualenv(
     venv_dir: Path,
     prompt: Optional[str] = None,
