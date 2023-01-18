@@ -17,5 +17,5 @@ adapters = [
     {{ adapters|join(",\n")|indent(4) }}
 ]
 plugins = []
-plugin_dirs = ["{{ cookiecutter.computed.source_dir }}/plugins"]
+plugin_dirs = ["{{ cookiecutter.custom.source_dir }}/plugins"]
 builtin_plugins = []

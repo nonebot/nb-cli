@@ -8,7 +8,9 @@
   },
   "computed": {
     "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
-    "project_desc": "{{ cookiecutter.nonebot.project_name }}",
+    "project_desc": "{{ cookiecutter.nonebot.project_name }}"
+  },
+  "custom": {
     "source_dir": "{{ 'src' if cookiecutter.nonebot.use_src else cookiecutter.computed.project_slug|lower|replace('-', '_') }}"
   }
 }
