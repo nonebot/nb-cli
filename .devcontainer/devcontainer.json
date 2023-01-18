@@ -4,7 +4,7 @@
   "features": {
     "ghcr.io/devcontainers-contrib/features/pdm:2": {}
   },
-  "postCreateCommand": "pdm config venv.in_project true && pdm sync && pdm run pre-commit install && pdm run compile && yarn install",
+  "postCreateCommand": "pdm config venv.in_project true && pdm config venv.with_pip true && pdm sync && pdm run pre-commit install && pdm run compile && yarn install",
   "customizations": {
     "vscode": {
       "settings": {

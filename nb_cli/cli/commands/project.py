@@ -196,8 +196,9 @@ async def create(
         ctx.exit()
 
     use_venv = False
-    project_dir = context.variables["project_name"].replace(" ", "-")
-    venv_dir = Path(output_dir or ".") / project_dir / ".venv"
+    project_dir_name = context.variables["project_name"].replace(" ", "-")
+    project_dir = Path(output_dir or ".") / project_dir_name
+    venv_dir = project_dir / ".venv"
 
     if install_dependencies:
         try:
@@ -216,7 +217,7 @@ async def create(
                 fg="yellow",
             )
             await create_virtualenv(
-                venv_dir, prompt=project_dir, python_interpreter=python_interpreter
+                venv_dir, prompt=project_dir_name, python_interpreter=python_interpreter
             )
             path = (
                 venv_dir
@@ -228,11 +229,19 @@ async def create(
         await proc.wait()
 
     click.secho(_("Done!"), fg="green")
+    click.secho(
+        _(
+            "Add following packages to your project using dependency manager like poetry or pdm:"
+        ),
+        fg="green",
+    )
+    click.secho(f"  {' '.join(context.packages)}", fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
     if use_venv:
+        activate_script = Path(".venv", "Scripts" if WINDOWS else "bin", "activate")
         click.secho(
-            f"  {'' if WINDOWS else 'source '}./.venv/{'Scripts' if WINDOWS else 'bin'}/activate",
+            f"  {'' if WINDOWS else 'source '}{activate_script}",
             fg="green",
         )
     click.secho("  nb run --reload", fg="green")

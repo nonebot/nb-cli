@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-13 08:06+0000\n"
+"POT-Creation-Date: 2023-01-18 05:38+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -46,7 +46,7 @@ msgstr "欢迎使用 NoneBot CLI!"
 msgid "What do you want to do?"
 msgstr "你想要进行什么操作?"
 
-#: nb_cli/cli/commands/project.py:258 nb_cli/cli/customize.py:109
+#: nb_cli/cli/commands/project.py:267 nb_cli/cli/customize.py:109
 msgid "The working directory."
 msgstr "工作目录."
 
@@ -300,47 +300,53 @@ msgstr "选择一个要使用的模板:"
 msgid "Install dependencies now?"
 msgstr "立即安装依赖?"
 
-#: nb_cli/cli/commands/project.py:205
+#: nb_cli/cli/commands/project.py:206
 msgid "Create virtual environment?"
 msgstr "创建虚拟环境?"
 
-#: nb_cli/cli/commands/project.py:213
+#: nb_cli/cli/commands/project.py:214
 msgid "Creating virtual environment in {venv_dir} ..."
 msgstr "在 {venv_dir} 中创建虚拟环境..."
 
-#: nb_cli/cli/commands/project.py:230
+#: nb_cli/cli/commands/project.py:231
 msgid "Done!"
 msgstr "完成!"
 
-#: nb_cli/cli/commands/project.py:231
+#: nb_cli/cli/commands/project.py:233
+msgid ""
+"Add following packages to your project using dependency manager like "
+"poetry or pdm:"
+msgstr "使用 poetry 或 pdm 等依赖管理工具添加以下包:"
+
+#: nb_cli/cli/commands/project.py:239
 msgid "Run the following command to start your bot:"
 msgstr "运行以下命令来启动你的机器人:"
 
-#: nb_cli/cli/commands/project.py:241
+#: nb_cli/cli/commands/project.py:250
 msgid "Generate entry file of your bot."
 msgstr "生成机器人的入口文件."
 
-#: nb_cli/cli/commands/project.py:247
+#: nb_cli/cli/commands/project.py:256
 msgid "The file script saved to."
 msgstr "脚本文件保存路径."
 
-#: nb_cli/cli/commands/project.py:256
+#: nb_cli/cli/commands/project.py:265
 msgid "Run the bot in current folder."
 msgstr "在当前文件夹中运行机器人."
 
-#: nb_cli/cli/commands/project.py:264
+#: nb_cli/cli/commands/project.py:273
 msgid "Exist entry file of your bot."
 msgstr "存在的机器人入口文件."
 
-#: nb_cli/cli/commands/project.py:271
+#: nb_cli/cli/commands/project.py:280
 msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
-#: nb_cli/cli/commands/project.py:277
+#: nb_cli/cli/commands/project.py:286
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:283
+#: nb_cli/cli/commands/project.py:292
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
