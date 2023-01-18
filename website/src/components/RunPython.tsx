@@ -9,11 +9,13 @@ function RunPython({
   placeholder = "Loading Python Modules...",
   packages = [],
   mockPackages = [],
+  className = "",
 }: {
   code: string;
   placeholder?: string;
   packages?: string[];
   mockPackages?: MockedPackage[];
+  className?: string;
 }) {
   const [output, setOutput] = useState(placeholder);
   const { pyodide, ensurePackage } = usePyodide();
@@ -22,7 +24,9 @@ function RunPython({
     if (!pyodide) return;
     let isMounted = true;
     ensurePackage(packages, mockPackages).then(() => {
+      console.log(code, isMounted);
       pyodide.runPythonAsync(code).then((result) => {
+        console.log(isMounted, result);
         if (isMounted) {
           setOutput(result);
         }
@@ -32,7 +36,7 @@ function RunPython({
       isMounted = false;
     };
   }, [code, packages, mockPackages, pyodide]);
-  return <CodeBlock className="language-shell">{output}</CodeBlock>;
+  return <CodeBlock className={className}>{output}</CodeBlock>;
 }
 
 export default RunPython;

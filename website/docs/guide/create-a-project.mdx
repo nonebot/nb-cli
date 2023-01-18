@@ -10,7 +10,7 @@ options:
 
 # 创建项目
 
-import RunPython from "@site/src/components/RunPython";
+import RunCLI from "@site/src/components/RunCLI";
 import CreateHelpSource from "!!raw-loader!./nb_create.py";
 
 运行以下命令来创建一个新项目：
@@ -29,18 +29,7 @@ nb create
 
 CLI 所创建的项目目录结构可参考 [NoneBot 文档](https://v2.nonebot.dev/docs/tutorial/create-project#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84)
 
-<RunPython
-  code={CreateHelpSource}
-  placeholder="正在加载 Python 模块..."
-  packages={["ssl", "nb-cli"]}
-  mockPackages={[
-    {
-      name: "watchfiles",
-      version: "0.999.0",
-      modules: { watchfiles: "async def awatch(*args, **kwargs): ..." },
-    },
-  ]}
-/>
+<RunCLI code={CreateHelpSource} placeholder="正在加载 Python 模块..." />
 
 ```shell
 $ nb create --help

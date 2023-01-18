@@ -17,7 +17,7 @@ interface Micropip extends PyProxy {
 export type MockedPackage = {
   name: string;
   version: string;
-  modules?: Record<string, string>;
+  modules?: Map<string, string>;
 };
 
 export type usePyodideReturns = {

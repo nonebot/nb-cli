@@ -1,5 +1,9 @@
-from nb_cli import cli_main
+import click
 
-print("$ nb create --help")
+from nb_cli import cli_sync
 
-await cli_main(["nb", "create", "--help"])
+print("run")
+cli_sync(["nb", "create", "--help"])
+print("done")
+
+"$ nb create --help\n" + click.get_text_stream("stdout").read()
