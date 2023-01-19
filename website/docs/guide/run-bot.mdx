@@ -10,6 +10,10 @@ options:
 
 # 启动 Bot
 
+import RunCLI from "@site/src/components/RunCLI";
+import RunHelpSource from "!!raw-loader!@site/src/scripts/nb_run.py";
+import GenerateHelpSource from "!!raw-loader!@site/src/scripts/nb_generate.py";
+
 :::warning 注意
 请在运行命令前，确保已经在项目目录下。如果使用了虚拟环境，确保已经激活。
 :::
@@ -26,32 +30,18 @@ nb run
 对于目录下已有 `bot.py` 的项目，CLI 会使用该脚本运行 bot。
 :::
 
-```shell
-$ nb run --help
-Usage: nb run [OPTIONS]
-
-  Run the bot in current folder.
-
-Options:
-  -d, --cwd TEXT          The working directory.
-  -f, --file TEXT         Exist entry file of your bot.  [default: bot.py]
-  -r, --reload            Reload the bot when file changed.
-  --reload-includes TEXT  Files to watch for changes.
-  --reload-excludes TEXT  Files to ignore for changes.
-  -h, --help              Show this message and exit.
-```
+<RunCLI
+  code={RunHelpSource}
+  placeholder="正在加载 Python 模块..."
+  className="language-shell"
+/>
 
 ## 生成启动脚本
 
 运行以下命令在当前执行目录下生成启动脚本，一般用于 docker 部署。
 
-```shell
-$ nb generate --help
-Usage: nb generate [OPTIONS]
-
-  Generate entry file of your bot.
-
-Options:
-  -f, --file TEXT  The file script saved to.  [default: bot.py]
-  -h, --help       Show this message and exit.
-```
+<RunCLI
+  code={GenerateHelpSource}
+  placeholder="正在加载 Python 模块..."
+  className="language-shell"
+/>

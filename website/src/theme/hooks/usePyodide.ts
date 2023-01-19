@@ -57,6 +57,7 @@ function usePyodide(): usePyodideReturns {
           if (mockedPackges.has(mockPackage.name)) {
             micropip.remove_mock_package(mockPackage.name);
           }
+          mockedPackges.destroy();
           micropip.add_mock_package.callKwargs(
             mockPackage.name,
             mockPackage.version,

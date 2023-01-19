@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import CodeBlock from "@theme/CodeBlock";
-import usePyodide from "@theme/hooks/usePyodide";
 import type { MockedPackage } from "@theme/hooks/usePyodide";
+import usePyodideContext from "@theme/hooks/usePyodideContext";
 
 function RunPython({
   code,
@@ -18,15 +18,13 @@ function RunPython({
   className?: string;
 }) {
   const [output, setOutput] = useState(placeholder);
-  const { pyodide, ensurePackage } = usePyodide();
+  const { pyodide, ensurePackage } = usePyodideContext();
 
   useEffect(() => {
     if (!pyodide) return;
     let isMounted = true;
     ensurePackage(packages, mockPackages).then(() => {
-      console.log(code, isMounted);
       pyodide.runPythonAsync(code).then((result) => {
-        console.log(isMounted, result);
         if (isMounted) {
           setOutput(result);
         }

@@ -32,6 +32,8 @@ Poetry 格式:
 foo = "awesome_bot.module:function"
 ```
 
+脚本函数可以通过 `sys.argv` 获取用户提供的额外命令行参数:
+
 ## 使用脚本
 
 注册后，命令行即可直接调用:

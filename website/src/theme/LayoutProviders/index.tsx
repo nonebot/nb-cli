@@ -1,6 +1,6 @@
 import React from "react";
 
-import OriginProvider from "@theme-original/LayoutProvider";
+import OriginProvider from "@theme-original/LayoutProviders";
 import type { Props } from "@theme/LayoutProviders";
 import PyodideProvider from "@theme/PyodideProvider";
 

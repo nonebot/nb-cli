@@ -1,11 +1,9 @@
 import type { PyodideInterface } from "pyodide";
 import React from "react";
 
-export type PyodideContextType = {
-  pyodide: PyodideInterface;
-};
+import type { usePyodideReturns } from "./hooks/usePyodide";
 
-const PyodideContext = React.createContext<PyodideContextType | undefined>(
+const PyodideContext = React.createContext<usePyodideReturns | undefined>(
   undefined
 );
 
