@@ -8,6 +8,9 @@
       "@docusaurus/module-type-aliases",
       "docusaurus-theme-nonepress"
     ],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@theme/*": ["./src/theme/*"]
+    }
   }
 }

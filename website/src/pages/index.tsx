@@ -34,7 +34,7 @@ export default function Home() {
         <HeroFeature {...firstFeature}>
           <CodeBlock
             title="Installation"
-            className={clsx("inline-block language-bash", styles.homeCodeBlock)}
+            className={clsx("inline-block", styles.homeCodeBlock)}
           >
             {[
               "$ pipx install nb-cli",

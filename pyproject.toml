@@ -58,10 +58,13 @@ docs = [
 nb = "nb_cli.__main__:main"
 
 [tool.pyright]
-pythonVersion = "3.8"
 pythonPlatform = "All"
 reportPrivateImportUsage = false
 reportShadowedImports = false
+executionEnvironments = [
+  { root = "./website", pythonVersion = "3.10" },
+  { root = "./", pythonVersion = "3.8" }
+]
 
 [tool.black]
 line-length = 88
@@ -79,13 +82,14 @@ extra_standard_library = ["typing_extensions"]
 extend_skip = ["nb_cli/template/"]
 
 [tool.pdm.scripts]
-autodoc = { shell = "nb-autodoc nb_cli && cp -r ./build/nb_cli/* ./website/docs/api/"}
+autodoc = { shell = "rm -rf ./website/docs/api/* && nb-autodoc nb_cli && cp -r ./build/nb_cli/* ./website/docs/api/"}
 extract = "pybabel extract -o messages.pot --project nb-cli --version 1.0.0 nb_cli/"
 _init = "pybabel init -D nb-cli -i messages.pot -d nb_cli/locale/ -l {args}"
 init = { composite = ["extract", "_init {args}"] }
 _update = "pybabel update -D nb-cli -i messages.pot -d nb_cli/locale/"
 update = { composite = ["extract", "_update"] }
 compile = "pybabel compile -D nb-cli -d nb_cli/locale/"
+
 
 [tool.pdm.build]
 setup-script = "build.py"
