@@ -26,7 +26,7 @@ plugin_name = "cli_plugin.plugin:install"
 Poetry 格式:
 
 ```toml title="pyproject.toml"
-[tool.poetry.plugins.nb_scripts]
+[tool.poetry.plugins.nb]
 plugin_name = "cli_plugin.plugin:install"
 ```
 
