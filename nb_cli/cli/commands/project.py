@@ -30,6 +30,7 @@ from nb_cli.handlers import (
     create_project,
     call_pip_install,
     create_virtualenv,
+    detect_virtualenv,
     terminate_process,
     generate_run_script,
     list_builtin_plugins,
@@ -267,12 +268,6 @@ async def create(
     click.secho(f"  {' '.join(context.packages)}", fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
-    if use_venv:
-        activate_script = Path(".venv", "Scripts" if WINDOWS else "bin", "activate")
-        click.secho(
-            f"  {'' if WINDOWS else 'source '}{activate_script}",
-            fg="green",
-        )
     click.secho("  nb run --reload", fg="green")
 
 
@@ -302,6 +297,12 @@ async def generate(file: str):
     help=_("Exist entry file of your bot."),
 )
 @click.option(
+    "--venv/--no-venv",
+    default=True,
+    help=_("Auto detect virtual environment."),
+    show_default=True,
+)
+@click.option(
     "-r",
     "--reload",
     is_flag=True,
@@ -324,13 +325,15 @@ async def generate(file: str):
 async def run(
     cwd: str,
     file: str,
+    venv: bool,
     reload: bool,
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
 ):
+    python_path = detect_virtualenv(Path(cwd)) if venv else None
     if reload:
         await Reloader(
-            partial(run_project, exist_bot=Path(file)),
+            partial(run_project, exist_bot=Path(file), python_path=python_path),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
             cwd=Path(cwd),
@@ -347,7 +350,9 @@ async def run(
             await should_exit.wait()
             await terminate_process(proc)
 
-        proc = await run_project(exist_bot=Path(file), cwd=Path(cwd))
+        proc = await run_project(
+            exist_bot=Path(file), python_path=python_path, cwd=Path(cwd)
+        )
         task = asyncio.create_task(wait_for_exit())
         await proc.wait()
         should_exit.set()

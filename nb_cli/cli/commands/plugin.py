@@ -13,6 +13,7 @@ from nb_cli.handlers import (
     create_plugin,
     call_pip_update,
     call_pip_install,
+    detect_virtualenv,
     call_pip_uninstall,
     format_package_results,
 )
@@ -75,12 +76,18 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot plugin to current project."),
 )
+@click.option(
+    "--venv/--no-venv",
+    default=True,
+    help=_("Auto detect virtual environment."),
+    show_default=True,
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -100,19 +107,28 @@ async def install(
             )
         )
 
-    proc = await call_pip_install(plugin.project_link, pip_args)
+    python_path = detect_virtualenv() if venv else None
+    proc = await call_pip_install(
+        plugin.project_link, pip_args, python_path=python_path
+    )
     await proc.wait()
 
 
 @plugin.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot plugin.")
 )
+@click.option(
+    "--venv/--no-venv",
+    default=True,
+    help=_("Auto detect virtual environment."),
+    show_default=True,
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -123,7 +139,8 @@ async def update(
     except Exception:
         ctx.exit(1)
 
-    proc = await call_pip_update(plugin.project_link, pip_args)
+    python_path = detect_virtualenv() if venv else None
+    proc = await call_pip_update(plugin.project_link, pip_args, python_path=python_path)
     await proc.wait()
 
 
@@ -132,12 +149,18 @@ async def update(
     context_settings={"ignore_unknown_options": True},
     help=_("Uninstall nonebot plugin from current project."),
 )
+@click.option(
+    "--venv/--no-venv",
+    default=True,
+    help=_("Auto detect virtual environment."),
+    show_default=True,
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -157,7 +180,10 @@ async def uninstall(
             )
         )
 
-    proc = await call_pip_uninstall(plugin.project_link, pip_args)
+    python_path = detect_virtualenv() if venv else None
+    proc = await call_pip_uninstall(
+        plugin.project_link, pip_args, python_path=python_path
+    )
     await proc.wait()
 
 

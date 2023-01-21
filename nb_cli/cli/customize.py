@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 import click
 
 from nb_cli import _, cache
-from nb_cli.handlers import run_script, list_scripts
+from nb_cli.handlers import run_script, list_scripts, detect_virtualenv
 
 from .utils import run_async
 
@@ -97,8 +97,13 @@ class CLIMainGroup(ClickAliasedGroup):
 
     @staticmethod
     @run_async
-    async def _run_script_command(script_name: str, cwd: Path, script_args: List[str]):
-        proc = await run_script(script_name, script_args, cwd=cwd)
+    async def _run_script_command(
+        script_name: str, cwd: Path, venv: bool, script_args: List[str]
+    ):
+        python_path = detect_virtualenv(cwd) if venv else None
+        proc = await run_script(
+            script_name, script_args, cwd=cwd, python_path=python_path
+        )
         await proc.wait()
 
     def _build_script_command(self, script_name: str) -> click.Command:
@@ -108,6 +113,12 @@ class CLIMainGroup(ClickAliasedGroup):
                 default=".",
                 help=_("The working directory."),
                 type=Path,
+            ),
+            click.Option(
+                ["--venv/--no-venv"],
+                default=True,
+                help=_("Auto detect virtual environment."),
+                show_default=True,
             ),
             click.Argument(["script_args"], nargs=-1),
         ]
