@@ -21,19 +21,19 @@ requires-python = ">=3.8, <4.0"
 dependencies = [
   "click ~=8.0",
   "anyio ~=3.6",
+  "httpx ~=0.18",
   "jinja2 ~=3.0",
   "cashews ~=5.0",
   "wcwidth ~=0.2",
   "tomlkit ~=0.10",
   "pydantic ~=1.9",
-  "noneprompt >=0.1.7, <1.0.0",
   "watchfiles ~=0.16",
-  "pyfiglet >=0.8.post1, <1.0.0",
   "cookiecutter ~=1.7.2",
   "virtualenv ~=20.17.1",
-  "httpx ~=0.18",
   "typing-extensions ~=4.4",
-  "importlib-metadata ~=6.0",
+  "noneprompt >=0.1.7, <1.0.0",
+  "pyfiglet >=0.8.post1, <1.0.0",
+  "importlib-metadata >=4.6; python_version < '3.10'",
 ]
 
 [project.urls]

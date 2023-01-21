@@ -444,7 +444,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:e8f4a9fdbf7bbdd36faaed40ad7b4e441964036d04160a0cf16d246f0d08da83"
+content_hash = "sha256:12adfda52b036b69a28dd27b570a01a04b0ebfb946444660e3b1532797d34e0e"
 
 [metadata.files]
 "anyio 3.6.2" = [
