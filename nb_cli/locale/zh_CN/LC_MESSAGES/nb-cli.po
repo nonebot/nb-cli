@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-21 08:49+0000\n"
+"POT-Creation-Date: 2023-01-21 09:01+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -398,3 +398,27 @@ msgstr "要卸载的包名?"
 #: nb_cli/cli/commands/self.py:110
 msgid "List installed packages in cli venv."
 msgstr "列出 cli 虚拟环境中已安装的包."
+
+#: nb_cli/handlers/meta.py:72
+msgid "Cannot find a valid Python interpreter."
+msgstr "无法找到可用的 Python 解释器."
+
+#: nb_cli/handlers/meta.py:113
+msgid "Python {major}.{minor} is not supported."
+msgstr "Python {major}.{minor} 不受支持."
+
+#: nb_cli/handlers/meta.py:155
+msgid "NoneBot is not installed."
+msgstr "NoneBot 未安装."
+
+#: nb_cli/handlers/meta.py:194
+msgid "pip is not installed."
+msgstr "pip 未安装."
+
+#: nb_cli/handlers/meta.py:232
+msgid "Invalid module type: {module_type}"
+msgstr "无效的模块类型: {module_type}"
+
+#: nb_cli/handlers/meta.py:254
+msgid "Failed to get {module_type} list."
+msgstr "获取 {module_type} 列表失败."

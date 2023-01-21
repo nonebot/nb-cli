@@ -25,14 +25,14 @@ import httpx
 from wcwidth import wcswidth
 from pyfiglet import figlet_format
 
-from nb_cli import cache
+from nb_cli import _, cache
 from nb_cli.config.model import NoneBotConfig
 from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
 from nb_cli.config import GLOBAL_CONFIG, Driver, Plugin, Adapter, NoneBotConfig
 from nb_cli.exceptions import (
     ModuleLoadFailed,
-    PythonVersionError,
     PipNotInstalledError,
+    PythonInterpreterError,
     NoneBotNotInstalledError,
 )
 
@@ -68,6 +68,8 @@ else:
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, _ = await proc.communicate()
+        if proc.returncode != 0:
+            raise PythonInterpreterError(_("Cannot find a valid Python interpreter."))
         return json.loads(stdout.strip())
 
 
@@ -107,8 +109,10 @@ def requires_python(
         if (version["major"], version["minor"]) >= REQUIRES_PYTHON:
             return await func(*args, **kwargs)
 
-        raise PythonVersionError(
-            f"Python {version['major']}.{version['minor']} is not supported."
+        raise PythonInterpreterError(
+            _("Python {major}.{minor} is not supported.").format(
+                marjo=version["major"], minor=version["minor"]
+            )
         )
 
     return wrapper
@@ -148,7 +152,7 @@ def requires_nonebot(
         if await get_nonebot_version(cast(Union[str, None], kwargs.get("python_path"))):
             return await func(*args, **kwargs)
 
-        raise NoneBotNotInstalledError("NoneBot is not installed.")
+        raise NoneBotNotInstalledError(_("NoneBot is not installed."))
 
     return wrapper
 
@@ -187,7 +191,7 @@ def requires_pip(
         if await get_pip_version(cast(Union[str, None], kwargs.get("python_path"))):
             return await func(*args, **kwargs)
 
-        raise PipNotInstalledError("pip is not installed.")
+        raise PipNotInstalledError(_("pip is not installed."))
 
     return wrapper
 
@@ -224,7 +228,9 @@ else:
         elif module_type == "driver":
             module_class = Driver
         else:
-            raise ValueError(f"Invalid module type: {module_type}")
+            raise ValueError(
+                _("Invalid module type: {module_type}").format(module_type=module_type)
+            )
         module_name: str = getattr(module_class.__config__, "module_name")
 
         exceptions: List[Exception] = []
@@ -244,7 +250,10 @@ else:
                 except Exception as e:
                     exceptions.append(e)
 
-        raise ModuleLoadFailed(f"Failed to get {module_name} list.", exceptions)
+        raise ModuleLoadFailed(
+            _("Failed to get {module_type} list.").format(module_type=module_type),
+            exceptions,
+        )
 
 
 def format_package_results(

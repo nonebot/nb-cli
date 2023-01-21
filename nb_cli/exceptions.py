@@ -2,7 +2,7 @@ class ModuleLoadFailed(RuntimeError):
     """Raised when a module fails to load."""
 
 
-class PythonVersionError(RuntimeError):
+class PythonInterpreterError(RuntimeError):
     """Raised when the Python version is not supported."""
 
 
