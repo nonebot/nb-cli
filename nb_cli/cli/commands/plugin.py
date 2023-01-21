@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import List, Optional, cast
 
 import click
-from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
+from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt, CancelledError
 
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
@@ -163,7 +163,7 @@ async def uninstall(
 
 @plugin.command(aliases=["new"], help=_("Create a new nonebot plugin."))
 @click.argument("name", nargs=1, required=False, default=None)
-@click.option("-s", "--sub-plugin", is_flag=True, default=False)
+@click.option("-s", "--sub-plugin", is_flag=True, default=None)
 @click.option(
     "-o",
     "--output-dir",
@@ -176,7 +176,7 @@ async def uninstall(
 async def create(
     ctx: click.Context,
     name: Optional[str],
-    sub_plugin: bool,
+    sub_plugin: Optional[bool],
     output_dir: Optional[str],
     template: Optional[str],
 ):
@@ -187,6 +187,14 @@ async def create(
             )
         except CancelledError:
             ctx.exit()
+    if sub_plugin is None:
+        try:
+            sub_plugin = await ConfirmPrompt(
+                _("Use nested plugin?"), default_choice=False
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            ctx.exit()
+
     if output_dir is None:
         detected: List[Choice[None]] = [
             Choice(str(d)) for d in Path(".").glob("**/plugins/") if d.is_dir()
