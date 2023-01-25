@@ -67,7 +67,7 @@ else:
             'python -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
             stdout=asyncio.subprocess.PIPE,
         )
-        stdout, _ = await proc.communicate()
+        stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
             raise PythonInterpreterError(_("Cannot find a valid Python interpreter."))
         return json.loads(stdout.strip())
@@ -94,7 +94,7 @@ else:
             await t.render_async(),
             stdout=asyncio.subprocess.PIPE,
         )
-        stdout, _ = await proc.communicate()
+        stdout, stderr = await proc.communicate()
         return json.loads(stdout.strip())
 
 
@@ -139,7 +139,7 @@ else:
             await t.render_async(),
             stdout=asyncio.subprocess.PIPE,
         )
-        stdout, _ = await proc.communicate()
+        stdout, stderr = await proc.communicate()
         return json.loads(stdout.strip())
 
 
@@ -178,7 +178,7 @@ else:
             await t.render_async(),
             stdout=asyncio.subprocess.PIPE,
         )
-        stdout, _ = await proc.communicate()
+        stdout, stderr = await proc.communicate()
         return json.loads(stdout.strip())
 
 
