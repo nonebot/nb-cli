@@ -42,6 +42,8 @@ T = TypeVar("T", Adapter, Plugin, Driver)
 R = TypeVar("R")
 P = ParamSpec("P")
 
+DEFAULT_PYTHON = ("python3", "python")
+
 
 def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
@@ -63,14 +65,15 @@ else:
         if GLOBAL_CONFIG.python is not None:
             return GLOBAL_CONFIG.python
 
-        proc = await asyncio.create_subprocess_shell(
-            'python -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
-            stdout=asyncio.subprocess.PIPE,
-        )
-        stdout, stderr = await proc.communicate()
-        if proc.returncode != 0:
-            raise PythonInterpreterError(_("Cannot find a valid Python interpreter."))
-        return json.loads(stdout.strip())
+        for python in DEFAULT_PYTHON:
+            proc = await asyncio.create_subprocess_shell(
+                f'{python} -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
+                stdout=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+            if proc.returncode == 0:
+                return json.loads(stdout.strip())
+        raise PythonInterpreterError(_("Cannot find a valid Python interpreter."))
 
 
 if TYPE_CHECKING:
