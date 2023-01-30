@@ -103,18 +103,17 @@ summary = "Cross-platform colored terminal text."
 
 [[package]]
 name = "cookiecutter"
-version = "1.7.3"
-requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+version = "2.1.1"
+requires_python = ">=3.7"
 summary = "A command-line utility that creates projects from project templates, e.g. creating a Python package project from a Python package project template."
 dependencies = [
     "Jinja2<4.0.0,>=2.7",
     "binaryornot>=0.4.4",
-    "click>=7.0",
+    "click<9.0.0,>=7.0",
     "jinja2-time>=0.2.0",
-    "poyo>=0.5.0",
     "python-slugify>=4.0.0",
+    "pyyaml>=5.3.1",
     "requests>=2.23.0",
-    "six>=1.10",
 ]
 
 [[package]]
@@ -265,12 +264,6 @@ name = "platformdirs"
 version = "2.6.2"
 requires_python = ">=3.7"
 summary = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-
-[[package]]
-name = "poyo"
-version = "0.5.0"
-requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-summary = "A lightweight YAML Parser for Python. 🐓"
 
 [[package]]
 name = "pre-commit"
@@ -444,7 +437,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:12adfda52b036b69a28dd27b570a01a04b0ebfb946444660e3b1532797d34e0e"
+content_hash = "sha256:affe26e0e8e02cd061d34b2111844b9ffe903db35f403d9520469c2816759f1e"
 
 [metadata.files]
 "anyio 3.6.2" = [
@@ -595,9 +588,9 @@ content_hash = "sha256:12adfda52b036b69a28dd27b570a01a04b0ebfb946444660e3b153279
     {url = "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {url = "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
-"cookiecutter 1.7.3" = [
-    {url = "https://files.pythonhosted.org/packages/58/f5/6f41fa38e6efe4a0e85771f99a4ad8c33b4c14f03b4cc53b459aac4a629a/cookiecutter-1.7.3.tar.gz", hash = "sha256:6b9a4d72882e243be077a7397d0f1f76fe66cf3df91f3115dbb5330e214fa457"},
-    {url = "https://files.pythonhosted.org/packages/a2/62/d061b19f307455506e63825586e2e1816b71d56b4a5873c278cb315b9660/cookiecutter-1.7.3-py2.py3-none-any.whl", hash = "sha256:f8671531fa96ab14339d0c59b4f662a4f12a2ecacd94a0f70a3500843da588e2"},
+"cookiecutter 2.1.1" = [
+    {url = "https://files.pythonhosted.org/packages/64/4f/66a92457a729104db896321135e05b0cf94a9034fd5345f30d4d8386b957/cookiecutter-2.1.1-py2.py3-none-any.whl", hash = "sha256:9f3ab027cec4f70916e28f03470bdb41e637a3ad354b4d65c765d93aad160022"},
+    {url = "https://files.pythonhosted.org/packages/96/43/65a3dad94dceaaaa12807ce4d4eff1064db6e91a8c6fb6945e3e61e63552/cookiecutter-2.1.1.tar.gz", hash = "sha256:f3982be8d9c53dac1261864013fdec7f83afd2e42ede6f6dd069c5e149c540d5"},
 ]
 "distlib 0.3.6" = [
     {url = "https://files.pythonhosted.org/packages/58/07/815476ae605bcc5f95c87a62b95e74a1bce0878bc7a3119bc2bf4178f175/distlib-0.3.6.tar.gz", hash = "sha256:14bad2d9b04d3a36127ac97f30b12a19268f211063d8f8ee4f47108896e11b46"},
@@ -708,10 +701,6 @@ content_hash = "sha256:12adfda52b036b69a28dd27b570a01a04b0ebfb946444660e3b153279
 "platformdirs 2.6.2" = [
     {url = "https://files.pythonhosted.org/packages/c1/c7/9be9d651b93efce682b45142a6267034fc4215972780748618c02e236361/platformdirs-2.6.2-py3-none-any.whl", hash = "sha256:83c8f6d04389165de7c9b6f0c682439697887bca0aa2f1c87ef1826be3584490"},
     {url = "https://files.pythonhosted.org/packages/cf/4d/198b7e6c6c2b152f4f9f4cdf975d3590e33e63f1920f2d89af7f0390e6db/platformdirs-2.6.2.tar.gz", hash = "sha256:e1fea1fe471b9ff8332e229df3cb7de4f53eeea4998d3b6bfff542115e998bd2"},
-]
-"poyo 0.5.0" = [
-    {url = "https://files.pythonhosted.org/packages/42/50/0b0820601bde2eda403f47b9a4a1f270098ed0dd4c00c443d883164bdccc/poyo-0.5.0-py2.py3-none-any.whl", hash = "sha256:3e2ca8e33fdc3c411cd101ca395668395dd5dc7ac775b8e809e3def9f9fe041a"},
-    {url = "https://files.pythonhosted.org/packages/7d/56/01b496f36bbd496aed9351dd1b06cf57fd2f5028480a87adbcf7a4ff1f65/poyo-0.5.0.tar.gz", hash = "sha256:e26956aa780c45f011ca9886f044590e2d8fd8b61db7b1c1cf4e0869f48ed4dd"},
 ]
 "pre-commit 2.21.0" = [
     {url = "https://files.pythonhosted.org/packages/6b/00/1637ae945c6e10838ef5c41965f1c864e59301811bb203e979f335608e7c/pre_commit-2.21.0.tar.gz", hash = "sha256:31ef31af7e474a8d8995027fefdfcf509b5c913ff31f2015b4ec4beb26a6f658"},
