@@ -330,7 +330,14 @@ async def run(
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
 ):
-    python_path = detect_virtualenv(Path(cwd)) if venv else None
+    if python_path := detect_virtualenv(Path(cwd)) if venv else None:
+        click.secho(
+            _("Using virtual environment: {python_path}").format(
+                python_path=python_path
+            ),
+            fg="green",
+        )
+
     if reload:
         await Reloader(
             partial(run_project, exist_bot=Path(file), python_path=python_path),

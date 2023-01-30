@@ -96,7 +96,13 @@ async def install(
         ctx.exit(1)
 
     if driver.project_link:
-        python_path = detect_virtualenv() if venv else None
+        if python_path := detect_virtualenv() if venv else None:
+            click.secho(
+                _("Using virtual environment: {python_path}").format(
+                    python_path=python_path
+                ),
+                fg="green",
+            )
         proc = await call_pip_install(
             driver.project_link, pip_args, python_path=python_path
         )
@@ -129,7 +135,13 @@ async def update(
         ctx.exit(1)
 
     if driver.project_link:
-        python_path = detect_virtualenv() if venv else None
+        if python_path := detect_virtualenv() if venv else None:
+            click.secho(
+                _("Using virtual environment: {python_path}").format(
+                    python_path=python_path
+                ),
+                fg="green",
+            )
         proc = await call_pip_update(
             driver.project_link, pip_args, python_path=python_path
         )
@@ -167,7 +179,13 @@ async def uninstall(
         if package.startswith("nonebot2[") and package.endswith("]"):
             package = package[9:-1]
 
-        python_path = detect_virtualenv() if venv else None
+        if python_path := detect_virtualenv() if venv else None:
+            click.secho(
+                _("Using virtual environment: {python_path}").format(
+                    python_path=python_path
+                ),
+                fg="green",
+            )
         proc = await call_pip_uninstall(
             driver.project_link, pip_args, python_path=python_path
         )

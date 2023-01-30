@@ -100,7 +100,13 @@ class CLIMainGroup(ClickAliasedGroup):
     async def _run_script_command(
         script_name: str, cwd: Path, venv: bool, script_args: List[str]
     ):
-        python_path = detect_virtualenv(cwd) if venv else None
+        if python_path := detect_virtualenv(cwd) if venv else None:
+            click.secho(
+                _("Using virtual environment: {python_path}").format(
+                    python_path=python_path
+                ),
+                fg="green",
+            )
         proc = await run_script(
             script_name, script_args, cwd=cwd, python_path=python_path
         )

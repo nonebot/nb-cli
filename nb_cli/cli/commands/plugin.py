@@ -107,7 +107,13 @@ async def install(
             )
         )
 
-    python_path = detect_virtualenv() if venv else None
+    if python_path := detect_virtualenv() if venv else None:
+        click.secho(
+            _("Using virtual environment: {python_path}").format(
+                python_path=python_path
+            ),
+            fg="green",
+        )
     proc = await call_pip_install(
         plugin.project_link, pip_args, python_path=python_path
     )
@@ -139,7 +145,13 @@ async def update(
     except Exception:
         ctx.exit(1)
 
-    python_path = detect_virtualenv() if venv else None
+    if python_path := detect_virtualenv() if venv else None:
+        click.secho(
+            _("Using virtual environment: {python_path}").format(
+                python_path=python_path
+            ),
+            fg="green",
+        )
     proc = await call_pip_update(plugin.project_link, pip_args, python_path=python_path)
     await proc.wait()
 
@@ -180,7 +192,13 @@ async def uninstall(
             )
         )
 
-    python_path = detect_virtualenv() if venv else None
+    if python_path := detect_virtualenv() if venv else None:
+        click.secho(
+            _("Using virtual environment: {python_path}").format(
+                python_path=python_path
+            ),
+            fg="green",
+        )
     proc = await call_pip_uninstall(
         plugin.project_link, pip_args, python_path=python_path
     )
