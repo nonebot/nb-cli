@@ -43,6 +43,7 @@ R = TypeVar("R")
 P = ParamSpec("P")
 
 DEFAULT_PYTHON = ("python3", "python")
+WINDOWS_DEFAULT_PYTHON = ("py -3", "python")
 
 
 def draw_logo() -> str:
@@ -65,7 +66,9 @@ else:
         if GLOBAL_CONFIG.python is not None:
             return GLOBAL_CONFIG.python
 
-        for python in DEFAULT_PYTHON:
+        python_to_try = WINDOWS_DEFAULT_PYTHON if WINDOWS else DEFAULT_PYTHON
+
+        for python in python_to_try:
             proc = await asyncio.create_subprocess_shell(
                 f'{python} -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
                 stdout=asyncio.subprocess.PIPE,
