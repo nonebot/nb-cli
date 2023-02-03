@@ -43,7 +43,7 @@ R = TypeVar("R")
 P = ParamSpec("P")
 
 DEFAULT_PYTHON = ("python3", "python")
-WINDOWS_DEFAULT_PYTHON = ("py -3", "python")
+WINDOWS_DEFAULT_PYTHON = ("python",)
 
 
 def draw_logo() -> str:
