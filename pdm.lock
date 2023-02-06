@@ -21,12 +21,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "attrs"
-version = "21.4.0"
-requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-summary = "Classes Without Boilerplate"
-
-[[package]]
 name = "babel"
 version = "2.11.0"
 requires_python = ">=3.6"
@@ -216,15 +210,14 @@ summary = "Experimental type system extensions for programs checked with the myp
 
 [[package]]
 name = "nb-autodoc"
-version = "0.1.0"
-requires_python = ">=3.7"
+version = "1.0.0a5"
+requires_python = ">=3.8"
 git = "https://github.com/nonebot/nb-autodoc.git"
-revision = "b9d69419dddf49c57f4cc47d5c2bcdbec673d32d"
-summary = "API doc generator for NoneBot."
+revision = "f48fdbfbc7f801c4b414756e90333003bc5e0027"
+summary = "Powerful API Documentation Generator."
 dependencies = [
-    "attrs~=21.4",
-    "click>=8.0.3",
-    "six>=1.6.1",
+    "click==8.*",
+    "typing-extensions>=4.0",
 ]
 
 [[package]]
@@ -454,10 +447,6 @@ content_hash = "sha256:802122d0e7452bcb577784dfc305caa3611a77f417c76f82fd9b4cf9a
 "arrow 1.2.3" = [
     {url = "https://files.pythonhosted.org/packages/67/67/4bca5a595e2f89bff271724ddb1098e6c9e16f7f3d018d120255e3c30313/arrow-1.2.3-py3-none-any.whl", hash = "sha256:5a49ab92e3b7b71d96cd6bfcc4df14efefc9dfa96ea19045815914a6ab6b1fe2"},
     {url = "https://files.pythonhosted.org/packages/7f/c0/c601ea7811f422700ef809f167683899cdfddec5aa3f83597edf97349962/arrow-1.2.3.tar.gz", hash = "sha256:3934b30ca1b9f292376d9db15b19446088d12ec58629bc3f0da28fd55fb633a1"},
-]
-"attrs 21.4.0" = [
-    {url = "https://files.pythonhosted.org/packages/be/be/7abce643bfdf8ca01c48afa2ddf8308c2308b0c3b239a44e57d020afa0ef/attrs-21.4.0-py2.py3-none-any.whl", hash = "sha256:2d27e3784d7a565d36ab851fe94887c5eccd6a463168875832a1be79c82828b4"},
-    {url = "https://files.pythonhosted.org/packages/d7/77/ebb15fc26d0f815839ecd897b919ed6d85c050feeb83e100e020df9153d2/attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
 ]
 "babel 2.11.0" = [
     {url = "https://files.pythonhosted.org/packages/92/f7/86301a69926e11cd52f73396d169554d09b20b1723a040c2dcc1559ef588/Babel-2.11.0-py3-none-any.whl", hash = "sha256:1ad3eca1c885218f6dce2ab67291178944f810a10a9b5f3cb8382a5a232b64fe"},
