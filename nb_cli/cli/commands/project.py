@@ -43,7 +43,7 @@ VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
 BLACKLISTED_PROJECT_NAME = {"nonebot", "bot"}
 TEMPLATE_DESCRIPTION = {
     "bootstrap": _("bootstrap (for beginner or user)"),
-    "simple": _("simple (for developer)"),
+    "simple": _("simple (for plugin developer)"),
 }
 
 if sys.version_info >= (3, 10):

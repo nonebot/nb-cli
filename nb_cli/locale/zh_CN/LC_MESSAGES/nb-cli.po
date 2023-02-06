@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-30 08:05+0000\n"
+"POT-Creation-Date: 2023-02-06 07:36+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -267,8 +267,8 @@ msgid "bootstrap (for beginner or user)"
 msgstr "bootstrap (初学者或用户)"
 
 #: nb_cli/cli/commands/project.py:46
-msgid "simple (for developer)"
-msgstr "simple (开发者)"
+msgid "simple (for plugin developer)"
+msgstr "simple (插件开发者)"
 
 #: nb_cli/cli/commands/project.py:67
 msgid "Loading adapters..."
@@ -408,26 +408,26 @@ msgstr "要卸载的包名?"
 msgid "List installed packages in cli venv."
 msgstr "列出 cli 虚拟环境中已安装的包."
 
-#: nb_cli/handlers/meta.py:76
+#: nb_cli/handlers/meta.py:79
 msgid "Cannot find a valid Python interpreter."
 msgstr "无法找到可用的 Python 解释器."
 
-#: nb_cli/handlers/meta.py:116
+#: nb_cli/handlers/meta.py:119
 msgid "Python {major}.{minor} is not supported."
 msgstr "Python {major}.{minor} 不受支持."
 
-#: nb_cli/handlers/meta.py:158
+#: nb_cli/handlers/meta.py:161
 msgid "NoneBot is not installed."
 msgstr "NoneBot 未安装."
 
-#: nb_cli/handlers/meta.py:197
+#: nb_cli/handlers/meta.py:200
 msgid "pip is not installed."
 msgstr "pip 未安装."
 
-#: nb_cli/handlers/meta.py:235
+#: nb_cli/handlers/meta.py:238
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/meta.py:257
+#: nb_cli/handlers/meta.py:260
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
