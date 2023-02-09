@@ -117,7 +117,7 @@ def requires_python(
 
         raise PythonInterpreterError(
             _("Python {major}.{minor} is not supported.").format(
-                marjo=version["major"], minor=version["minor"]
+                major=version["major"], minor=version["minor"]
             )
         )
 
