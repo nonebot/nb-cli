@@ -83,7 +83,7 @@ extra_standard_library = ["typing_extensions"]
 extend_skip = ["nb_cli/template/"]
 
 [tool.pdm.scripts]
-autodoc = { shell = "rm -rf ./website/docs/api/* && nb-autodoc nb_cli && cp -r ./build/nb_cli/* ./website/docs/api/"}
+autodoc = { shell = "rm -rf ./website/docs/api/* && nb-autodoc nb_cli -s nb_cli.template && cp -r ./build/nb_cli/* ./website/docs/api/"}
 extract = "pybabel extract -o messages.pot --project nb-cli --version 1.0.0 nb_cli/"
 _init = "pybabel init -D nb-cli -i messages.pot -d nb_cli/locale/ -l {args}"
 init = { composite = ["extract", "_init {args}"] }
