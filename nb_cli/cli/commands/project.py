@@ -346,22 +346,7 @@ async def run(
             cwd=Path(cwd),
         ).run()
     else:
-        should_exit = asyncio.Event()
-
-        def shutdown(signum, frame):
-            should_exit.set()
-
-        register_signal_handler(shutdown)
-
-        async def wait_for_exit():
-            await should_exit.wait()
-            await terminate_process(proc)
-
         proc = await run_project(
             exist_bot=Path(file), python_path=python_path, cwd=Path(cwd)
         )
-        task = asyncio.create_task(wait_for_exit())
         await proc.wait()
-        should_exit.set()
-        await task
-        remove_signal_handler(shutdown)

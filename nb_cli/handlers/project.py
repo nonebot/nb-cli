@@ -8,7 +8,12 @@ from cookiecutter.main import cookiecutter
 from nb_cli.config import SimpleInfo
 
 from . import templates
-from .meta import requires_nonebot, get_default_python, get_nonebot_config
+from .meta import (
+    requires_nonebot,
+    get_default_python,
+    get_nonebot_config,
+    ensure_process_terminated,
+)
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
@@ -49,6 +54,7 @@ async def generate_run_script(
 
 
 @requires_nonebot
+@ensure_process_terminated
 async def run_project(
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,

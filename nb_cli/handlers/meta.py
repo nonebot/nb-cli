@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import (
     TYPE_CHECKING,
     Any,
+    Set,
     Dict,
     List,
     Union,
@@ -37,6 +38,7 @@ from nb_cli.exceptions import (
 )
 
 from . import templates
+from .signal import remove_signal_handler, register_signal_handler
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 R = TypeVar("R")
@@ -308,3 +310,41 @@ async def terminate_process(process: asyncio.subprocess.Process) -> None:
         process.terminate()
 
     await process.wait()
+
+
+def ensure_process_terminated(
+    func: Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]
+) -> Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]:
+    tasks: Set[asyncio.Task] = set()
+
+    @wraps(func)
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> asyncio.subprocess.Process:
+        should_exit = asyncio.Event()
+
+        def shutdown(signum, frame):
+            should_exit.set()
+
+        register_signal_handler(shutdown)
+
+        async def wait_for_exit():
+            await should_exit.wait()
+            await terminate_process(proc)
+
+        async def wait_for_finish():
+            await proc.wait()
+            should_exit.set()
+
+        proc = await func(*args, **kwargs)
+
+        exit_task = asyncio.create_task(wait_for_exit())
+        tasks.add(exit_task)
+        exit_task.add_done_callback(tasks.discard)
+
+        wait_task = asyncio.create_task(wait_for_finish())
+        tasks.add(wait_task)
+        wait_task.add_done_callback(tasks.discard)
+        wait_task.add_done_callback(lambda t: remove_signal_handler(shutdown))
+
+        return proc
+
+    return wrapper

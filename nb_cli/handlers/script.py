@@ -1,4 +1,3 @@
-import sys
 import json
 import asyncio
 from pathlib import Path
@@ -12,6 +11,7 @@ from .meta import (
     requires_nonebot,
     get_default_python,
     get_nonebot_config,
+    ensure_process_terminated,
 )
 
 
@@ -34,6 +34,7 @@ async def list_scripts(*, python_path: Optional[str] = None) -> List[str]:
 
 
 @requires_nonebot
+@ensure_process_terminated
 async def run_script(
     script_name: str,
     script_args: Optional[List[str]] = None,

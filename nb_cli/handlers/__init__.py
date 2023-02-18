@@ -27,10 +27,12 @@ from .meta import get_nonebot_config as get_nonebot_config
 from .meta import get_python_version as get_python_version
 from .meta import get_nonebot_version as get_nonebot_version
 from .meta import format_package_results as format_package_results
+from .meta import ensure_process_terminated as ensure_process_terminated
 
 # isort: split
 
 # pip
+from .pip import call_pip as call_pip
 from .pip import call_pip_list as call_pip_list
 from .pip import call_pip_update as call_pip_update
 from .pip import call_pip_install as call_pip_install
