@@ -77,7 +77,12 @@ else:
             )
             stdout, stderr = await proc.communicate()
             if proc.returncode == 0:
-                return json.loads(stdout.strip())
+                if stdout:
+                    return json.loads(stdout.strip())
+                else:
+                    raise PythonInterpreterError(
+                        _(f"Cannot get valid `sys.executable`, got {stdout}.")
+                    )
         raise PythonInterpreterError(_("Cannot find a valid Python interpreter."))
 
 
