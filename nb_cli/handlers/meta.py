@@ -83,10 +83,8 @@ else:
                 except Exception:
                     continue
         raise PythonInterpreterError(
-            _(
-                "Cannot find a valid Python interpreter."
-                + (f" stdout={repr(stdout)}" if stdout else "")
-            )
+            _("Cannot find a valid Python interpreter.")
+            + (f" stdout={stdout!r}" if stdout else "")
         )
 
 
