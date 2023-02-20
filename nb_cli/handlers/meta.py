@@ -82,7 +82,13 @@ else:
                         return executable
                 except Exception:
                     continue
-        raise PythonInterpreterError(_("Cannot find a valid Python interpreter."))
+        raise PythonInterpreterError(
+            _(
+                "Cannot find a valid Python interpreter." + f"stdout={repr(stdout)}"
+                if not stdout
+                else ""
+            )
+        )
 
 
 if TYPE_CHECKING:
