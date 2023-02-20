@@ -85,7 +85,7 @@ else:
         raise PythonInterpreterError(
             _(
                 "Cannot find a valid Python interpreter."
-                + (f"stdout={repr(stdout)}" if stdout else "")
+                + (f" stdout={repr(stdout)}" if stdout else "")
             )
         )
 
