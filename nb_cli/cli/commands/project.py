@@ -282,7 +282,7 @@ async def create(
 @run_async
 async def generate(file: str):
     content = await generate_run_script()
-    Path(file).write_text(content)
+    Path(file).write_text(content, encoding="utf-8")
 
 
 @click.command(
