@@ -53,12 +53,12 @@ if sys.version_info >= (3, 10):
 @dataclass
 class ProjectContext:
     """项目模板生成上下文
-    
+
     参数:
         variables: 模板渲染变量字典
         packages: 项目需要安装的包
     """
-    
+
     variables: Dict[str, Any] = field(default_factory=dict)
     packages: List[str] = field(default_factory=list)
 
