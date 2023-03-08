@@ -42,7 +42,7 @@ class ConfigManager:
         adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
         if all(a["module_name"] != adapter.module_name for a in adapters):
             t = tomlkit.inline_table()
-            t.update(adapter.dict())
+            t.update(adapter.dict(include={"name", "module_name"}))
             adapters.append(t)
         self._write_data(data)
 
