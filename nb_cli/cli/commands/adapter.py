@@ -256,7 +256,9 @@ async def create(
         click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
             output_dir = await InputPrompt(
-                _("Output Dir:"), validator=lambda x: len(x) > 0 and Path(x).is_dir()
+                _("Output Dir:"),
+                validator=lambda x: len(x) > 0 and Path(x).is_dir(),
+                error_message=_("Invalid output dir!"),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             ctx.exit()

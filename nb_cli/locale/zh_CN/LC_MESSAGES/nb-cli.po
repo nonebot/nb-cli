@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-03-09 16:49+0000\n"
+"POT-Creation-Date: 2023-03-09 16:57+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.11.0\n"
+"Generated-By: Babel 2.12.1\n"
 
 #: nb_cli/cli/__init__.py:47
 msgid "Config file path."
@@ -146,13 +146,18 @@ msgid "Other"
 msgstr "其他"
 
 #: nb_cli/cli/commands/adapter.py:250 nb_cli/cli/commands/adapter.py:259
-#: nb_cli/cli/commands/plugin.py:254 nb_cli/cli/commands/plugin.py:263
+#: nb_cli/cli/commands/plugin.py:254 nb_cli/cli/commands/plugin.py:264
 msgid "Output Dir:"
 msgstr "输出目录:"
 
-#: nb_cli/cli/commands/adapter.py:256 nb_cli/cli/commands/plugin.py:260
+#: nb_cli/cli/commands/adapter.py:256 nb_cli/cli/commands/plugin.py:261
 msgid "Output dir is not a directory!"
 msgstr "输出目录不是一个文件夹!"
+
+#: nb_cli/cli/commands/adapter.py:261 nb_cli/cli/commands/plugin.py:256
+#: nb_cli/cli/commands/plugin.py:266
+msgid "Invalid output dir!"
+msgstr "无效的输出目录!"
 
 #: nb_cli/cli/commands/driver.py:20
 msgid "Manage bot driver."
@@ -262,29 +267,37 @@ msgstr "使用嵌套插件?"
 msgid "Where to store the plugin?"
 msgstr "请输入插件存储位置:"
 
-#: nb_cli/cli/commands/project.py:45
+#: nb_cli/cli/commands/project.py:42
 msgid "bootstrap (for beginner or user)"
 msgstr "bootstrap (初学者或用户)"
 
-#: nb_cli/cli/commands/project.py:46
+#: nb_cli/cli/commands/project.py:43
 msgid "simple (for plugin developer)"
 msgstr "simple (插件开发者)"
 
-#: nb_cli/cli/commands/project.py:74
+#: nb_cli/cli/commands/project.py:71
 msgid "Loading adapters..."
 msgstr "正在加载适配器..."
 
-#: nb_cli/cli/commands/project.py:76
+#: nb_cli/cli/commands/project.py:73
 msgid "Loading drivers..."
 msgstr "正在加载驱动器..."
 
-#: nb_cli/cli/commands/project.py:81
+#: nb_cli/cli/commands/project.py:78
 msgid "Project Name:"
 msgstr "项目名称:"
 
-#: nb_cli/cli/commands/project.py:86
+#: nb_cli/cli/commands/project.py:80
+msgid "Invalid project name!"
+msgstr "无效的项目名称!"
+
+#: nb_cli/cli/commands/project.py:85
 msgid "Which driver(s) would you like to use?"
 msgstr "要使用哪些驱动器?"
+
+#: nb_cli/cli/commands/project.py:93
+msgid "Chosen drivers is not valid!"
+msgstr ""
 
 #: nb_cli/cli/commands/project.py:104
 msgid "Which adapter(s) would you like to use?"

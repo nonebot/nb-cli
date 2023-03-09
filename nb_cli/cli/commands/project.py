@@ -1,6 +1,5 @@
 import re
 import sys
-import asyncio
 from pathlib import Path
 from functools import partial
 from dataclasses import field, dataclass
@@ -34,9 +33,7 @@ from nb_cli.handlers import (
     terminate_process,
     generate_run_script,
     list_builtin_plugins,
-    remove_signal_handler,
     list_project_templates,
-    register_signal_handler,
 )
 
 VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
@@ -78,7 +75,9 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     click.clear()
 
     project_name = await InputPrompt(
-        _("Project Name:"), validator=project_name_validator
+        _("Project Name:"),
+        validator=project_name_validator,
+        error_message=_("Invalid project name!"),
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["project_name"] = project_name
 
@@ -91,6 +90,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             if driver.name in DEFAULT_DRIVER
         ],
         validator=bool,
+        error_message=_("Chosen drivers is not valid!"),
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["drivers"] = [d.data.dict() for d in drivers]
     context.packages.extend(

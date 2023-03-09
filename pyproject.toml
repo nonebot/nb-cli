@@ -31,7 +31,7 @@ dependencies = [
   "cookiecutter ~=2.1",
   "virtualenv ~=20.17.1",
   "typing-extensions ~=4.4",
-  "noneprompt >=0.1.7, <1.0.0",
+  "noneprompt >=0.1.9, <1.0.0",
   "pyfiglet >=0.8.post1, <1.0.0",
   "importlib-metadata >=4.6; python_version < '3.10'",
 ]
