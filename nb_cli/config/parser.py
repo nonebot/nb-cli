@@ -4,6 +4,8 @@ from typing import Any, Dict, List, Optional
 import tomlkit
 from tomlkit.toml_document import TOMLDocument
 
+from nb_cli import _
+
 from .model import SimpleInfo, NoneBotConfig
 
 
@@ -37,7 +39,7 @@ class ConfigManager:
 
     def add_adapter(self, adapter: SimpleInfo) -> None:
         if not (data := self._get_data()):
-            raise RuntimeError("Config file not found!")
+            raise RuntimeError(_("Config file not found!"))
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
         if all(a["module_name"] != adapter.module_name for a in adapters):
@@ -48,7 +50,7 @@ class ConfigManager:
 
     def remove_adapter(self, adapter: SimpleInfo) -> None:
         if not (data := self._get_data()):
-            raise RuntimeError("Config file not found!")
+            raise RuntimeError(_("Config file not found!"))
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
         if index := next(
@@ -64,7 +66,7 @@ class ConfigManager:
 
     def add_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
-            raise RuntimeError("Config file not found!")
+            raise RuntimeError(_("Config file not found!"))
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("plugins", [])
         if plugin not in plugins:
@@ -73,7 +75,7 @@ class ConfigManager:
 
     def remove_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
-            raise RuntimeError("Config file not found!")
+            raise RuntimeError(_("Config file not found!"))
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("plugins", [])
         if plugin in plugins:
@@ -82,7 +84,7 @@ class ConfigManager:
 
     def add_builtin_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
-            raise RuntimeError("Config file not found!")
+            raise RuntimeError(_("Config file not found!"))
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("builtin_plugins", [])
         if plugin not in plugins:
@@ -91,7 +93,7 @@ class ConfigManager:
 
     def remove_builtin_plugin(self, plugin: str) -> None:
         if not (data := self._get_data()):
-            raise RuntimeError("Config file not found!")
+            raise RuntimeError(_("Config file not found!"))
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: List[str] = table.setdefault("builtin_plugins", [])
         if plugin in plugins:
