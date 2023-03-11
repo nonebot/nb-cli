@@ -8,8 +8,7 @@ from .config import Config
 global_config = get_driver().config
 config = Config.parse_obj(global_config)
 {% if cookiecutter.sub_plugin == "True" %}
-_sub_plugins = set()
-_sub_plugins |= nonebot.load_plugins(
-    str((Path(__file__).parent / "plugins").resolve())
+sub_plugins = nonebot.load_plugins(
+    str(Path(__file__).parent.joinpath("plugins").resolve())
 )
 {% endif %}
