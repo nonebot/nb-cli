@@ -1,6 +1,7 @@
 import os
 import signal
 import asyncio
+import subprocess
 from pathlib import Path
 from functools import wraps
 from typing_extensions import ParamSpec
@@ -65,6 +66,7 @@ async def create_process(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if WINDOWS else 0,
     )
 
 
@@ -82,6 +84,7 @@ async def create_process_shell(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if WINDOWS else 0,
     )
 
 
