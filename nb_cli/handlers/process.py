@@ -88,6 +88,7 @@ async def create_process_shell(
 async def terminate_process(process: asyncio.subprocess.Process) -> None:
     if process.returncode is not None:
         return
+
     if WINDOWS:
         os.kill(process.pid, signal.CTRL_C_EVENT)
     else:

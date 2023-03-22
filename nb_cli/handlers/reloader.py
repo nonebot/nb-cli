@@ -74,11 +74,12 @@ class Reloader:
         self.shutdown_func = shutdown_func
         self.process: Optional[asyncio.subprocess.Process] = None
 
-        self.cwd = cwd or Path.cwd()
+        self.cwd = (cwd or Path.cwd()).resolve()
         self.stdout = stdout or sys.stdout
 
         self.reload_dirs = []
         for directory in reload_dirs or []:
+            directory = directory.resolve()
             if self.cwd not in directory.parents:
                 self.reload_dirs.append(directory)
         if self.cwd not in self.reload_dirs:
@@ -86,7 +87,6 @@ class Reloader:
 
         self.watch_filter = file_filter or FileFilter()
         self.should_exit = asyncio.Event()
-        self.is_restarting: bool = False
         self.watcher = awatch(
             *self.reload_dirs,
             watch_filter=None,
@@ -96,11 +96,31 @@ class Reloader:
             yield_on_timeout=True,
         )
 
+    async def __aenter__(self):
+        await self.startup()
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.shutdown()
+
     def __aiter__(self):
         return self
 
     async def __anext__(self) -> Optional[List[Path]]:
         return await self.should_restart()
+
+    async def run(self) -> None:
+        async with self:
+            async for changes in self:
+                if self.process and self.process.returncode is not None:
+                    break
+                if changes:
+                    print(
+                        "Watchfiles detected changes in "
+                        f"{', '.join(map(self._display_path, changes))}. Reloading...",
+                        file=self.stdout,
+                    )
+                    await self.restart()
 
     async def startup(self) -> None:
         register_signal_handler(self.handle_exit)
@@ -108,35 +128,20 @@ class Reloader:
         self.process = await self.startup_func()
         print(f"Started reloader with process [{self.process.pid}].", file=self.stdout)
 
-    async def run(self) -> None:
-        await self.startup()
-
-        async for changes in self:
-            if self.process.returncode is not None:  # type: ignore
-                break
-            if changes:
-                print(
-                    "Watchfiles detected changes in "
-                    f"{', '.join(map(self._display_path, changes))}. Reloading...",
-                    file=self.stdout,
-                )
-                await self.restart()
-
-        await self.shutdown()
-
     async def restart(self) -> None:
-        self.is_restarting = True
-        await self.shutdown_func(cast(asyncio.subprocess.Process, self.process))
+        if self.process and self.process.returncode is None:
+            await self.shutdown_func(self.process)
         self.process = await self.startup_func()
         print(f"Restarted process [{self.process.pid}].", file=self.stdout)
 
     async def shutdown(self) -> None:
         remove_signal_handler(self.handle_exit)
 
-        if self.process:
+        if self.process and self.process.returncode is None:
             print(f"Shutting down process [{self.process.pid}]...", file=self.stdout)
             await self.shutdown_func(self.process)
-            print("Stopped reloader.", file=self.stdout)
+
+        print("Stopped reloader.", file=self.stdout)
 
     async def should_restart(self) -> Optional[List[Path]]:
         changes = await self.watcher.__anext__()
@@ -146,12 +151,10 @@ class Reloader:
         return None
 
     def handle_exit(self, sig, frame):
-        if WINDOWS and self.is_restarting:
-            self.is_restarting = False
-        else:
-            self.should_exit.set()
+        self.should_exit.set()
 
     def _display_path(self, path: Path) -> str:
+        print(self.cwd, path)
         try:
             return f'"{path.relative_to(self.cwd)}"'
         except ValueError:

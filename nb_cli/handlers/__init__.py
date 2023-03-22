@@ -32,6 +32,7 @@ from .meta import format_package_results as format_package_results
 # process
 from .process import create_process as create_process
 from .process import terminate_process as terminate_process
+from .process import create_process_shell as create_process_shell
 from .process import ensure_process_terminated as ensure_process_terminated
 
 # isort: split
