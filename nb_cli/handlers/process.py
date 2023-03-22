@@ -97,7 +97,7 @@ async def terminate_process(process: asyncio.subprocess.Process) -> None:
 
     with context:
         if WINDOWS:
-            os.kill(process.pid, signal.CTRL_C_EVENT)
+            os.kill(process.pid, signal.CTRL_BREAK_EVENT)
         else:
             process.terminate()
 

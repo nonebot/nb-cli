@@ -9,11 +9,27 @@ from typing import List, Callable, Optional, Generator
 HANDLED_SIGNALS = (
     signal.SIGINT,  # Unix signal 2. Sent by Ctrl+C.
     signal.SIGTERM,  # Unix signal 15. Sent by `kill <pid>`.
+    signal.SIGBREAK,  # Windows signal 21. Sent by Ctrl+Break.
 )
 
 handlers: List[Callable[[int, Optional[FrameType]], None]] = []
 
-shield_context: ContextVar[bool] = ContextVar("shield_context", default=False)
+
+class _ShieldContext:
+    def __init__(self) -> None:
+        self._counter = 0
+
+    def acquire(self) -> None:
+        self._counter += 1
+
+    def release(self) -> None:
+        self._counter -= 1
+
+    def active(self) -> bool:
+        return self._counter > 0
+
+
+shield_context = _ShieldContext()
 
 
 def install_signal_handler() -> None:
@@ -33,7 +49,7 @@ def install_signal_handler() -> None:
 
 
 def handle_signal(signum: int, frame: Optional[FrameType]) -> None:
-    if shield_context.get():
+    if shield_context.active():
         return
 
     for handler in handlers:
@@ -52,8 +68,8 @@ def remove_signal_handler(handler: Callable[[int, Optional[FrameType]], None]) -
 
 @contextmanager
 def shield_signals() -> Generator[None, None, None]:
-    token = shield_context.set(True)
+    shield_context.acquire()
     try:
         yield
     finally:
-        shield_context.reset(token)
+        shield_context.release()
