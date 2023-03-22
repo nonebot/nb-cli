@@ -2,15 +2,17 @@ import signal
 import asyncio
 import threading
 from types import FrameType
-from contextvars import ContextVar
 from contextlib import contextmanager
 from typing import List, Callable, Optional, Generator
+
+from nb_cli.consts import WINDOWS
 
 HANDLED_SIGNALS = (
     signal.SIGINT,  # Unix signal 2. Sent by Ctrl+C.
     signal.SIGTERM,  # Unix signal 15. Sent by `kill <pid>`.
-    signal.SIGBREAK,  # Windows signal 21. Sent by Ctrl+Break.
 )
+if WINDOWS:
+    HANDLED_SIGNALS += (signal.SIGBREAK,)  # Windows signal 21. Sent by Ctrl+Break.
 
 handlers: List[Callable[[int, Optional[FrameType]], None]] = []
 
