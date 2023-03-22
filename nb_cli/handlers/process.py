@@ -4,12 +4,13 @@ import asyncio
 import subprocess
 from pathlib import Path
 from functools import wraps
+from contextlib import nullcontext
 from typing_extensions import ParamSpec
 from typing import IO, Any, Set, Union, Callable, Optional, Coroutine
 
 from nb_cli.consts import WINDOWS
 
-from .signal import remove_signal_handler, register_signal_handler
+from .signal import shield_signals, remove_signal_handler, register_signal_handler
 
 P = ParamSpec("P")
 
@@ -92,9 +93,12 @@ async def terminate_process(process: asyncio.subprocess.Process) -> None:
     if process.returncode is not None:
         return
 
-    if WINDOWS:
-        os.kill(process.pid, signal.CTRL_C_EVENT)
-    else:
-        process.terminate()
+    context = shield_signals() if WINDOWS else nullcontext()
 
-    await process.wait()
+    with context:
+        if WINDOWS:
+            os.kill(process.pid, signal.CTRL_C_EVENT)
+        else:
+            process.terminate()
+
+        await process.wait()

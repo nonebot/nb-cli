@@ -53,6 +53,7 @@ from .venv import detect_virtualenv as detect_virtualenv
 # isort: split
 
 # signal
+from .signal import shield_signals as shield_signals
 from .signal import remove_signal_handler as remove_signal_handler
 from .signal import install_signal_handler as install_signal_handler
 from .signal import register_signal_handler as register_signal_handler

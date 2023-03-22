@@ -2,7 +2,9 @@ import signal
 import asyncio
 import threading
 from types import FrameType
-from typing import List, Callable, Optional
+from contextvars import ContextVar
+from contextlib import contextmanager
+from typing import List, Callable, Optional, Generator
 
 HANDLED_SIGNALS = (
     signal.SIGINT,  # Unix signal 2. Sent by Ctrl+C.
@@ -10,6 +12,8 @@ HANDLED_SIGNALS = (
 )
 
 handlers: List[Callable[[int, Optional[FrameType]], None]] = []
+
+shield_context: ContextVar[bool] = ContextVar("shield_context", default=False)
 
 
 def install_signal_handler() -> None:
@@ -29,6 +33,9 @@ def install_signal_handler() -> None:
 
 
 def handle_signal(signum: int, frame: Optional[FrameType]) -> None:
+    if shield_context.get():
+        return
+
     for handler in handlers:
         handler(signum, frame)
 
@@ -41,3 +48,12 @@ def register_signal_handler(
 
 def remove_signal_handler(handler: Callable[[int, Optional[FrameType]], None]) -> None:
     handlers.remove(handler)
+
+
+@contextmanager
+def shield_signals() -> Generator[None, None, None]:
+    token = shield_context.set(True)
+    try:
+        yield
+    finally:
+        shield_context.reset(token)
