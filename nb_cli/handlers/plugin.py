@@ -8,6 +8,7 @@ from cookiecutter.main import cookiecutter
 from nb_cli.config import Plugin
 
 from . import templates
+from .process import create_process
 from .meta import load_module_data, requires_nonebot, get_default_python
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
@@ -20,7 +21,7 @@ async def list_builtin_plugins(*, python_path: Optional[str] = None) -> List[str
 
     t = templates.get_template("plugin/list_builtin_plugin.py.jinja")
 
-    proc = await asyncio.create_subprocess_exec(
+    proc = await create_process(
         python_path,
         "-W",
         "ignore",

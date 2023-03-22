@@ -1,7 +1,5 @@
-import os
 import json
 import shutil
-import signal
 import asyncio
 from functools import wraps
 from typing_extensions import ParamSpec
@@ -9,7 +7,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import (
     TYPE_CHECKING,
     Any,
-    Set,
     Dict,
     List,
     Union,
@@ -38,7 +35,7 @@ from nb_cli.exceptions import (
 )
 
 from . import templates
-from .signal import remove_signal_handler, register_signal_handler
+from .process import create_process, create_process_shell
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 R = TypeVar("R")
@@ -71,7 +68,7 @@ else:
         python_to_try = WINDOWS_DEFAULT_PYTHON if WINDOWS else DEFAULT_PYTHON
 
         for python in python_to_try:
-            proc = await asyncio.create_subprocess_shell(
+            proc = await create_process_shell(
                 f'{python} -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
                 stdout=asyncio.subprocess.PIPE,
             )
@@ -101,7 +98,7 @@ else:
             python_path = await get_default_python()
 
         t = templates.get_template("meta/python_version.py.jinja")
-        proc = await asyncio.create_subprocess_exec(
+        proc = await create_process(
             python_path,
             "-W",
             "ignore",
@@ -146,7 +143,7 @@ else:
             python_path = await get_default_python()
 
         t = templates.get_template("meta/nonebot_version.py.jinja")
-        proc = await asyncio.create_subprocess_exec(
+        proc = await create_process(
             python_path,
             "-W",
             "ignore",
@@ -185,7 +182,7 @@ else:
             python_path = await get_default_python()
 
         t = templates.get_template("meta/pip_version.py.jinja")
-        proc = await asyncio.create_subprocess_exec(
+        proc = await create_process(
             python_path,
             "-W",
             "ignore",
@@ -306,52 +303,3 @@ def format_package_results(
         lines.append(f"{name + ' ' * (name_column_width - wcswidth(name))} - {summary}")
 
     return "\n".join(lines)
-
-
-async def terminate_process(process: asyncio.subprocess.Process) -> None:
-    if process.returncode is not None:
-        return
-    if WINDOWS:
-        os.kill(process.pid, signal.CTRL_C_EVENT)
-    else:
-        process.terminate()
-
-    await process.wait()
-
-
-def ensure_process_terminated(
-    func: Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]
-) -> Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]:
-    tasks: Set[asyncio.Task] = set()
-
-    @wraps(func)
-    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> asyncio.subprocess.Process:
-        should_exit = asyncio.Event()
-
-        def shutdown(signum, frame):
-            should_exit.set()
-
-        register_signal_handler(shutdown)
-
-        async def wait_for_exit():
-            await should_exit.wait()
-            await terminate_process(proc)
-
-        async def wait_for_finish():
-            await proc.wait()
-            should_exit.set()
-
-        proc = await func(*args, **kwargs)
-
-        exit_task = asyncio.create_task(wait_for_exit())
-        tasks.add(exit_task)
-        exit_task.add_done_callback(tasks.discard)
-
-        wait_task = asyncio.create_task(wait_for_finish())
-        tasks.add(wait_task)
-        wait_task.add_done_callback(tasks.discard)
-        wait_task.add_done_callback(lambda t: remove_signal_handler(shutdown))
-
-        return proc
-
-    return wrapper

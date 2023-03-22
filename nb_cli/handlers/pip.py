@@ -1,11 +1,11 @@
 import asyncio
 from typing import IO, Any, List, Union, Optional
 
-from .meta import requires_pip, get_default_python, ensure_process_terminated
+from .process import create_process
+from .meta import requires_pip, get_default_python
 
 
 @requires_pip
-@ensure_process_terminated
 async def call_pip(
     pip_args: Optional[List[str]] = None,
     *,
@@ -19,7 +19,7 @@ async def call_pip(
     if python_path is None:
         python_path = await get_default_python()
 
-    return await asyncio.create_subprocess_exec(
+    return await create_process(
         python_path,
         "-m",
         "pip",
@@ -103,7 +103,6 @@ async def call_pip_uninstall(
 
 
 @requires_pip
-@ensure_process_terminated
 async def call_pip_list(
     pip_args: Optional[List[str]] = None,
     *,

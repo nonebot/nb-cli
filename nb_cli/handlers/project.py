@@ -1,4 +1,3 @@
-import sys
 import asyncio
 from pathlib import Path
 from typing import IO, Any, Dict, List, Union, Optional
@@ -8,12 +7,8 @@ from cookiecutter.main import cookiecutter
 from nb_cli.config import SimpleInfo
 
 from . import templates
-from .meta import (
-    requires_nonebot,
-    get_default_python,
-    get_nonebot_config,
-    ensure_process_terminated,
-)
+from .process import create_process
+from .meta import requires_nonebot, get_default_python, get_nonebot_config
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
@@ -54,7 +49,6 @@ async def generate_run_script(
 
 
 @requires_nonebot
-@ensure_process_terminated
 async def run_project(
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
@@ -75,7 +69,7 @@ async def run_project(
         python_path = await get_default_python()
 
     if exist_bot.exists():
-        return await asyncio.create_subprocess_exec(
+        return await create_process(
             python_path,
             exist_bot,
             cwd=cwd,
@@ -84,7 +78,7 @@ async def run_project(
             stderr=stderr,
         )
 
-    return await asyncio.create_subprocess_exec(
+    return await create_process(
         python_path,
         "-c",
         await generate_run_script(adapters=adapters, builtin_plugins=builtin_plugins),

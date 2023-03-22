@@ -21,13 +21,18 @@ from .meta import get_pip_version as get_pip_version
 from .meta import requires_python as requires_python
 from .meta import load_module_data as load_module_data
 from .meta import requires_nonebot as requires_nonebot
-from .meta import terminate_process as terminate_process
 from .meta import get_default_python as get_default_python
 from .meta import get_nonebot_config as get_nonebot_config
 from .meta import get_python_version as get_python_version
 from .meta import get_nonebot_version as get_nonebot_version
 from .meta import format_package_results as format_package_results
-from .meta import ensure_process_terminated as ensure_process_terminated
+
+# isort: split
+
+# process
+from .process import create_process as create_process
+from .process import terminate_process as terminate_process
+from .process import ensure_process_terminated as ensure_process_terminated
 
 # isort: split
 
