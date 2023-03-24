@@ -187,6 +187,6 @@ async def uninstall(
                 fg="green",
             )
         proc = await call_pip_uninstall(
-            driver.project_link, pip_args, python_path=python_path
+            package, pip_args, python_path=python_path
         )
         await proc.wait()
