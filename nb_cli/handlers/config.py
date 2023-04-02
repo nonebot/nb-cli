@@ -102,14 +102,16 @@ class ConfigManager:
         data = self._get_data()
         table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
-        if index := next(
-            (
-                i
-                for i, a in enumerate(adapters)
-                if a["module_name"] == adapter.module_name
-            ),
-            None,
-        ):
+        if (
+            index := next(
+                (
+                    i
+                    for i, a in enumerate(adapters)
+                    if a["module_name"] == adapter.module_name
+                ),
+                None,
+            )
+        ) is not None:
             del adapters[index]
         self._write_data(data)
 
