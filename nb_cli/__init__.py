@@ -26,7 +26,7 @@ from .handlers import install_signal_handler
 def load_plugins():
     entrypoint: EntryPoint
     for entrypoint in entry_points(group=PLUGINS_GROUP):
-        entrypoint.load()()
+        entrypoint.load()()  # type: ignore
 
 
 async def cli_main(*args, **kwargs):

@@ -1,34 +1,24 @@
 import json
-import shutil
 import asyncio
 from functools import wraps
 from typing_extensions import ParamSpec
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
-    List,
     Union,
-    Literal,
     TypeVar,
     Callable,
     Optional,
     Coroutine,
     cast,
-    overload,
 )
 
-import httpx
-from wcwidth import wcswidth
 from pyfiglet import figlet_format
 
 from nb_cli import _, cache
-from nb_cli.config.model import NoneBotConfig
 from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
-from nb_cli.config import GLOBAL_CONFIG, Driver, Plugin, Adapter, NoneBotConfig
 from nb_cli.exceptions import (
-    ModuleLoadFailed,
     PipNotInstalledError,
     PythonInterpreterError,
     NoneBotNotInstalledError,
@@ -37,7 +27,6 @@ from nb_cli.exceptions import (
 from . import templates
 from .process import create_process, create_process_shell
 
-T = TypeVar("T", Adapter, Plugin, Driver)
 R = TypeVar("R")
 P = ParamSpec("P")
 
@@ -47,10 +36,6 @@ WINDOWS_DEFAULT_PYTHON = ("python",)
 
 def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
-
-
-def get_nonebot_config() -> NoneBotConfig:
-    return GLOBAL_CONFIG.get_nonebot_config()
 
 
 if TYPE_CHECKING:
@@ -206,100 +191,3 @@ def requires_pip(
         raise PipNotInstalledError(_("pip is not installed."))
 
     return wrapper
-
-
-if TYPE_CHECKING:
-
-    @overload
-    async def load_module_data(module_type: Literal["adapter"]) -> List[Adapter]:
-        ...
-
-    @overload
-    async def load_module_data(module_type: Literal["plugin"]) -> List[Plugin]:
-        ...
-
-    @overload
-    async def load_module_data(module_type: Literal["driver"]) -> List[Driver]:
-        ...
-
-    async def load_module_data(
-        module_type: Literal["adapter", "plugin", "driver"]
-    ) -> Union[List[Adapter], List[Plugin], List[Driver]]:
-        ...
-
-else:
-
-    @cache(ttl=None)
-    async def load_module_data(
-        module_type: Literal["adapter", "plugin", "driver"]
-    ) -> Union[List[Adapter], List[Plugin], List[Driver]]:
-        if module_type == "adapter":
-            module_class = Adapter
-        elif module_type == "plugin":
-            module_class = Plugin
-        elif module_type == "driver":
-            module_class = Driver
-        else:
-            raise ValueError(
-                _("Invalid module type: {module_type}").format(module_type=module_type)
-            )
-        module_name: str = getattr(module_class.__config__, "module_name")
-
-        exceptions: List[Exception] = []
-        urls = [
-            f"https://v2.nonebot.dev/{module_name}.json",
-            f"https://raw.fastgit.org/nonebot/nonebot2/master/website/static/{module_name}.json",
-            f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/{module_name}.json",
-        ]
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            tasks = [executor.submit(httpx.get, url) for url in urls]
-
-            for future in as_completed(tasks):
-                try:
-                    resp = future.result()
-                    items = resp.json()
-                    return [module_class.parse_obj(item) for item in items]  # type: ignore
-                except Exception as e:
-                    exceptions.append(e)
-
-        raise ModuleLoadFailed(
-            _("Failed to get {module_type} list.").format(module_type=module_type),
-            exceptions,
-        )
-
-
-def format_package_results(
-    hits: List[T],
-    name_column_width: Optional[int] = None,
-    terminal_width: Optional[int] = None,
-) -> str:
-    if not hits:
-        return ""
-
-    if name_column_width is None:
-        name_column_width = (
-            max(wcswidth(f"{hit.name} ({hit.project_link})") for hit in hits) + 4
-        )
-    if terminal_width is None:
-        terminal_width = shutil.get_terminal_size()[0]
-
-    lines: List[str] = []
-    for hit in hits:
-        name = f"{hit.name} ({hit.project_link})"
-        summary = hit.desc
-        target_width = terminal_width - name_column_width - 5
-        if target_width > 10:
-            # wrap and indent summary to fit terminal
-            summary_lines = []
-            while wcswidth(summary) > target_width:
-                tmp_length = target_width
-                while wcswidth(summary[:tmp_length]) > target_width:
-                    tmp_length = tmp_length - 1
-                summary_lines.append(summary[:tmp_length])
-                summary = summary[tmp_length:]
-            summary_lines.append(summary)
-            summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
-
-        lines.append(f"{name + ' ' * (name_column_width - wcswidth(name))} - {summary}")
-
-    return "\n".join(lines)

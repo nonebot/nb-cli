@@ -5,19 +5,20 @@ from typing import List, Optional
 
 from cookiecutter.main import cookiecutter
 
-from nb_cli.config import Plugin
-
 from . import templates
+from .config import ConfigManager
 from .process import create_process
-from .meta import load_module_data, requires_nonebot, get_default_python
+from .store import Plugin, load_module_data
+from .meta import requires_nonebot, get_default_python
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
 
 @requires_nonebot
-async def list_builtin_plugins(*, python_path: Optional[str] = None) -> List[str]:
-    if python_path is None:
-        python_path = await get_default_python()
+async def list_builtin_plugins(
+    *, config_manager: Optional[ConfigManager] = None
+) -> List[str]:
+    python_path = await (config_manager or ConfigManager()).get_python_path()
 
     t = templates.get_template("plugin/list_builtin_plugin.py.jinja")
 

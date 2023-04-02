@@ -7,6 +7,7 @@ from nb_cli import _
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
+    ConfigManager,
     list_drivers,
     call_pip_update,
     call_pip_install,
@@ -73,18 +74,12 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot driver to current project."),
 )
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
-)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         driver = await find_exact_package(
@@ -96,34 +91,19 @@ async def install(
         ctx.exit(1)
 
     if driver.project_link:
-        if python_path := detect_virtualenv() if venv else None:
-            click.secho(
-                _("Using virtual environment: {python_path}").format(
-                    python_path=python_path
-                ),
-                fg="green",
-            )
-        proc = await call_pip_install(
-            driver.project_link, pip_args, python_path=python_path
-        )
+        proc = await call_pip_install(driver.project_link, pip_args)
         await proc.wait()
 
 
 @driver.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot driver.")
 )
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
-)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         driver = await find_exact_package(
@@ -135,16 +115,7 @@ async def update(
         ctx.exit(1)
 
     if driver.project_link:
-        if python_path := detect_virtualenv() if venv else None:
-            click.secho(
-                _("Using virtual environment: {python_path}").format(
-                    python_path=python_path
-                ),
-                fg="green",
-            )
-        proc = await call_pip_update(
-            driver.project_link, pip_args, python_path=python_path
-        )
+        proc = await call_pip_update(driver.project_link, pip_args)
         await proc.wait()
 
 
@@ -153,18 +124,12 @@ async def update(
     context_settings={"ignore_unknown_options": True},
     help=_("Uninstall nonebot driver from current project."),
 )
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
-)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         driver = await find_exact_package(
@@ -179,14 +144,5 @@ async def uninstall(
         if package.startswith("nonebot2[") and package.endswith("]"):
             package = package[9:-1]
 
-        if python_path := detect_virtualenv() if venv else None:
-            click.secho(
-                _("Using virtual environment: {python_path}").format(
-                    python_path=python_path
-                ),
-                fg="green",
-            )
-        proc = await call_pip_uninstall(
-            package, pip_args, python_path=python_path
-        )
+        proc = await call_pip_uninstall(package, pip_args)
         await proc.wait()

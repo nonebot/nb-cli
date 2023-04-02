@@ -1,24 +1,16 @@
 import json
 import asyncio
-from pathlib import Path
 from typing import IO, Any, List, Union, Optional
 
-from nb_cli.config import SimpleInfo
-
 from . import templates
+from .config import ConfigManager
 from .process import create_process
-from .meta import (
-    requires_python,
-    requires_nonebot,
-    get_default_python,
-    get_nonebot_config,
-)
+from .meta import requires_python, requires_nonebot
 
 
 @requires_python
-async def list_scripts(*, python_path: Optional[str] = None) -> List[str]:
-    if python_path is None:
-        python_path = await get_default_python()
+async def list_scripts(*, config_manager: Optional[ConfigManager] = None) -> List[str]:
+    python_path = await (config_manager or ConfigManager()).get_python_path()
 
     t = templates.get_template("script/list_scripts.py.jinja")
     proc = await create_process(
@@ -37,11 +29,8 @@ async def list_scripts(*, python_path: Optional[str] = None) -> List[str]:
 async def run_script(
     script_name: str,
     script_args: Optional[List[str]] = None,
-    adapters: Optional[List[SimpleInfo]] = None,
-    builtin_plugins: Optional[List[str]] = None,
     *,
-    python_path: Optional[str] = None,
-    cwd: Optional[Path] = None,
+    config_manager: Optional[ConfigManager] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
@@ -49,13 +38,12 @@ async def run_script(
     if script_args is None:
         script_args = []
 
-    bot_config = get_nonebot_config()
-    if adapters is None:
-        adapters = bot_config.adapters
-    if builtin_plugins is None:
-        builtin_plugins = bot_config.builtin_plugins
-    if python_path is None:
-        python_path = await get_default_python()
+    config_manager = config_manager or ConfigManager()
+
+    cwd = config_manager.get_project_root()
+    python_path = await config_manager.get_python_path()
+
+    config = config_manager.get_nonebot_config()
 
     t = templates.get_template("script/run_script.py.jinja")
 
@@ -63,8 +51,8 @@ async def run_script(
         python_path,
         "-c",
         await t.render_async(
-            adapters=adapters,
-            builtin_plugins=builtin_plugins,
+            adapters=config.adapters,
+            builtin_plugins=config.builtin_plugins,
             script_name=script_name,
         ),
         *script_args,

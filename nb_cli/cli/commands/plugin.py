@@ -5,10 +5,10 @@ import click
 from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt, CancelledError
 
 from nb_cli import _
-from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
+    ConfigManager,
     list_plugins,
     create_plugin,
     call_pip_update,
@@ -76,18 +76,12 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot plugin to current project."),
 )
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
-)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -98,8 +92,10 @@ async def install(
     except Exception:
         ctx.exit(1)
 
+    config_manager = ConfigManager()
+
     try:
-        GLOBAL_CONFIG.add_plugin(plugin.module_name)
+        config_manager.add_plugin(plugin.module_name)
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to config: {e}").format(
@@ -107,15 +103,10 @@ async def install(
             )
         )
 
-    if python_path := detect_virtualenv() if venv else None:
-        click.secho(
-            _("Using virtual environment: {python_path}").format(
-                python_path=python_path
-            ),
-            fg="green",
-        )
     proc = await call_pip_install(
-        plugin.project_link, pip_args, python_path=python_path
+        plugin.project_link,
+        pip_args,
+        python_path=await config_manager.get_python_path(),
     )
     await proc.wait()
 
@@ -123,18 +114,12 @@ async def install(
 @plugin.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot plugin.")
 )
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
-)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -145,14 +130,7 @@ async def update(
     except Exception:
         ctx.exit(1)
 
-    if python_path := detect_virtualenv() if venv else None:
-        click.secho(
-            _("Using virtual environment: {python_path}").format(
-                python_path=python_path
-            ),
-            fg="green",
-        )
-    proc = await call_pip_update(plugin.project_link, pip_args, python_path=python_path)
+    proc = await call_pip_update(plugin.project_link, pip_args)
     await proc.wait()
 
 
@@ -161,18 +139,12 @@ async def update(
     context_settings={"ignore_unknown_options": True},
     help=_("Uninstall nonebot plugin from current project."),
 )
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
-)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, venv: bool, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -183,8 +155,10 @@ async def uninstall(
     except Exception:
         ctx.exit(1)
 
+    config_manager = ConfigManager()
+
     try:
-        GLOBAL_CONFIG.remove_plugin(plugin.module_name)
+        config_manager.remove_plugin(plugin.module_name)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(
@@ -192,15 +166,10 @@ async def uninstall(
             )
         )
 
-    if python_path := detect_virtualenv() if venv else None:
-        click.secho(
-            _("Using virtual environment: {python_path}").format(
-                python_path=python_path
-            ),
-            fg="green",
-        )
     proc = await call_pip_uninstall(
-        plugin.project_link, pip_args, python_path=python_path
+        plugin.project_link,
+        pip_args,
+        python_path=await config_manager.get_python_path(),
     )
     await proc.wait()
 

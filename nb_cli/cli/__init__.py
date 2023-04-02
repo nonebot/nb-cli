@@ -5,8 +5,7 @@ import click
 from noneprompt import Choice, ListPrompt, CancelledError
 
 from nb_cli import _, __version__
-from nb_cli.handlers import draw_logo
-from nb_cli.config import GLOBAL_CONFIG
+from nb_cli.handlers import ConfigManager, draw_logo
 
 from .utils import run_sync as run_sync
 from .utils import run_async as run_async
@@ -16,16 +15,20 @@ from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import ClickAliasedCommand as ClickAliasedCommand
 
 
-def prepare_config(ctx: click.Context, param: click.Option, value: str):
-    GLOBAL_CONFIG.file = Path(value)
+def _set_global_project_root(ctx: click.Context, param: click.Option, value: Path):
+    ConfigManager._project_root = value
 
 
-def prepare_encoding(ctx: click.Context, param: click.Option, value: str):
-    GLOBAL_CONFIG.encoding = value
+def _set_global_config_file(ctx: click.Context, param: click.Option, value: Path):
+    ConfigManager._config_file = value
 
 
-def prepare_python(ctx: click.Context, param: click.Option, value: str):
-    GLOBAL_CONFIG.python = value
+def _set_global_python_path(ctx: click.Context, param: click.Option, value: str):
+    ConfigManager._python_path = value
+
+
+def _set_global_use_venv(ctx: click.Context, param: click.Option, value: bool):
+    ConfigManager._use_venv = value
 
 
 @click.group(
@@ -41,32 +44,37 @@ def prepare_python(ctx: click.Context, param: click.Option, value: str):
     message="%(prog)s: nonebot cli version %(version)s",
 )
 @click.option(
-    "-c",
-    "--config",
-    default="pyproject.toml",
-    help=_("Config file path."),
-    type=click.Path(exists=False, dir_okay=False, readable=True),
+    "-d",
+    "--cwd",
+    help=_("The working directory."),
+    type=Path,
     is_eager=True,
     expose_value=False,
-    callback=prepare_config,
+    callback=_set_global_project_root,
 )
 @click.option(
-    "-e",
-    "--encoding",
-    default="utf-8",
-    help=_("Config file encoding."),
+    "-c",
+    "--config",
+    help=_("Config file path."),
+    type=Path,
     is_eager=True,
     expose_value=False,
-    callback=prepare_encoding,
+    callback=_set_global_config_file,
 )
 @click.option(
     "-py",
     "--python",
-    default=None,
     help=_("Python executable path."),
     is_eager=True,
     expose_value=False,
-    callback=prepare_python,
+    callback=_set_global_python_path,
+)
+@click.option(
+    "--venv/--no-venv",
+    help=_("Auto detect virtual environment."),
+    is_eager=True,
+    expose_value=False,
+    callback=_set_global_use_venv,
 )
 @click.pass_context
 @run_async

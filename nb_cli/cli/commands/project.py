@@ -16,13 +16,13 @@ from noneprompt import (
 )
 
 from nb_cli import _
-from nb_cli.config import ConfigManager
 from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.consts import WINDOWS, DEFAULT_DRIVER
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
     FileFilter,
+    ConfigManager,
     run_project,
     list_drivers,
     list_adapters,
@@ -218,7 +218,6 @@ async def create(
         except CancelledError:
             ctx.exit()
 
-        path = None
         if use_venv:
             click.secho(
                 _("Creating virtual environment in {venv_dir} ...").format(
@@ -229,18 +228,17 @@ async def create(
             await create_virtualenv(
                 venv_dir, prompt=project_dir_name, python_path=python_interpreter
             )
-            path = (
-                venv_dir
-                / ("Scripts" if WINDOWS else "bin")
-                / ("python.exe" if WINDOWS else "python")
-            )
+
+        config_manager = ConfigManager(project_root=project_dir, use_venv=use_venv)
 
         proc = await call_pip_install(
-            ["nonebot2", *context.packages], pip_args, python_path=path
+            ["nonebot2", *context.packages],
+            pip_args,
+            python_path=await config_manager.get_python_path(),
         )
         await proc.wait()
 
-        builtin_plugins = await list_builtin_plugins(python_path=path)
+        builtin_plugins = await list_builtin_plugins(config_manager=config_manager)
         try:
             loaded_builtin_plugins = [
                 c.data
@@ -253,9 +251,8 @@ async def create(
             ctx.exit()
 
         try:
-            m = ConfigManager(python=path, config_file=project_dir / "pyproject.toml")
             for plugin in loaded_builtin_plugins:
-                m.add_builtin_plugin(plugin)
+                config_manager.add_builtin_plugin(plugin)
         except Exception as e:
             click.secho(
                 _(
@@ -295,19 +292,12 @@ async def generate(file: str):
 @click.command(
     cls=ClickAliasedCommand, aliases=["start"], help=_("Run the bot in current folder.")
 )
-@click.option("-d", "--cwd", default=".", help=_("The working directory."))
 @click.option(
     "-f",
     "--file",
     default="bot.py",
     show_default=True,
     help=_("Exist entry file of your bot."),
-)
-@click.option(
-    "--venv/--no-venv",
-    default=True,
-    help=_("Auto detect virtual environment."),
-    show_default=True,
 )
 @click.option(
     "-r",
@@ -332,28 +322,17 @@ async def generate(file: str):
 async def run(
     cwd: str,
     file: str,
-    venv: bool,
     reload: bool,
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
 ):
-    if python_path := detect_virtualenv(Path(cwd)) if venv else None:
-        click.secho(
-            _("Using virtual environment: {python_path}").format(
-                python_path=python_path
-            ),
-            fg="green",
-        )
-
     if reload:
         await Reloader(
-            partial(run_project, exist_bot=Path(file), python_path=python_path),
+            partial(run_project, exist_bot=Path(file)),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
             cwd=Path(cwd),
         ).run()
     else:
-        proc = await run_project(
-            exist_bot=Path(file), python_path=python_path, cwd=Path(cwd)
-        )
+        proc = await run_project(exist_bot=Path(file))
         await proc.wait()

@@ -4,11 +4,12 @@ from typing import IO, Any, Dict, List, Union, Optional
 
 from cookiecutter.main import cookiecutter
 
-from nb_cli.config import SimpleInfo
+from nb_cli import _
 
 from . import templates
+from .config import ConfigManager
+from .meta import requires_nonebot
 from .process import create_process
-from .meta import requires_nonebot, get_default_python, get_nonebot_config
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
@@ -34,39 +35,30 @@ def create_project(
     )
 
 
-async def generate_run_script(
-    adapters: Optional[List[SimpleInfo]] = None,
-    builtin_plugins: Optional[List[str]] = None,
-) -> str:
-    bot_config = get_nonebot_config()
-    if adapters is None:
-        adapters = bot_config.adapters
-    if builtin_plugins is None:
-        builtin_plugins = bot_config.builtin_plugins
+async def generate_run_script(config_manager: Optional[ConfigManager] = None) -> str:
+    config = (config_manager or ConfigManager()).get_nonebot_config()
 
     t = templates.get_template("project/run_project.py.jinja")
-    return await t.render_async(adapters=adapters, builtin_plugins=builtin_plugins)
+    return await t.render_async(
+        adapters=config.adapters, builtin_plugins=config.builtin_plugins
+    )
 
 
 @requires_nonebot
 async def run_project(
-    adapters: Optional[List[SimpleInfo]] = None,
-    builtin_plugins: Optional[List[str]] = None,
     exist_bot: Path = Path("bot.py"),
     *,
-    python_path: Optional[str] = None,
-    cwd: Optional[Path] = None,
+    config_manager: Optional[ConfigManager] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
 ) -> asyncio.subprocess.Process:
-    bot_config = get_nonebot_config()
-    if adapters is None:
-        adapters = bot_config.adapters
-    if builtin_plugins is None:
-        builtin_plugins = bot_config.builtin_plugins
-    if python_path is None:
-        python_path = await get_default_python()
+    config_manager = config_manager or ConfigManager()
+
+    cwd = config_manager.get_project_root()
+    exist_bot = cwd / exist_bot
+
+    python_path = await config_manager.get_python_path()
 
     if exist_bot.exists():
         return await create_process(
@@ -81,7 +73,7 @@ async def run_project(
     return await create_process(
         python_path,
         "-c",
-        await generate_run_script(adapters=adapters, builtin_plugins=builtin_plugins),
+        await generate_run_script(config_manager=config_manager),
         cwd=cwd,
         stdin=stdin,
         stdout=stdout,

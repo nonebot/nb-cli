@@ -97,37 +97,12 @@ class CLIMainGroup(ClickAliasedGroup):
 
     @staticmethod
     @run_async
-    async def _run_script_command(
-        script_name: str, cwd: Path, venv: bool, script_args: List[str]
-    ):
-        if python_path := detect_virtualenv(cwd) if venv else None:
-            click.secho(
-                _("Using virtual environment: {python_path}").format(
-                    python_path=python_path
-                ),
-                fg="green",
-            )
-        proc = await run_script(
-            script_name, script_args, cwd=cwd, python_path=python_path
-        )
+    async def _run_script_command(script_name: str, script_args: List[str]):
+        proc = await run_script(script_name, script_args)
         await proc.wait()
 
     def _build_script_command(self, script_name: str) -> click.Command:
-        params = [
-            click.Option(
-                ["-d", "--cwd"],
-                default=".",
-                help=_("The working directory."),
-                type=Path,
-            ),
-            click.Option(
-                ["--venv/--no-venv"],
-                default=True,
-                help=_("Auto detect virtual environment."),
-                show_default=True,
-            ),
-            click.Argument(["script_args"], nargs=-1),
-        ]
+        params = [click.Argument(["script_args"], nargs=-1)]
         return click.command(
             name=script_name,
             params=params,

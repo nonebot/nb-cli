@@ -1,11 +1,9 @@
 import sys
 import asyncio
 from pathlib import Path
-from typing import IO, Any, List, Callable, Optional, Coroutine, cast
+from typing import IO, Any, List, Callable, Optional, Coroutine
 
 from watchfiles import awatch
-
-from nb_cli.consts import WINDOWS
 
 from .signal import remove_signal_handler, register_signal_handler
 
