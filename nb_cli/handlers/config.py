@@ -1,17 +1,24 @@
+import json
+import asyncio
 from pathlib import Path
 from typing import Any, Dict, List, ClassVar, Optional
 
 import tomlkit
 from pydantic import Extra, BaseModel
 
-from nb_cli import _
+from nb_cli import _, cache
+from nb_cli.consts import WINDOWS
+from nb_cli.exceptions import PythonInterpreterError
 
 from .store import SimpleInfo
 from .venv import detect_virtualenv
-from .meta import get_default_python
+from .process import create_process_shell
 
 CONFIG_FILE = "pyproject.toml"
 CONFIG_FILE_ENCODING = "utf-8"
+
+DEFAULT_PYTHON = ("python3", "python")
+WINDOWS_DEFAULT_PYTHON = ("python",)
 
 
 class NoneBotConfig(BaseModel, extra=Extra.allow):
@@ -40,7 +47,7 @@ class ConfigManager:
         self.__python_path = python_path or self._python_path
         self.use_venv = use_venv or self._use_venv or True
 
-    def locate(self, cwd: Optional[Path] = None) -> Path:
+    def _locate_project_root(self, cwd: Optional[Path] = None) -> Path:
         cwd = (cwd or Path.cwd()).resolve()
         for dir in (cwd,) + tuple(cwd.parents):
             if dir.joinpath(self.config_file).exists():
@@ -53,8 +60,31 @@ class ConfigManager:
 
     def get_project_root(self) -> Path:
         if not self.__project_root:
-            self.__project_root = self.locate()
+            self.__project_root = self._locate_project_root()
         return self.__project_root
+
+    @cache(ttl=None)
+    async def _locate_default_python(self) -> str:
+        python_to_try = WINDOWS_DEFAULT_PYTHON if WINDOWS else DEFAULT_PYTHON
+
+        stdout = None
+
+        for python in python_to_try:
+            proc = await create_process_shell(
+                f'{python} -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
+                stdout=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+            if proc.returncode == 0:
+                try:
+                    if executable := json.loads(stdout.strip()):
+                        return executable
+                except Exception:
+                    continue
+        raise PythonInterpreterError(
+            _("Cannot find a valid Python interpreter.")
+            + (f" stdout={stdout!r}" if stdout else "")
+        )
 
     async def get_python_path(self) -> str:
         if not self.__python_path:
@@ -63,9 +93,9 @@ class ConfigManager:
                     # TODO: log
                     self.__python_path = venv
                 else:
-                    self.__python_path = await get_default_python()
+                    self.__python_path = await self._locate_default_python()
             else:
-                self.__python_path = await get_default_python()
+                self.__python_path = await self._locate_default_python()
         return self.__python_path
 
     def get_config_file(self) -> Path:
