@@ -7,9 +7,9 @@ from cookiecutter.main import cookiecutter
 
 from . import templates
 from .config import ConfigManager
+from .meta import requires_nonebot
 from .process import create_process
 from .store import Plugin, load_module_data
-from .meta import requires_nonebot, get_default_python
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 

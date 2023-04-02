@@ -320,19 +320,19 @@ async def generate(file: str):
 )
 @run_async
 async def run(
-    cwd: str,
     file: str,
     reload: bool,
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
 ):
+    config_manager = ConfigManager()
     if reload:
         await Reloader(
-            partial(run_project, exist_bot=Path(file)),
+            partial(run_project, exist_bot=Path(file), config_manager=config_manager),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
-            cwd=Path(cwd),
+            cwd=config_manager.get_project_root(),
         ).run()
     else:
-        proc = await run_project(exist_bot=Path(file))
+        proc = await run_project(exist_bot=Path(file), config_manager=config_manager)
         await proc.wait()

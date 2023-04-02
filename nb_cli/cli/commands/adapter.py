@@ -130,7 +130,11 @@ async def update(
     except Exception:
         ctx.exit(1)
 
-    proc = await call_pip_update(adapter.project_link, pip_args)
+    proc = await call_pip_update(
+        adapter.project_link,
+        pip_args,
+        python_path=await ConfigManager().get_python_path(),
+    )
     await proc.wait()
 
 

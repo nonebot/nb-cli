@@ -91,7 +91,11 @@ async def install(
         ctx.exit(1)
 
     if driver.project_link:
-        proc = await call_pip_install(driver.project_link, pip_args)
+        proc = await call_pip_install(
+            driver.project_link,
+            pip_args,
+            python_path=await ConfigManager().get_python_path(),
+        )
         await proc.wait()
 
 
@@ -115,7 +119,11 @@ async def update(
         ctx.exit(1)
 
     if driver.project_link:
-        proc = await call_pip_update(driver.project_link, pip_args)
+        proc = await call_pip_update(
+            driver.project_link,
+            pip_args,
+            python_path=await ConfigManager().get_python_path(),
+        )
         await proc.wait()
 
 
@@ -144,5 +152,9 @@ async def uninstall(
         if package.startswith("nonebot2[") and package.endswith("]"):
             package = package[9:-1]
 
-        proc = await call_pip_uninstall(package, pip_args)
+        proc = await call_pip_uninstall(
+            package,
+            pip_args,
+            python_path=await ConfigManager().get_python_path(),
+        )
         await proc.wait()

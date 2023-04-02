@@ -27,6 +27,9 @@ from nb_cli.exceptions import (
 from . import templates
 from .process import create_process, create_process_shell
 
+if TYPE_CHECKING:
+    from .config import ConfigManager
+
 R = TypeVar("R")
 P = ParamSpec("P")
 
@@ -47,9 +50,6 @@ else:
 
     @cache(ttl=None)
     async def get_default_python() -> str:
-        if GLOBAL_CONFIG.python is not None:
-            return GLOBAL_CONFIG.python
-
         python_to_try = WINDOWS_DEFAULT_PYTHON if WINDOWS else DEFAULT_PYTHON
 
         for python in python_to_try:
@@ -146,7 +146,13 @@ def requires_nonebot(
     @wraps(func)
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if await get_nonebot_version(cast(Union[str, None], kwargs.get("python_path"))):
+        if "config_manager" in kwargs:
+            python_path = await cast(
+                "ConfigManager", kwargs["config_manager"]
+            ).get_python_path()
+        else:
+            python_path = cast(Union[str, None], kwargs.get("python_path"))
+        if await get_nonebot_version(python_path=python_path):
             return await func(*args, **kwargs)
 
         raise NoneBotNotInstalledError(_("NoneBot is not installed."))
@@ -185,7 +191,13 @@ def requires_pip(
     @wraps(func)
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if await get_pip_version(cast(Union[str, None], kwargs.get("python_path"))):
+        if "config_manager" in kwargs:
+            python_path = await cast(
+                "ConfigManager", kwargs["config_manager"]
+            ).get_python_path()
+        else:
+            python_path = cast(Union[str, None], kwargs.get("python_path"))
+        if await get_pip_version(python_path=python_path):
             return await func(*args, **kwargs)
 
         raise PipNotInstalledError(_("pip is not installed."))

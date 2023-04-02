@@ -84,16 +84,19 @@ else:
             f"https://raw.fastgit.org/nonebot/nonebot2/master/website/static/{module_name}.json",
             f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2/website/static/{module_name}.json",
         ]
-        async with httpx.AsyncClient() as client:
-            tasks = (client.get(url) for url in urls)
 
-            for future in as_completed(tasks):
-                try:
-                    resp = future.result()
-                    items = resp.json()
-                    return [module_class.parse_obj(item) for item in items]  # type: ignore
-                except Exception as e:
-                    exceptions.append(e)
+        async def _request(url: str) -> httpx.Response:
+            async with httpx.AsyncClient() as client:
+                return await client.get(url)
+
+        tasks = [_request(url) for url in urls]
+        for future in as_completed(tasks):
+            try:
+                resp = await future
+                items = resp.json()
+                return [module_class.parse_obj(item) for item in items]  # type: ignore
+            except Exception as e:
+                exceptions.append(e)
 
         raise ModuleLoadFailed(
             _("Failed to get {module_type} list.").format(module_type=module_type),
