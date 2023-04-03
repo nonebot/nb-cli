@@ -1,11 +1,12 @@
 from pathlib import Path
-from typing import List, cast
+from typing import List, Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, CancelledError
 
 from nb_cli import _, __version__
-from nb_cli.handlers import ConfigManager, draw_logo
+from nb_cli.handlers import draw_logo
+from nb_cli.config import ConfigManager
 
 from .utils import run_sync as run_sync
 from .utils import run_async as run_async
@@ -15,20 +16,20 @@ from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import ClickAliasedCommand as ClickAliasedCommand
 
 
-def _set_global_project_root(ctx: click.Context, param: click.Option, value: Path):
-    ConfigManager._project_root = value
+def _set_global_working_dir(
+    ctx: click.Context, param: click.Option, value: Optional[Path]
+):
+    ConfigManager._global_working_dir = value
 
 
-def _set_global_config_file(ctx: click.Context, param: click.Option, value: Path):
-    ConfigManager._config_file = value
-
-
-def _set_global_python_path(ctx: click.Context, param: click.Option, value: str):
-    ConfigManager._python_path = value
+def _set_global_python_path(
+    ctx: click.Context, param: click.Option, value: Optional[str]
+):
+    ConfigManager._global_python_path = value
 
 
 def _set_global_use_venv(ctx: click.Context, param: click.Option, value: bool):
-    ConfigManager._use_venv = value
+    ConfigManager._global_use_venv = value
 
 
 @click.group(
@@ -46,24 +47,17 @@ def _set_global_use_venv(ctx: click.Context, param: click.Option, value: bool):
 @click.option(
     "-d",
     "--cwd",
+    default=None,
     help=_("The working directory."),
     type=Path,
     is_eager=True,
     expose_value=False,
-    callback=_set_global_project_root,
-)
-@click.option(
-    "-c",
-    "--config",
-    help=_("Config file path."),
-    type=Path,
-    is_eager=True,
-    expose_value=False,
-    callback=_set_global_config_file,
+    callback=_set_global_working_dir,
 )
 @click.option(
     "-py",
     "--python",
+    default=None,
     help=_("Python executable path."),
     is_eager=True,
     expose_value=False,
@@ -71,6 +65,7 @@ def _set_global_use_venv(ctx: click.Context, param: click.Option, value: bool):
 )
 @click.option(
     "--venv/--no-venv",
+    default=True,
     help=_("Auto detect virtual environment."),
     is_eager=True,
     expose_value=False,

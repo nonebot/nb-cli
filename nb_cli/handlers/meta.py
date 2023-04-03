@@ -15,7 +15,8 @@ from typing import (
 )
 
 from nb_cli import _, cache
-from nb_cli.consts import REQUIRES_PYTHON
+from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
+from nb_cli.config import GLOBAL_CONFIG, NoneBotConfig
 from nb_cli.exceptions import (
     PipNotInstalledError,
     PythonInterpreterError,
@@ -23,14 +24,13 @@ from nb_cli.exceptions import (
 )
 
 from . import templates
-from .config import ConfigManager
-from .process import create_process
+from .process import create_process, create_process_shell
 
 try:
     from pyfiglet import figlet_format
 except ModuleNotFoundError as e:
     if e.name == "pkg_resources":
-        raise ModuleNotFoundError("Please install setuptools to use pyfiglet")
+        raise ModuleNotFoundError("Please install setuptools to use pyfiglet") from e
     raise
 
 R = TypeVar("R")
@@ -44,16 +44,44 @@ def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
 
 
+def get_nonebot_config() -> NoneBotConfig:
+    return GLOBAL_CONFIG.get_nonebot_config()
+
+
 if TYPE_CHECKING:
 
-    async def get_default_python() -> str:
+    async def _get_env_python() -> str:
         ...
 
 else:
 
     @cache(ttl=None)
-    async def get_default_python() -> str:
-        return ConfigManager(use_venv=False).get_python_path()
+    async def _get_env_python() -> str:
+        python_to_try = WINDOWS_DEFAULT_PYTHON if WINDOWS else DEFAULT_PYTHON
+
+        for python in python_to_try:
+            proc = await create_process_shell(
+                f'{python} -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
+                stdout=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+            if proc.returncode == 0:
+                try:
+                    if executable := json.loads(stdout.strip()):
+                        return executable
+                except Exception:
+                    continue
+        raise PythonInterpreterError(
+            _("Cannot find a valid Python interpreter.")
+            + (f" stdout={stdout!r}" if stdout else "")
+        )
+
+
+async def get_default_python() -> str:
+    if GLOBAL_CONFIG.python_path is not None:
+        return GLOBAL_CONFIG.python_path
+
+    return await _get_env_python()
 
 
 if TYPE_CHECKING:
@@ -86,13 +114,9 @@ def requires_python(
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if "config_manager" in kwargs:
-            python_path = await cast(
-                ConfigManager, kwargs["config_manager"]
-            ).get_python_path()
-        else:
-            python_path = cast(Union[str, None], kwargs.get("python_path"))
-        version = await get_python_version(python_path=python_path)
+        version = await get_python_version(
+            cast(Union[str, None], kwargs.get("python_path"))
+        )
         if (version["major"], version["minor"]) >= REQUIRES_PYTHON:
             return await func(*args, **kwargs)
 
@@ -136,13 +160,7 @@ def requires_nonebot(
     @wraps(func)
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if "config_manager" in kwargs:
-            python_path = await cast(
-                ConfigManager, kwargs["config_manager"]
-            ).get_python_path()
-        else:
-            python_path = cast(Union[str, None], kwargs.get("python_path"))
-        if await get_nonebot_version(python_path=python_path):
+        if await get_nonebot_version(cast(Union[str, None], kwargs.get("python_path"))):
             return await func(*args, **kwargs)
 
         raise NoneBotNotInstalledError(_("NoneBot is not installed."))
@@ -181,13 +199,7 @@ def requires_pip(
     @wraps(func)
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        if "config_manager" in kwargs:
-            python_path = await cast(
-                ConfigManager, kwargs["config_manager"]
-            ).get_python_path()
-        else:
-            python_path = cast(Union[str, None], kwargs.get("python_path"))
-        if await get_pip_version(python_path=python_path):
+        if await get_pip_version(cast(Union[str, None], kwargs.get("python_path"))):
             return await func(*args, **kwargs)
 
         raise PipNotInstalledError(_("pip is not installed."))

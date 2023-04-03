@@ -16,20 +16,19 @@ from noneprompt import (
 )
 
 from nb_cli import _
+from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.exceptions import ModuleLoadFailed
-from nb_cli.consts import WINDOWS, DEFAULT_DRIVER
+from nb_cli.config import GLOBAL_CONFIG, ConfigManager
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
     FileFilter,
-    ConfigManager,
     run_project,
     list_drivers,
     list_adapters,
     create_project,
     call_pip_install,
     create_virtualenv,
-    detect_virtualenv,
     terminate_process,
     generate_run_script,
     list_builtin_plugins,
@@ -229,16 +228,18 @@ async def create(
                 venv_dir, prompt=project_dir_name, python_path=python_interpreter
             )
 
-        config_manager = ConfigManager(project_root=project_dir, use_venv=use_venv)
+        config_manager = ConfigManager(working_dir=project_dir, use_venv=use_venv)
 
         proc = await call_pip_install(
             ["nonebot2", *context.packages],
             pip_args,
-            python_path=await config_manager.get_python_path(),
+            python_path=config_manager.python_path,
         )
         await proc.wait()
 
-        builtin_plugins = await list_builtin_plugins(config_manager=config_manager)
+        builtin_plugins = await list_builtin_plugins(
+            python_path=config_manager.python_path
+        )
         try:
             loaded_builtin_plugins = [
                 c.data
@@ -325,14 +326,13 @@ async def run(
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
 ):
-    config_manager = ConfigManager()
     if reload:
         await Reloader(
-            partial(run_project, exist_bot=Path(file), config_manager=config_manager),
+            partial(run_project, exist_bot=Path(file)),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
-            cwd=config_manager.get_project_root(),
+            cwd=GLOBAL_CONFIG.project_root,
         ).run()
     else:
-        proc = await run_project(exist_bot=Path(file), config_manager=config_manager)
+        proc = await run_project(exist_bot=Path(file))
         await proc.wait()

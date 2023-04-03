@@ -27,18 +27,8 @@ from .meta import get_nonebot_version as get_nonebot_version
 # isort: split
 
 # package
-from .store import Driver as Driver
-from .store import Plugin as Plugin
-from .store import Adapter as Adapter
-from .store import SimpleInfo as SimpleInfo
 from .store import load_module_data as load_module_data
 from .store import format_package_results as format_package_results
-
-# isort: split
-
-# config
-from .config import ConfigManager as ConfigManager
-from .config import NoneBotConfig as NoneBotConfig
 
 # isort: split
 

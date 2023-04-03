@@ -7,11 +7,9 @@ from nb_cli import _
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
-    ConfigManager,
     list_drivers,
     call_pip_update,
     call_pip_install,
-    detect_virtualenv,
     call_pip_uninstall,
     format_package_results,
 )
@@ -91,11 +89,7 @@ async def install(
         ctx.exit(1)
 
     if driver.project_link:
-        proc = await call_pip_install(
-            driver.project_link,
-            pip_args,
-            python_path=await ConfigManager().get_python_path(),
-        )
+        proc = await call_pip_install(driver.project_link, pip_args)
         await proc.wait()
 
 
@@ -119,11 +113,7 @@ async def update(
         ctx.exit(1)
 
     if driver.project_link:
-        proc = await call_pip_update(
-            driver.project_link,
-            pip_args,
-            python_path=await ConfigManager().get_python_path(),
-        )
+        proc = await call_pip_update(driver.project_link, pip_args)
         await proc.wait()
 
 
@@ -152,9 +142,5 @@ async def uninstall(
         if package.startswith("nonebot2[") and package.endswith("]"):
             package = package[9:-1]
 
-        proc = await call_pip_uninstall(
-            package,
-            pip_args,
-            python_path=await ConfigManager().get_python_path(),
-        )
+        proc = await call_pip_uninstall(package, pip_args)
         await proc.wait()

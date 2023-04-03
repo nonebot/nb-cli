@@ -3,20 +3,13 @@ from typing import Optional
 
 import virtualenv
 
-from nb_cli.consts import WINDOWS
+from nb_cli.config import ConfigManager
 
 from .meta import requires_python, get_default_python
 
 
 def detect_virtualenv(cwd: Optional[Path] = None) -> Optional[str]:
-    cwd = (cwd or Path.cwd()).resolve()
-    for venv_dir in cwd.iterdir():
-        if venv_dir.is_dir() and (venv_dir / "pyvenv.cfg").is_file():
-            return str(
-                venv_dir
-                / ("Scripts" if WINDOWS else "bin")
-                / ("python.exe" if WINDOWS else "python")
-            )
+    return ConfigManager._detact_virtual_env(cwd)
 
 
 @requires_python

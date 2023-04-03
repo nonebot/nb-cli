@@ -5,15 +5,14 @@ import click
 from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt, CancelledError
 
 from nb_cli import _
+from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
-    ConfigManager,
     list_plugins,
     create_plugin,
     call_pip_update,
     call_pip_install,
-    detect_virtualenv,
     call_pip_uninstall,
     format_package_results,
 )
@@ -92,10 +91,8 @@ async def install(
     except Exception:
         ctx.exit(1)
 
-    config_manager = ConfigManager()
-
     try:
-        config_manager.add_plugin(plugin.module_name)
+        GLOBAL_CONFIG.add_plugin(plugin.module_name)
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to config: {e}").format(
@@ -103,11 +100,7 @@ async def install(
             )
         )
 
-    proc = await call_pip_install(
-        plugin.project_link,
-        pip_args,
-        python_path=await config_manager.get_python_path(),
-    )
+    proc = await call_pip_install(plugin.project_link, pip_args)
     await proc.wait()
 
 
@@ -130,11 +123,7 @@ async def update(
     except Exception:
         ctx.exit(1)
 
-    proc = await call_pip_update(
-        plugin.project_link,
-        pip_args,
-        python_path=await ConfigManager().get_python_path(),
-    )
+    proc = await call_pip_update(plugin.project_link, pip_args)
     await proc.wait()
 
 
@@ -159,10 +148,8 @@ async def uninstall(
     except Exception:
         ctx.exit(1)
 
-    config_manager = ConfigManager()
-
     try:
-        config_manager.remove_plugin(plugin.module_name)
+        GLOBAL_CONFIG.remove_plugin(plugin.module_name)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(
@@ -170,11 +157,7 @@ async def uninstall(
             )
         )
 
-    proc = await call_pip_uninstall(
-        plugin.project_link,
-        pip_args,
-        python_path=await config_manager.get_python_path(),
-    )
+    proc = await call_pip_uninstall(plugin.project_link, pip_args)
     await proc.wait()
 
 

@@ -3,7 +3,9 @@ from typing import List, Optional
 
 from cookiecutter.main import cookiecutter
 
-from .store import Adapter, load_module_data
+from nb_cli.config import Adapter
+
+from .store import load_module_data
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "adapter"
 

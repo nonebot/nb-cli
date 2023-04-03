@@ -60,7 +60,7 @@ nb = "nb_cli.__main__:main"
 
 [tool.pyright]
 pythonPlatform = "All"
-reportPrivateImportUsage = false
+# reportPrivateImportUsage = false
 reportShadowedImports = false
 executionEnvironments = [
   { root = "./website", pythonVersion = "3.10" },

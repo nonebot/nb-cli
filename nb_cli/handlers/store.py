@@ -4,41 +4,12 @@ from typing import TYPE_CHECKING, List, Union, Literal, TypeVar, Optional, overl
 
 import httpx
 from wcwidth import wcswidth
-from pydantic import BaseModel
 
 from nb_cli import _, cache
 from nb_cli.exceptions import ModuleLoadFailed
+from nb_cli.config import Driver, Plugin, Adapter
 
-T = TypeVar("T", "Adapter", "Plugin", "Driver")
-
-
-class SimpleInfo(BaseModel):
-    name: str
-    module_name: str
-
-
-class Adapter(SimpleInfo):
-    project_link: str
-    desc: str
-
-    class Config:
-        module_name = "adapters"
-
-
-class Plugin(SimpleInfo):
-    project_link: str
-    desc: str
-
-    class Config:
-        module_name = "plugins"
-
-
-class Driver(SimpleInfo):
-    project_link: str
-    desc: str
-
-    class Config:
-        module_name = "drivers"
+T = TypeVar("T", Adapter, Plugin, Driver)
 
 
 if TYPE_CHECKING:

@@ -8,7 +8,8 @@ from noneprompt import InputPrompt
 from prompt_toolkit.styles import Style
 
 from nb_cli import _
-from nb_cli.handlers import Driver, Plugin, Adapter, format_package_results
+from nb_cli.config import Driver, Plugin, Adapter
+from nb_cli.handlers import format_package_results
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 P = ParamSpec("P")

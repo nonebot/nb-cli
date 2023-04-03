@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 import click
 
 from nb_cli import _, cache
-from nb_cli.handlers import run_script, list_scripts, detect_virtualenv
+from nb_cli.handlers import run_script, list_scripts
 
 from .utils import run_async
 
