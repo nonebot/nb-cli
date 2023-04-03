@@ -1,9 +1,12 @@
 import sys
 import asyncio
+import logging
 from pathlib import Path
 from typing import IO, Any, List, Callable, Optional, Coroutine
 
 from watchfiles import awatch
+
+from nb_cli import _
 
 from .signal import remove_signal_handler, register_signal_handler
 
@@ -15,7 +18,7 @@ class FileFilter:
         includes = includes or []
         excludes = excludes or []
 
-        default_includes = ["*.py"]
+        default_includes = ["*.py", "pyproject.toml"]
         self.includes = [
             default for default in default_includes if default not in excludes
         ]
@@ -66,14 +69,14 @@ class Reloader:
         reload_dirs: Optional[List[Path]] = None,
         file_filter: Optional[FileFilter] = None,
         cwd: Optional[Path] = None,
-        stdout: Optional[IO[Any]] = None,
+        logger: Optional[logging.Logger] = None,
     ) -> None:
         self.startup_func = startup_func
         self.shutdown_func = shutdown_func
         self.process: Optional[asyncio.subprocess.Process] = None
 
         self.cwd = (cwd or Path.cwd()).resolve()
-        self.stdout = stdout or sys.stdout
+        self.logger = logger
 
         self.reload_dirs = []
         for directory in reload_dirs or []:
@@ -113,33 +116,44 @@ class Reloader:
                 if self.process and self.process.returncode is not None:
                     break
                 if changes:
-                    print(
-                        "Watchfiles detected changes in "
-                        f"{', '.join(map(self._display_path, changes))}. Reloading...",
-                        file=self.stdout,
-                    )
+                    if self.logger:
+                        self.logger.info(
+                            _(
+                                "Watchfiles detected changes in {paths}. Reloading..."
+                            ).format(paths=", ".join(map(self._display_path, changes)))
+                        )
                     await self.restart()
 
     async def startup(self) -> None:
         register_signal_handler(self.handle_exit)
 
         self.process = await self.startup_func()
-        print(f"Started reloader with process [{self.process.pid}].", file=self.stdout)
+        if self.logger:
+            self.logger.info(
+                _("Started reloader with process [{pid}].").format(pid=self.process.pid)
+            )
 
     async def restart(self) -> None:
         if self.process and self.process.returncode is None:
             await self.shutdown_func(self.process)
         self.process = await self.startup_func()
-        print(f"Restarted process [{self.process.pid}].", file=self.stdout)
+        if self.logger:
+            self.logger.info(
+                _("Restarted process [{pid}].").format(pid=self.process.pid)
+            )
 
     async def shutdown(self) -> None:
         remove_signal_handler(self.handle_exit)
 
         if self.process and self.process.returncode is None:
-            print(f"Shutting down process [{self.process.pid}]...", file=self.stdout)
+            if self.logger:
+                self.logger.info(
+                    _("Shutting down process [{pid}]...").format(pid=self.process.pid)
+                )
             await self.shutdown_func(self.process)
 
-        print("Stopped reloader.", file=self.stdout)
+        if self.logger:
+            self.logger.info("Stopped reloader.")
 
     async def should_restart(self) -> Optional[List[Path]]:
         changes = await self.watcher.__anext__()

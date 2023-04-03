@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any, Dict, List, ClassVar, Optional
 
@@ -5,6 +6,7 @@ import tomlkit
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli import _
+from nb_cli.log import SUCCESS
 from nb_cli.consts import WINDOWS
 
 from .model import SimpleInfo, NoneBotConfig
@@ -17,6 +19,7 @@ class ConfigManager:
     _global_working_dir: ClassVar[Optional[Path]] = None
     _global_python_path: ClassVar[Optional[str]] = None
     _global_use_venv: ClassVar[bool] = True
+    _path_venv_cache: ClassVar[Dict[Path, Optional[str]]] = {}
 
     def __init__(
         self,
@@ -24,10 +27,12 @@ class ConfigManager:
         working_dir: Optional[Path] = None,
         python_path: Optional[str] = None,
         use_venv: Optional[bool] = None,
+        logger: Optional[logging.Logger] = None,
     ):
         self._working_dir = working_dir
         self._python_path = python_path
         self._use_venv = use_venv
+        self._logger = logger
 
     @property
     def working_dir(self) -> Path:
@@ -70,11 +75,23 @@ class ConfigManager:
             return python
         elif self.use_venv:
             try:
-                cwd = self.project_root
+                cwd = self.project_root.resolve()
             except RuntimeError:
-                cwd = None
-            # TODO: log
-            return self._detact_virtual_env(cwd)
+                cwd = Path.cwd().resolve()
+
+            if cwd in self._path_venv_cache:
+                return self._path_venv_cache[cwd]
+
+            if venv_python := self._detact_virtual_env(cwd):
+                self._path_venv_cache[cwd] = venv_python
+                if self._logger:
+                    self._logger.log(
+                        SUCCESS,
+                        _("Using python: {python_path}").format(
+                            python_path=venv_python
+                        ),
+                    )
+                return venv_python
 
     @property
     def use_venv(self) -> bool:

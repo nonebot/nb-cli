@@ -1,6 +1,7 @@
 import re
 import sys
 from pathlib import Path
+from logging import Logger
 from functools import partial
 from dataclasses import field, dataclass
 from typing import Any, Dict, List, Optional
@@ -16,6 +17,7 @@ from noneprompt import (
 )
 
 from nb_cli import _
+from nb_cli.log import ClickHandler
 from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager
@@ -327,11 +329,14 @@ async def run(
     reload_excludes: Optional[List[str]],
 ):
     if reload:
+        logger = Logger(__name__)
+        logger.addHandler(ClickHandler())
         await Reloader(
             partial(run_project, exist_bot=Path(file)),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
             cwd=GLOBAL_CONFIG.project_root,
+            logger=logger,
         ).run()
     else:
         proc = await run_project(exist_bot=Path(file))
