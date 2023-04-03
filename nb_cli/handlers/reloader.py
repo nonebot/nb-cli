@@ -153,7 +153,7 @@ class Reloader:
             await self.shutdown_func(self.process)
 
         if self.logger:
-            self.logger.info("Stopped reloader.")
+            self.logger.info(_("Stopped reloader."))
 
     async def should_restart(self) -> Optional[List[Path]]:
         changes = await self.watcher.__anext__()
