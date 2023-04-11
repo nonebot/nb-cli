@@ -197,7 +197,12 @@ async def create(
 
     if output_dir is None:
         detected: List[Choice[None]] = [
-            Choice(str(d)) for d in Path(".").glob("**/plugins/") if d.is_dir()
+            Choice(str(d))
+            for d in Path(".").glob("**/plugins/")
+            if d.is_dir()
+            and not any(
+                p.name.startswith("_") or p.name.startswith(".") for p in d.parents
+            )
         ]
         try:
             output_dir = (

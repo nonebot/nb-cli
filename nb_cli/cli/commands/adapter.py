@@ -187,7 +187,12 @@ async def create(
             ctx.exit()
     if output_dir is None:
         detected: List[Choice[None]] = [
-            Choice(str(x)) for x in Path(".").glob("**/adapters/") if x.is_dir()
+            Choice(str(x))
+            for x in Path(".").glob("**/adapters/")
+            if x.is_dir()
+            and not any(
+                p.name.startswith(".") or p.name.startswith("_") for p in x.parents
+            )
         ] or [
             Choice(f"{x}/adapters/")
             for x in Path(".").glob("*/")

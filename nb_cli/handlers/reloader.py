@@ -1,8 +1,7 @@
-import sys
 import asyncio
 import logging
 from pathlib import Path
-from typing import IO, Any, List, Callable, Optional, Coroutine
+from typing import Any, List, Callable, Optional, Coroutine
 
 from watchfiles import awatch
 
