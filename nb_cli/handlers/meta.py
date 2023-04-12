@@ -1,5 +1,6 @@
 import json
 import asyncio
+from pathlib import Path
 from functools import wraps
 from typing_extensions import ParamSpec
 from typing import (
@@ -46,6 +47,10 @@ def draw_logo() -> str:
 
 def get_nonebot_config() -> NoneBotConfig:
     return GLOBAL_CONFIG.get_nonebot_config()
+
+
+def get_project_root() -> Path:
+    return GLOBAL_CONFIG.project_root
 
 
 if TYPE_CHECKING:

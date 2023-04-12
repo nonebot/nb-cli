@@ -18,9 +18,9 @@ from noneprompt import (
 
 from nb_cli import _
 from nb_cli.log import ClickHandler
+from nb_cli.config import ConfigManager
 from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.exceptions import ModuleLoadFailed
-from nb_cli.config import GLOBAL_CONFIG, ConfigManager
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
@@ -30,6 +30,7 @@ from nb_cli.handlers import (
     list_adapters,
     create_project,
     call_pip_install,
+    get_project_root,
     create_virtualenv,
     terminate_process,
     generate_run_script,
@@ -335,7 +336,7 @@ async def run(
             partial(run_project, exist_bot=Path(file)),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
-            cwd=GLOBAL_CONFIG.project_root,
+            cwd=get_project_root(),
             logger=logger,
         ).run()
     else:

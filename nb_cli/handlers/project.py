@@ -4,11 +4,16 @@ from typing import IO, Any, Dict, List, Union, Optional
 
 from cookiecutter.main import cookiecutter
 
-from nb_cli.config import GLOBAL_CONFIG, SimpleInfo
+from nb_cli.config import SimpleInfo
 
 from . import templates
 from .process import create_process
-from .meta import requires_nonebot, get_default_python, get_nonebot_config
+from .meta import (
+    get_project_root,
+    requires_nonebot,
+    get_default_python,
+    get_nonebot_config,
+)
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
@@ -68,7 +73,7 @@ async def run_project(
     if python_path is None:
         python_path = await get_default_python()
     if cwd is None:
-        cwd = GLOBAL_CONFIG.project_root
+        cwd = get_project_root()
 
     if cwd.joinpath(exist_bot).exists():
         return await create_process(

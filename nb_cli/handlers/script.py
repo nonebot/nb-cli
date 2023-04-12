@@ -3,12 +3,13 @@ import asyncio
 from pathlib import Path
 from typing import IO, Any, List, Union, Optional
 
-from nb_cli.config import GLOBAL_CONFIG, SimpleInfo
+from nb_cli.config import SimpleInfo
 
 from . import templates
 from .process import create_process
 from .meta import (
     requires_python,
+    get_project_root,
     requires_nonebot,
     get_default_python,
     get_nonebot_config,
@@ -57,7 +58,7 @@ async def run_script(
     if python_path is None:
         python_path = await get_default_python()
     if cwd is None:
-        cwd = GLOBAL_CONFIG.project_root
+        cwd = get_project_root()
 
     t = templates.get_template("script/run_script.py.jinja")
 
