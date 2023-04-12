@@ -22,6 +22,7 @@ from .meta import requires_python as requires_python
 from .meta import get_project_root as get_project_root
 from .meta import requires_nonebot as requires_nonebot
 from .meta import get_default_python as get_default_python
+from .meta import get_nonebot_config as get_nonebot_config
 from .meta import get_python_version as get_python_version
 from .meta import get_nonebot_version as get_nonebot_version
 
