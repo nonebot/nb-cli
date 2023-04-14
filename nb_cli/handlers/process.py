@@ -55,7 +55,7 @@ def ensure_process_terminated(
 
 @ensure_process_terminated
 async def create_process(
-    *args: Union[str, bytes, os.PathLike[str], os.PathLike[bytes]],
+    *args: Union[str, bytes, "os.PathLike[str]", "os.PathLike[bytes]"],
     cwd: Optional[Path] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
