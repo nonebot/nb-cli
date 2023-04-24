@@ -8,6 +8,7 @@ from tomlkit.toml_document import TOMLDocument
 from nb_cli import _
 from nb_cli.log import SUCCESS
 from nb_cli.consts import WINDOWS
+from nb_cli.exceptions import ProjectNotFoundError
 
 from .model import SimpleInfo, NoneBotConfig
 
@@ -44,7 +45,7 @@ class ConfigManager:
         for dir in (cwd,) + tuple(cwd.parents):
             if dir.joinpath(CONFIG_FILE).is_file():
                 return dir
-        raise RuntimeError(
+        raise ProjectNotFoundError(
             _(
                 "Cannot find project root directory! {config_file} file not exists."
             ).format(config_file=CONFIG_FILE)
@@ -76,7 +77,7 @@ class ConfigManager:
         elif self.use_venv:
             try:
                 cwd = self.project_root.resolve()
-            except RuntimeError:
+            except ProjectNotFoundError:
                 cwd = Path.cwd().resolve()
 
             if cwd in self._path_venv_cache:

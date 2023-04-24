@@ -25,6 +25,7 @@ from .meta import get_default_python as get_default_python
 from .meta import get_nonebot_config as get_nonebot_config
 from .meta import get_python_version as get_python_version
 from .meta import get_nonebot_version as get_nonebot_version
+from .meta import requires_project_root as requires_project_root
 
 # isort: split
 

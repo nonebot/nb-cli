@@ -12,3 +12,7 @@ class PipNotInstalledError(RuntimeError):
 
 class NoneBotNotInstalledError(RuntimeError):
     """Raised when NoneBot is not installed."""
+
+
+class ProjectNotFoundError(RuntimeError):
+    """Raised when project root directory not found"""

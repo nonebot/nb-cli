@@ -13,13 +13,17 @@ from .meta import (
     requires_nonebot,
     get_default_python,
     get_nonebot_config,
+    requires_project_root,
 )
 
 
+@requires_project_root
 @requires_python
-async def list_scripts(*, python_path: Optional[str] = None) -> List[str]:
+async def list_scripts(
+    *, python_path: Optional[str] = None, cwd: Optional[Path] = None
+) -> List[str]:
     if python_path is None:
-        python_path = await get_default_python()
+        python_path = await get_default_python(cwd)
 
     t = templates.get_template("script/list_scripts.py.jinja")
     proc = await create_process(
