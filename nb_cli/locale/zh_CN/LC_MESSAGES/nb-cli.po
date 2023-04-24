@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-04-12 05:58+0000\n"
+"POT-Creation-Date: 2023-04-24 08:58+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -399,27 +399,27 @@ msgstr "要卸载的包名?"
 msgid "List installed packages in cli venv."
 msgstr "列出 cli 虚拟环境中已安装的包."
 
-#: nb_cli/config/parser.py:48
+#: nb_cli/config/parser.py:49
 msgid "Cannot find project root directory! {config_file} file not exists."
 msgstr "无法找到项目根目录! {config_file} 文件不存在."
 
-#: nb_cli/config/parser.py:90
+#: nb_cli/config/parser.py:91
 msgid "Using python: {python_path}"
 msgstr "使用 Python: {python_path}"
 
-#: nb_cli/handlers/meta.py:80
+#: nb_cli/handlers/meta.py:91
 msgid "Cannot find a valid Python interpreter."
 msgstr "无法找到可用的 Python 解释器."
 
-#: nb_cli/handlers/meta.py:129
+#: nb_cli/handlers/meta.py:146
 msgid "Python {major}.{minor} is not supported."
 msgstr "Python {major}.{minor} 不受支持."
 
-#: nb_cli/handlers/meta.py:171
+#: nb_cli/handlers/meta.py:196
 msgid "NoneBot is not installed."
 msgstr "NoneBot 未安装."
 
-#: nb_cli/handlers/meta.py:210
+#: nb_cli/handlers/meta.py:242
 msgid "pip is not installed."
 msgstr "pip 未安装."
 

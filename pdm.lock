@@ -166,7 +166,7 @@ summary = "Internationalized Domain Names in Applications (IDNA)"
 
 [[package]]
 name = "importlib-metadata"
-version = "6.4.1"
+version = "6.6.0"
 requires_python = ">=3.7"
 summary = "Read metadata from Python packages"
 dependencies = [
@@ -212,9 +212,7 @@ summary = "Experimental type system extensions for programs checked with the myp
 name = "nb-autodoc"
 version = "1.0.0a5"
 requires_python = ">=3.8"
-git = "https://github.com/nonebot/nb-autodoc.git"
-revision = "2da733fc316edaa2ab0ef7a05d093292f454d3da"
-summary = "Python API documentation tool supporting the modern PEPs and typing features."
+summary = "Powerful API Documentation Generator."
 dependencies = [
     "click==8.*",
     "typing-extensions>=4.0",
@@ -423,7 +421,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 [metadata]
 lock_version = "4.2"
 groups = ["default", "dev", "docs", "i18n"]
-content_hash = "sha256:283115fcdf3703142bbd71cd4b8922f123648c8b613cef2b59d0b0137fd9fa81"
+content_hash = "sha256:0e3310954225f194dccdafb7c6570714f97b685bbc954eb219b65b9a3b72e322"
 
 [metadata.files]
 "anyio 3.6.2" = [
@@ -615,9 +613,9 @@ content_hash = "sha256:283115fcdf3703142bbd71cd4b8922f123648c8b613cef2b59d0b0137
     {url = "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
     {url = "https://files.pythonhosted.org/packages/fc/34/3030de6f1370931b9dbb4dad48f6ab1015ab1d32447850b9fc94e60097be/idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
 ]
-"importlib-metadata 6.4.1" = [
-    {url = "https://files.pythonhosted.org/packages/20/fc/a0e728307f38609ef849d813c95dc974d344a3d395f62013ddcd8fbe0bfe/importlib_metadata-6.4.1.tar.gz", hash = "sha256:eb1a7933041f0f85c94cd130258df3fb0dec060ad8c1c9318892ef4192c47ce1"},
-    {url = "https://files.pythonhosted.org/packages/fb/1d/11424f62d6057539224541f69282c300f11ac3f7dde8a92294145af8ea7f/importlib_metadata-6.4.1-py3-none-any.whl", hash = "sha256:63ace321e24167d12fbb176b6015f4dbe06868c54a2af4f15849586afb9027fd"},
+"importlib-metadata 6.6.0" = [
+    {url = "https://files.pythonhosted.org/packages/0b/1f/9de392c2b939384e08812ef93adf37684ec170b5b6e7ea302d9f163c2ea0/importlib_metadata-6.6.0.tar.gz", hash = "sha256:92501cdf9cc66ebd3e612f1b4f0c0765dfa42f0fa38ffb319b6bd84dd675d705"},
+    {url = "https://files.pythonhosted.org/packages/30/bb/bf2944b8b88c65b797acc2c6a2cb0fb817f7364debf0675792e034013858/importlib_metadata-6.6.0-py3-none-any.whl", hash = "sha256:43dd286a2cd8995d5eaef7fee2066340423b818ed3fd70adf0bad5f1fac53fed"},
 ]
 "isort 5.12.0" = [
     {url = "https://files.pythonhosted.org/packages/0a/63/4036ae70eea279c63e2304b91ee0ac182f467f24f86394ecfe726092340b/isort-5.12.0-py3-none-any.whl", hash = "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"},
@@ -676,6 +674,10 @@ content_hash = "sha256:283115fcdf3703142bbd71cd4b8922f123648c8b613cef2b59d0b0137
 "mypy-extensions 0.4.3" = [
     {url = "https://files.pythonhosted.org/packages/5c/eb/975c7c080f3223a5cdaff09612f3a5221e4ba534f7039db34c35d95fa6a5/mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {url = "https://files.pythonhosted.org/packages/63/60/0582ce2eaced55f65a4406fc97beba256de4b7a95a0034c6576458c6519f/mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
+]
+"nb-autodoc 1.0.0a5" = [
+    {url = "https://files.pythonhosted.org/packages/42/25/2f890f58d29112e423db2eda45442b560c590e45157bbc4f77e04ebde460/nb_autodoc-1.0.0a5-py3-none-any.whl", hash = "sha256:2158758d1d1cc959082f201719f0d343659306ef776546cd60f5b932b0f03488"},
+    {url = "https://files.pythonhosted.org/packages/d4/30/3e2c61be3a9a7fc847decadf04143d2b4d7acf2fb227dd93e37c1b350dd8/nb-autodoc-1.0.0a5.tar.gz", hash = "sha256:9341a2a231f9c1e97a040ee8701ff2e800ba742a1f1e548f7c92fbaa5d618e8b"},
 ]
 "nodeenv 1.7.0" = [
     {url = "https://files.pythonhosted.org/packages/96/a8/d3b5baead78adadacb99e7281b3e842126da825cf53df61688cfc8b8ff91/nodeenv-1.7.0-py2.py3-none-any.whl", hash = "sha256:27083a7b96a25f2f5e1d8cb4b6317ee8aeda3bdd121394e5ac54e498028a042e"},

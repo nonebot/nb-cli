@@ -52,7 +52,7 @@ dev = [
   "importlib-metadata"
 ]
 docs = [
-  "nb-autodoc @ git+https://github.com/nonebot/nb-autodoc.git"
+  "nb-autodoc >=1.0.0a5"
 ]
 
 [project.scripts]
