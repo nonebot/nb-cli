@@ -45,7 +45,7 @@ _✨ NoneBot2 命令行工具 ✨_
   ·
   <a href="https://cli.nonebot.dev/docs/guide/installation">安装</a>
   ·
-  <a href="https://v2.nonebot.dev/">NoneBot 文档</a>
+  <a href="https://nonebot.dev/">NoneBot 文档</a>
 </p>
 
 ## 功能

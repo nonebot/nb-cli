@@ -109,14 +109,10 @@ const config = {
             icon: ["fas", "user-friends"],
             items: [
               {
-                label: "主页",
-                href: "https://nonebot.dev",
-              },
-              {
                 label: "NoneBot V1",
-                href: "https://docs.nonebot.dev",
+                href: "https://v1.nonebot.dev",
               },
-              { label: "NoneBot V2", href: "https://v2.nonebot.dev" },
+              { label: "NoneBot V2", href: "https://nonebot.dev" },
             ],
           },
         ],

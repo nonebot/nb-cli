@@ -8,4 +8,4 @@
 
 ## Documentation
 
-See [Docs](https://v2.nonebot.dev/)
+See [Docs](https://nonebot.dev/)
