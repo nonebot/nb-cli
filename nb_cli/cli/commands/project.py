@@ -240,31 +240,40 @@ async def create(
         )
         await proc.wait()
 
-        builtin_plugins = await list_builtin_plugins(
-            python_path=config_manager.python_path
-        )
-        try:
-            loaded_builtin_plugins = [
-                c.data
-                for c in await CheckboxPrompt(
-                    _("Which builtin plugin(s) would you like to use?"),
-                    [Choice(p, p) for p in builtin_plugins],
-                ).prompt_async(style=CLI_DEFAULT_STYLE)
-            ]
-        except CancelledError:
-            ctx.exit()
+        if proc.returncode == 0:
+            builtin_plugins = await list_builtin_plugins(
+                python_path=config_manager.python_path
+            )
+            try:
+                loaded_builtin_plugins = [
+                    c.data
+                    for c in await CheckboxPrompt(
+                        _("Which builtin plugin(s) would you like to use?"),
+                        [Choice(p, p) for p in builtin_plugins],
+                    ).prompt_async(style=CLI_DEFAULT_STYLE)
+                ]
+            except CancelledError:
+                ctx.exit()
 
-        try:
-            for plugin in loaded_builtin_plugins:
-                config_manager.add_builtin_plugin(plugin)
-        except Exception as e:
+            try:
+                for plugin in loaded_builtin_plugins:
+                    config_manager.add_builtin_plugin(plugin)
+            except Exception as e:
+                click.secho(
+                    _(
+                        "Failed to add builtin plugins {builtin_plugins} to config: {e}"
+                    ).format(builtin_plugin=loaded_builtin_plugins, e=e),
+                    fg="red",
+                )
+                ctx.exit()
+        else:
             click.secho(
                 _(
-                    "Failed to add builtin plugins {builtin_plugins} to config: {e}"
-                ).format(builtin_plugin=loaded_builtin_plugins, e=e),
+                    "Failed to install dependencies! "
+                    "You should install the dependencies manually."
+                ),
                 fg="red",
             )
-            ctx.exit()
 
     click.secho(_("Done!"), fg="green")
     click.secho(
