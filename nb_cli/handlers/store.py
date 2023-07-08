@@ -52,7 +52,7 @@ else:
         exceptions: List[Exception] = []
         urls = [
             f"https://registry.nonebot.dev/{module_name}.json",
-            f"https://cdn.staticaly.com/gh/nonebot/registry@results/{module_name}.json",
+            f"https://cdn.jsdelivr.net/gh/nonebot/registry@results/{module_name}.json",
             f"https://cdn.staticaly.com/gh/nonebot/registry@results/{module_name}.json",
             f"https://jsd.cdn.zzko.cn/gh/nonebot/registry@results/{module_name}.json",
         ]
