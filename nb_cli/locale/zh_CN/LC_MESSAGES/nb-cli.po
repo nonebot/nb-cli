@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-06-04 09:28+0000\n"
+"POT-Creation-Date: 2023-07-08 15:40+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -241,139 +241,139 @@ msgstr "插件名称:"
 msgid "Use nested plugin?"
 msgstr "使用嵌套插件?"
 
-#: nb_cli/cli/commands/plugin.py:210 nb_cli/cli/commands/project.py:136
+#: nb_cli/cli/commands/plugin.py:210 nb_cli/cli/commands/project.py:141
 msgid "Where to store the plugin?"
 msgstr "请输入插件存储位置:"
 
-#: nb_cli/cli/commands/project.py:44
+#: nb_cli/cli/commands/project.py:45
 msgid "bootstrap (for beginner or user)"
 msgstr "bootstrap (初学者或用户)"
 
-#: nb_cli/cli/commands/project.py:45
+#: nb_cli/cli/commands/project.py:46
 msgid "simple (for plugin developer)"
 msgstr "simple (插件开发者)"
 
-#: nb_cli/cli/commands/project.py:73
+#: nb_cli/cli/commands/project.py:74
 msgid "Loading adapters..."
 msgstr "正在加载适配器..."
 
-#: nb_cli/cli/commands/project.py:75
+#: nb_cli/cli/commands/project.py:76
 msgid "Loading drivers..."
 msgstr "正在加载驱动器..."
 
-#: nb_cli/cli/commands/project.py:80
+#: nb_cli/cli/commands/project.py:81
 msgid "Project Name:"
 msgstr "项目名称:"
 
-#: nb_cli/cli/commands/project.py:82
+#: nb_cli/cli/commands/project.py:83
 msgid "Invalid project name!"
 msgstr "无效的项目名称!"
 
-#: nb_cli/cli/commands/project.py:87
+#: nb_cli/cli/commands/project.py:88
 msgid "Which driver(s) would you like to use?"
 msgstr "要使用哪些驱动器?"
 
-#: nb_cli/cli/commands/project.py:95
+#: nb_cli/cli/commands/project.py:96
 msgid "Chosen drivers is not valid!"
 msgstr "选择的驱动器不合法!"
 
-#: nb_cli/cli/commands/project.py:106
+#: nb_cli/cli/commands/project.py:109
 msgid "Which adapter(s) would you like to use?"
 msgstr "要使用哪些适配器?"
 
-#: nb_cli/cli/commands/project.py:116
+#: nb_cli/cli/commands/project.py:119
 msgid "You haven't chosen any adapter! Please confirm."
 msgstr "你没有选择任何适配器! 请确认."
 
-#: nb_cli/cli/commands/project.py:132
+#: nb_cli/cli/commands/project.py:137
 msgid "1) In a \"{dir_name}\" folder"
 msgstr "1) 在 \"{dir_name}\" 文件夹中"
 
-#: nb_cli/cli/commands/project.py:133
+#: nb_cli/cli/commands/project.py:138
 msgid "2) In a \"src\" folder"
 msgstr "2) 在 \"src\" 文件夹中"
 
-#: nb_cli/cli/commands/project.py:153
+#: nb_cli/cli/commands/project.py:158
 msgid "Create a NoneBot project."
 msgstr "创建一个 NoneBot 项目."
 
-#: nb_cli/cli/commands/project.py:161
+#: nb_cli/cli/commands/project.py:166
 msgid "The project template to use."
 msgstr "使用的项目模板."
 
-#: nb_cli/cli/commands/project.py:166
+#: nb_cli/cli/commands/project.py:171
 msgid "The python interpreter virtualenv is installed into."
 msgstr "虚拟环境使用的 Python 解释器."
 
-#: nb_cli/cli/commands/project.py:183
+#: nb_cli/cli/commands/project.py:188
 msgid "Select a template to use:"
 msgstr "选择一个要使用的模板:"
 
-#: nb_cli/cli/commands/project.py:205
+#: nb_cli/cli/commands/project.py:210
 msgid "Install dependencies now?"
 msgstr "立即安装依赖?"
 
-#: nb_cli/cli/commands/project.py:218
+#: nb_cli/cli/commands/project.py:223
 msgid "Create virtual environment?"
 msgstr "创建虚拟环境?"
 
-#: nb_cli/cli/commands/project.py:225
+#: nb_cli/cli/commands/project.py:230
 msgid "Creating virtual environment in {venv_dir} ..."
 msgstr "在 {venv_dir} 中创建虚拟环境..."
 
-#: nb_cli/cli/commands/project.py:251
+#: nb_cli/cli/commands/project.py:256
 msgid "Which builtin plugin(s) would you like to use?"
 msgstr "要使用哪些内置插件?"
 
-#: nb_cli/cli/commands/project.py:263
+#: nb_cli/cli/commands/project.py:268
 msgid "Failed to add builtin plugins {builtin_plugins} to config: {e}"
 msgstr "添加内置插件 {builtin_plugins} 到配置文件失败: {e}"
 
-#: nb_cli/cli/commands/project.py:271
+#: nb_cli/cli/commands/project.py:276
 msgid ""
 "Failed to install dependencies! You should install the dependencies "
 "manually."
 msgstr "安装依赖失败! 请手动安装依赖."
 
-#: nb_cli/cli/commands/project.py:278
+#: nb_cli/cli/commands/project.py:283
 msgid "Done!"
 msgstr "完成!"
 
-#: nb_cli/cli/commands/project.py:280
+#: nb_cli/cli/commands/project.py:285
 msgid ""
 "Add following packages to your project using dependency manager like "
 "poetry or pdm:"
 msgstr "使用 poetry 或 pdm 等依赖管理工具添加以下包:"
 
-#: nb_cli/cli/commands/project.py:286
+#: nb_cli/cli/commands/project.py:291
 msgid "Run the following command to start your bot:"
 msgstr "运行以下命令来启动你的机器人:"
 
-#: nb_cli/cli/commands/project.py:291
+#: nb_cli/cli/commands/project.py:296
 msgid "Generate entry file of your bot."
 msgstr "生成机器人的入口文件."
 
-#: nb_cli/cli/commands/project.py:297
+#: nb_cli/cli/commands/project.py:302
 msgid "The file script saved to."
 msgstr "脚本文件保存路径."
 
-#: nb_cli/cli/commands/project.py:306
+#: nb_cli/cli/commands/project.py:311
 msgid "Run the bot in current folder."
 msgstr "在当前文件夹中运行机器人."
 
-#: nb_cli/cli/commands/project.py:313
+#: nb_cli/cli/commands/project.py:318
 msgid "Exist entry file of your bot."
 msgstr "存在的机器人入口文件."
 
-#: nb_cli/cli/commands/project.py:320
+#: nb_cli/cli/commands/project.py:325
 msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
-#: nb_cli/cli/commands/project.py:326
+#: nb_cli/cli/commands/project.py:331
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:332
+#: nb_cli/cli/commands/project.py:337
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
@@ -453,6 +453,6 @@ msgstr "停止重载监视"
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/store.py:73
+#: nb_cli/handlers/store.py:79
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
