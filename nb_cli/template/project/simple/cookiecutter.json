@@ -11,6 +11,6 @@
     "project_desc": "{{ cookiecutter.nonebot.project_name }}"
   },
   "custom": {
-    "source_dir": "{{ 'src' if cookiecutter.nonebot.use_src == 'True' else cookiecutter.computed.project_slug|lower|replace('-', '_') }}"
+    "source_dir": "{{ 'src' if cookiecutter.nonebot.use_src else cookiecutter.computed.project_slug|lower|replace('-', '_') }}"
   }
 }
