@@ -1,8 +1,8 @@
 {
   "nonebot": {
     "project_name": "AwesomeBot",
-    "drivers": [],
-    "adapters": []
+    "drivers": "",
+    "adapters": ""
   },
   "computed": {
     "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
