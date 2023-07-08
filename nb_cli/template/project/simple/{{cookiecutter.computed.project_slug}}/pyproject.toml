@@ -7,7 +7,7 @@ requires-python = ">=3.8, <4.0"
 
 [tool.nonebot]
 {% set adapters = [] -%}
-{% for adapter in cookiecutter.nonebot.adapters -%}
+{% for adapter in cookiecutter.nonebot.adapters.values() -%}
 {% set name = adapter.name -%}
 {% set module_name = adapter.module_name -%}
 {% set adapter_str = '{ name = "%s", module_name = "%s" }'|format(name, module_name) -%}
