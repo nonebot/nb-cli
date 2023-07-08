@@ -1,5 +1,5 @@
 import shutil
-from asyncio import as_completed
+from asyncio import create_task, as_completed
 from typing import TYPE_CHECKING, List, Union, Literal, TypeVar, Optional, overload
 
 import httpx
@@ -49,19 +49,36 @@ else:
             )
         module_name: str = getattr(module_class.__config__, "module_name")
 
+        exceptions: List[Exception] = []
+        urls = [
+            f"https://nonebot.dev/{module_name}.json",
+            f"https://raw.fastgit.org/nonebot/nonebot2/master/website/static/{module_name}.json",
+            f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
+            f"https://cdn.staticaly.com/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
+            f"https://jsd.cdn.zzko.cn/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
+        ]
+
         async def _request(url: str) -> httpx.Response:
             async with httpx.AsyncClient() as client:
                 return await client.get(url)
 
-        try:
-            resp = await _request(f"https://registry.nonebot.dev/{module_name}.json")
-            items = resp.json()
-            return [module_class.parse_obj(item) for item in items]
-        except Exception as e:
-            raise ModuleLoadFailed(
-                _("Failed to get {module_type} list.").format(module_type=module_type),
-                e,
-            )
+        tasks = [create_task(_request(url)) for url in urls]
+        for future in as_completed(tasks):
+            try:
+                resp = await future
+                items = resp.json()
+                result = [module_class.parse_obj(item) for item in items]
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                return result  # type: ignore
+            except Exception as e:
+                exceptions.append(e)
+
+        raise ModuleLoadFailed(
+            _("Failed to get {module_type} list.").format(module_type=module_type),
+            exceptions,
+        )
 
 
 def format_package_results(
