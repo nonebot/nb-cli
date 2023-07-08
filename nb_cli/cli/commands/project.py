@@ -1,6 +1,6 @@
-import json
 import re
 import sys
+import json
 from pathlib import Path
 from logging import Logger
 from functools import partial
@@ -95,7 +95,9 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         validator=bool,
         error_message=_("Chosen drivers is not valid!"),
     ).prompt_async(style=CLI_DEFAULT_STYLE)
-    context.variables["drivers"] = json.dumps({d.data.project_link: d.data.dict() for d in drivers})
+    context.variables["drivers"] = json.dumps(
+        {d.data.project_link: d.data.dict() for d in drivers}
+    )
     context.packages.extend(
         [d.data.project_link for d in drivers if d.data.project_link]
     )
@@ -119,7 +121,9 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )
 
-    context.variables["adapters"] = json.dumps({a.data.project_link: a.data.dict() for a in adapters})
+    context.variables["adapters"] = json.dumps(
+        {a.data.project_link: a.data.dict() for a in adapters}
+    )
     context.packages.extend([a.data.project_link for a in adapters])
 
     return context
