@@ -1,5 +1,5 @@
 import shutil
-from asyncio import as_completed
+from asyncio import create_task, as_completed
 from typing import TYPE_CHECKING, List, Union, Literal, TypeVar, Optional, overload
 
 import httpx
@@ -62,12 +62,16 @@ else:
             async with httpx.AsyncClient() as client:
                 return await client.get(url)
 
-        tasks = [_request(url) for url in urls]
+        tasks = [create_task(_request(url)) for url in urls]
         for future in as_completed(tasks):
             try:
                 resp = await future
                 items = resp.json()
-                return [module_class.parse_obj(item) for item in items]  # type: ignore
+                result = [module_class.parse_obj(item) for item in items]
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                return result  # type: ignore
             except Exception as e:
                 exceptions.append(e)
 
