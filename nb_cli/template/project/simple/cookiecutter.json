@@ -2,8 +2,8 @@
   "py": "py",
   "nonebot": {
     "project_name": "AwesomeBot",
-    "drivers": {},
-    "adapters": {},
+    "drivers": "",
+    "adapters": "",
     "use_src": false
   },
   "computed": {
