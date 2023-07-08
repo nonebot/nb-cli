@@ -49,32 +49,19 @@ else:
             )
         module_name: str = getattr(module_class.__config__, "module_name")
 
-        exceptions: List[Exception] = []
-        urls = [
-            f"https://nonebot.dev/{module_name}.json",
-            f"https://raw.fgit.ml/nonebot/nonebot2/master/website/static/{module_name}.json",
-            f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
-            f"https://cdn.staticaly.com/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
-            f"https://jsd.cdn.zzko.cn/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
-        ]
-
         async def _request(url: str) -> httpx.Response:
             async with httpx.AsyncClient() as client:
                 return await client.get(url)
 
-        tasks = [_request(url) for url in urls]
-        for future in as_completed(tasks):
-            try:
-                resp = await future
-                items = resp.json()
-                return [module_class.parse_obj(item) for item in items]  # type: ignore
-            except Exception as e:
-                exceptions.append(e)
-
-        raise ModuleLoadFailed(
-            _("Failed to get {module_type} list.").format(module_type=module_type),
-            exceptions,
-        )
+        try:
+            resp = await _request(f"https://registry.nonebot.dev/{module_name}.json")
+            items = resp.json()
+            return [module_class.parse_obj(item) for item in items]
+        except Exception as e:
+            raise ModuleLoadFailed(
+                _("Failed to get {module_type} list.").format(module_type=module_type),
+                e,
+            )
 
 
 def format_package_results(

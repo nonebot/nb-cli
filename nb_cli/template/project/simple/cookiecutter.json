@@ -2,8 +2,8 @@
   "py": "py",
   "nonebot": {
     "project_name": "AwesomeBot",
-    "drivers": "{{ cookiecutter.nonebot.drivers }}",
-    "adapters": "{{ cookiecutter.nonebot.adapters }}",
+    "drivers": [],
+    "adapters": [],
     "use_src": false
   },
   "computed": {
