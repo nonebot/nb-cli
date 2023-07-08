@@ -51,7 +51,7 @@ else:
 
         exceptions: List[Exception] = []
         urls = [
-            f"https://nonebot.dev/{module_name}.json",
+            f"https://registry.nonebot.dev/{module_name}.json",
             f"https://raw.fastgit.org/nonebot/nonebot2/master/website/static/{module_name}.json",
             f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
             f"https://cdn.staticaly.com/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
