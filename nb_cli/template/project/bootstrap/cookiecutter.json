@@ -7,5 +7,6 @@
   "computed": {
     "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
     "project_desc": "{{ cookiecutter.nonebot.project_name }}"
-  }
+  },
+  "_extensions": ["nb_cli.extensions.UnJsonifyExtension"]
 }
