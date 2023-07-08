@@ -52,10 +52,9 @@ else:
         exceptions: List[Exception] = []
         urls = [
             f"https://registry.nonebot.dev/{module_name}.json",
-            f"https://raw.fgit.ml/nonebot/nonebot2/master/website/static/{module_name}.json",
-            f"https://cdn.jsdelivr.net/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
-            f"https://cdn.staticaly.com/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
-            f"https://jsd.cdn.zzko.cn/gh/nonebot/nonebot2@master/website/static/{module_name}.json",
+            f"https://cdn.staticaly.com/gh/nonebot/registry@results/{module_name}.json",
+            f"https://cdn.staticaly.com/gh/nonebot/registry@results/{module_name}.json",
+            f"https://jsd.cdn.zzko.cn/gh/nonebot/registry@results/{module_name}.json",
         ]
 
         async def _request(url: str) -> httpx.Response:
