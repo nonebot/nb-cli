@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-08 15:40+0000\n"
+"POT-Creation-Date: 2023-07-09 06:14+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -46,7 +46,7 @@ msgstr "欢迎使用 NoneBot CLI!"
 msgid "What do you want to do?"
 msgstr "你想要进行什么操作?"
 
-#: nb_cli/cli/customize.py:108
+#: nb_cli/cli/customize.py:109
 msgid "Run script {script_name!r}"
 msgstr "运行脚本 {script_name!r}"
 
