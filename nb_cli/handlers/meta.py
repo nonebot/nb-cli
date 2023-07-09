@@ -19,9 +19,9 @@ from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager, NoneBotConfig
 from nb_cli.exceptions import (
     PipNotInstalledError,
+    ProjectNotFoundError,
     PythonInterpreterError,
     NoneBotNotInstalledError,
-    ProjectNotFoundError
 )
 
 from . import templates
@@ -62,7 +62,7 @@ def requires_project_root(
         try:
             get_project_root(cast(Optional[Path], kwargs.get("cwd")))
         except ProjectNotFoundError:
-            pass 
+            pass
         return await func(*args, **kwargs)
 
     return wrapper
