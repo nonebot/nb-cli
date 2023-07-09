@@ -5,6 +5,7 @@ from typing import Dict, List, Optional
 import click
 
 from nb_cli import _, cache
+from nb_cli.exceptions import ProjectNotFoundError
 from nb_cli.handlers import run_script, list_scripts
 
 from .utils import run_async
@@ -118,7 +119,12 @@ class CLIMainGroup(ClickAliasedGroup):
     @run_async  # type: ignore
     @cache(ttl=None)
     async def _load_scripts(self, ctx: click.Context) -> List[click.Command]:
-        scripts = await list_scripts()
+        try:
+            scripts = await list_scripts()
+        except ProjectNotFoundError:
+            # not in a project
+            return []
+
         # check duplicate
         elements = Counter(scripts).most_common()
         if elements and elements[0][1] > 1:
