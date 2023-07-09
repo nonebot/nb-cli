@@ -21,6 +21,7 @@ from nb_cli.exceptions import (
     PipNotInstalledError,
     PythonInterpreterError,
     NoneBotNotInstalledError,
+    ProjectNotFoundError
 )
 
 from . import templates
@@ -58,7 +59,10 @@ def requires_project_root(
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        get_project_root(cast(Optional[Path], kwargs.get("cwd")))
+        try:
+            get_project_root(cast(Optional[Path], kwargs.get("cwd")))
+        except ProjectNotFoundError:
+            pass 
         return await func(*args, **kwargs)
 
     return wrapper
