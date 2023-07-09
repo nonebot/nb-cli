@@ -38,6 +38,7 @@ async def list_scripts(
     return json.loads(stdout.strip())
 
 
+@requires_project_root
 @requires_nonebot
 async def run_script(
     script_name: str,

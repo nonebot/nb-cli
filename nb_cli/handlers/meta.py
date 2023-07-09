@@ -184,7 +184,6 @@ def requires_nonebot(
     func: Callable[P, Coroutine[Any, Any, R]]
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
-    @requires_project_root
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         if await get_nonebot_version(
