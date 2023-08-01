@@ -1,26 +1,33 @@
-from typing import Union, Mapping, Iterable
+from typing_extensions import override
+from typing import Type, Union, Mapping, Iterable
+
 from nonebot.adapters import Message as BaseMessage, MessageSegment as BaseMessageSegment
 
 
-class MessageSegment(BaseMessageSegment):
+class MessageSegment(BaseMessageSegment["Message"]):
 
+    @classmethod
+    @override
+    def get_message_class(cls) -> Type["Message]:
+        raise NotImplementedError
+
+    @override
     def __str__(self) -> str:
         raise NotImplementedError
 
-    def __add__(self, other) -> "Message":
-        return Message(self) + other
-
-    def __radd__(self, other) -> "Message":
-        return Message(other) + self
-
+    @override
     def is_text(self) -> bool:
         raise NotImplementedError
 
 
-class Message(BaseMessage):
+class Message(BaseMessage[MessageSegment]):
+
+    @classmethod
+    @override
+    def get_segment_class(cls) -> Type[MessageSegment]:
+        raise NotImplementedError
 
     @staticmethod
-    def _construct(
-        msg: Union[str, Mapping,
-                   Iterable[Mapping]]) -> Iterable[MessageSegment]:
+    @override
+    def _construct(msg: str) -> Iterable[MessageSegment]:
         raise NotImplementedError

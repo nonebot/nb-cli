@@ -1,4 +1,5 @@
-from .bot import Bot
-from .event import Event
-from .adapter import Adapter
-from .message import Message, MessageSegment
+from .bot import Bot as Bot
+from .event import Event as Event
+from .adapter import Adapter as Adapter
+from .message import Message as Message
+from .message import MessageSegment as MessageSegment

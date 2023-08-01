@@ -1,4 +1,4 @@
-from nonebot.typing import overrides
+from typing_extensions import override
 
 from nonebot.adapters import Bot as BaseBot
 
@@ -8,7 +8,7 @@ from .message import Message, MessageSegment
 
 class Bot(BaseBot):
 
-    @overrides(BaseBot)
+    @override
     async def send(
         self,
         event: Event,
