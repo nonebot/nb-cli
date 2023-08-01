@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-07-09 12:42+0000\n"
+"POT-Creation-Date: 2023-08-01 03:11+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -345,35 +345,35 @@ msgid ""
 "poetry or pdm:"
 msgstr "使用 poetry 或 pdm 等依赖管理工具添加以下包:"
 
-#: nb_cli/cli/commands/project.py:291
+#: nb_cli/cli/commands/project.py:292
 msgid "Run the following command to start your bot:"
 msgstr "运行以下命令来启动你的机器人:"
 
-#: nb_cli/cli/commands/project.py:296
+#: nb_cli/cli/commands/project.py:297
 msgid "Generate entry file of your bot."
 msgstr "生成机器人的入口文件."
 
-#: nb_cli/cli/commands/project.py:302
+#: nb_cli/cli/commands/project.py:303
 msgid "The file script saved to."
 msgstr "脚本文件保存路径."
 
-#: nb_cli/cli/commands/project.py:311
+#: nb_cli/cli/commands/project.py:312
 msgid "Run the bot in current folder."
 msgstr "在当前文件夹中运行机器人."
 
-#: nb_cli/cli/commands/project.py:318
+#: nb_cli/cli/commands/project.py:319
 msgid "Exist entry file of your bot."
 msgstr "存在的机器人入口文件."
 
-#: nb_cli/cli/commands/project.py:325
+#: nb_cli/cli/commands/project.py:326
 msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
-#: nb_cli/cli/commands/project.py:331
+#: nb_cli/cli/commands/project.py:332
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:337
+#: nb_cli/cli/commands/project.py:338
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
@@ -413,19 +413,19 @@ msgstr "无法找到项目根目录! {config_file} 文件不存在."
 msgid "Using python: {python_path}"
 msgstr "使用 Python: {python_path}"
 
-#: nb_cli/handlers/meta.py:91
+#: nb_cli/handlers/meta.py:92
 msgid "Cannot find a valid Python interpreter."
 msgstr "无法找到可用的 Python 解释器."
 
-#: nb_cli/handlers/meta.py:146
+#: nb_cli/handlers/meta.py:147
 msgid "Python {major}.{minor} is not supported."
 msgstr "Python {major}.{minor} 不受支持."
 
-#: nb_cli/handlers/meta.py:195
+#: nb_cli/handlers/meta.py:196
 msgid "NoneBot is not installed."
 msgstr "NoneBot 未安装."
 
-#: nb_cli/handlers/meta.py:241
+#: nb_cli/handlers/meta.py:242
 msgid "pip is not installed."
 msgstr "pip 未安装."
 
