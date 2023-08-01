@@ -29,6 +29,13 @@ from .meta import requires_project_root as requires_project_root
 
 # isort: split
 
+# data
+from .data import DATA_DIR as DATA_DIR
+from .data import CACHE_DIR as CACHE_DIR
+from .data import CONFIG_DIR as CONFIG_DIR
+
+# isort: split
+
 # package
 from .store import load_module_data as load_module_data
 from .store import format_package_results as format_package_results
