@@ -8,7 +8,7 @@ from .consts import WINDOWS
 
 
 def _get_win_locale_with_ctypes() -> Optional[str]:
-    import ctypes
+    import ctypes  # noqa: F811
 
     kernel32 = ctypes.windll.kernel32
     lcid: int = kernel32.GetUserDefaultUILanguage()
@@ -28,7 +28,7 @@ def _get_win_locale_from_registry() -> Optional[str]:
 
 if WINDOWS:
     try:
-        import ctypes
+        import ctypes  # noqa: F401
 
         _get_win_locale = _get_win_locale_with_ctypes
     except ImportError:

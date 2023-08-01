@@ -283,7 +283,8 @@ async def create(
     click.secho(_("Done!"), fg="green")
     click.secho(
         _(
-            "Add following packages to your project using dependency manager like poetry or pdm:"
+            "Add following packages to your project "
+            "using dependency manager like poetry or pdm:"
         ),
         fg="green",
     )

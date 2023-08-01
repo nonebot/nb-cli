@@ -77,7 +77,8 @@ else:
 
         for python in python_to_try:
             proc = await create_process_shell(
-                f'{python} -W ignore -c "import sys, json; print(json.dumps(sys.executable))"',
+                f"{python} -W ignore -c "
+                '"import sys, json; print(json.dumps(sys.executable))"',
                 stdout=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await proc.communicate()

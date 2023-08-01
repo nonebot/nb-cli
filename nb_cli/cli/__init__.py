@@ -74,8 +74,8 @@ def _set_global_use_venv(ctx: click.Context, param: click.Option, value: bool):
 @click.pass_context
 @run_async
 async def cli(ctx: click.Context):
-    # postpone scripts discovery, only when needed (invoked)
-    # see {ref}`CLIMainGroup.get_command <nb_cli.cli.customize.CLIMainGroup.get_command>`
+    # Postpone scripts discovery, only when needed (invoked). See
+    # {ref}`CLIMainGroup.get_command <nb_cli.cli.customize.CLIMainGroup.get_command>`
 
     if ctx.invoked_subcommand is not None:
         return

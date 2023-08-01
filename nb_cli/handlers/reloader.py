@@ -165,7 +165,6 @@ class Reloader:
         self.should_exit.set()
 
     def _display_path(self, path: Path) -> str:
-        print(self.cwd, path)
         try:
             return f'"{path.relative_to(self.cwd)}"'
         except ValueError:
