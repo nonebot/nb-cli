@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-08-01 03:11+0000\n"
+"POT-Creation-Date: 2023-09-10 08:48+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -377,6 +377,10 @@ msgstr "要监视变化的文件."
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
+#: nb_cli/cli/commands/project.py:345
+msgid "Delay time for reloading in seconds."
+msgstr "重新加载的延迟时间(秒)."
+
 #: nb_cli/cli/commands/self.py:18
 msgid "Manage NB CLI."
 msgstr "管理 NB CLI."
@@ -429,23 +433,23 @@ msgstr "NoneBot 未安装."
 msgid "pip is not installed."
 msgstr "pip 未安装."
 
-#: nb_cli/handlers/reloader.py:120
+#: nb_cli/handlers/reloader.py:124
 msgid "Watchfiles detected changes in {paths}. Reloading..."
 msgstr "Watchfiles 在 {paths} 中发现变化. 正在重新加载..."
 
-#: nb_cli/handlers/reloader.py:132
+#: nb_cli/handlers/reloader.py:136
 msgid "Started reloader with process [{pid}]."
 msgstr "启动重载监视，当前进程 [{pid}]."
 
-#: nb_cli/handlers/reloader.py:141
+#: nb_cli/handlers/reloader.py:148
 msgid "Restarted process [{pid}]."
 msgstr "重启进程 [{pid}]."
 
-#: nb_cli/handlers/reloader.py:150
+#: nb_cli/handlers/reloader.py:157
 msgid "Shutting down process [{pid}]..."
 msgstr "正在终止进程 [{pid}]..."
 
-#: nb_cli/handlers/reloader.py:155
+#: nb_cli/handlers/reloader.py:162
 msgid "Stopped reloader."
 msgstr "停止重载监视"
 

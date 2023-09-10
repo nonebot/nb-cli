@@ -65,8 +65,10 @@ class Reloader:
         shutdown_func: Callable[
             [asyncio.subprocess.Process], Coroutine[Any, Any, None]
         ],
+        *,
         reload_dirs: Optional[List[Path]] = None,
         file_filter: Optional[FileFilter] = None,
+        reload_delay: float = 0.5,
         cwd: Optional[Path] = None,
         logger: Optional[logging.Logger] = None,
     ) -> None:
@@ -77,7 +79,7 @@ class Reloader:
         self.cwd = (cwd or Path.cwd()).resolve()
         self.logger = logger
 
-        self.reload_dirs = []
+        self.reload_dirs: List[Path] = []
         for directory in reload_dirs or []:
             directory = directory.resolve()
             if self.cwd not in directory.parents:
@@ -86,6 +88,8 @@ class Reloader:
             self.reload_dirs.append(self.cwd)
 
         self.watch_filter = file_filter or FileFilter()
+        self.reload_delay = reload_delay
+
         self.should_exit = asyncio.Event()
         self.watcher = awatch(
             *self.reload_dirs,
@@ -135,6 +139,9 @@ class Reloader:
     async def restart(self) -> None:
         if self.process and self.process.returncode is None:
             await self.shutdown_func(self.process)
+
+        await asyncio.sleep(self.reload_delay)
+
         self.process = await self.startup_func()
         if self.logger:
             self.logger.info(
