@@ -337,12 +337,20 @@ async def generate(file: str):
     default=None,
     help=_("Files to ignore for changes."),
 )
+@click.option(
+    "--reload-delay",
+    type=float,
+    default=0.5,
+    show_default=True,
+    help=_("Delay time for reloading in seconds."),
+)
 @run_async
 async def run(
     file: str,
     reload: bool,
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
+    reload_delay: float,
 ):
     if reload:
         logger = Logger(__name__)
@@ -351,6 +359,7 @@ async def run(
             partial(run_project, exist_bot=Path(file)),
             terminate_process,
             file_filter=FileFilter(reload_includes, reload_excludes),
+            reload_delay=reload_delay,
             cwd=get_project_root(),
             logger=logger,
         ).run()
