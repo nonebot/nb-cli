@@ -34,12 +34,13 @@ if WINDOWS:
     except ImportError:
         _get_win_locale = _get_win_locale_from_registry
 
-
-def get_locale() -> Optional[str]:
-    if WINDOWS:
+    def get_locale() -> Optional[str]:
         return _get_win_locale()
 
-    return locale.getlocale(locale.LC_MESSAGES)[0]
+else:
+
+    def get_locale() -> Optional[str]:
+        return locale.getlocale(locale.LC_MESSAGES)[0]
 
 
 t = gettext.translation(
