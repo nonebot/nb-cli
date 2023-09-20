@@ -55,11 +55,14 @@ async def run_script(
     if script_args is None:
         script_args = []
 
-    bot_config = get_nonebot_config()
-    if adapters is None:
-        adapters = bot_config.adapters
-    if builtin_plugins is None:
-        builtin_plugins = bot_config.builtin_plugins
+    # only read global config when no data provided
+    if adapters is None or builtin_plugins is None:
+        bot_config = get_nonebot_config()
+        if adapters is None:
+            adapters = bot_config.adapters
+        if builtin_plugins is None:
+            builtin_plugins = bot_config.builtin_plugins
+
     if python_path is None:
         python_path = await get_default_python()
     if cwd is None:

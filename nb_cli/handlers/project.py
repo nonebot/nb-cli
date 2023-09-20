@@ -44,11 +44,13 @@ async def generate_run_script(
     adapters: Optional[List[SimpleInfo]] = None,
     builtin_plugins: Optional[List[str]] = None,
 ) -> str:
-    bot_config = get_nonebot_config()
-    if adapters is None:
-        adapters = bot_config.adapters
-    if builtin_plugins is None:
-        builtin_plugins = bot_config.builtin_plugins
+    # only read global config when no data provided
+    if adapters is None or builtin_plugins is None:
+        bot_config = get_nonebot_config()
+        if adapters is None:
+            adapters = bot_config.adapters
+        if builtin_plugins is None:
+            builtin_plugins = bot_config.builtin_plugins
 
     t = templates.get_template("project/run_project.py.jinja")
     return await t.render_async(adapters=adapters, builtin_plugins=builtin_plugins)
@@ -67,11 +69,14 @@ async def run_project(
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
 ) -> asyncio.subprocess.Process:
-    bot_config = get_nonebot_config()
-    if adapters is None:
-        adapters = bot_config.adapters
-    if builtin_plugins is None:
-        builtin_plugins = bot_config.builtin_plugins
+    # only read global config when no data provided
+    if adapters is None or builtin_plugins is None:
+        bot_config = get_nonebot_config()
+        if adapters is None:
+            adapters = bot_config.adapters
+        if builtin_plugins is None:
+            builtin_plugins = bot_config.builtin_plugins
+
     if python_path is None:
         python_path = await get_default_python()
     if cwd is None:
