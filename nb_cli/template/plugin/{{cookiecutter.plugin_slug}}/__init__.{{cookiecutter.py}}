@@ -6,7 +6,7 @@ from nonebot.plugin import PluginMetadata
 
 from .config import Config
 
-__plugin_meta = PluginMetadata(
+__plugin_meta__ = PluginMetadata(
     name="{{cookiecutter.plugin_name}}",
     description="",
     usage="",
