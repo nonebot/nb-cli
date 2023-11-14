@@ -326,6 +326,12 @@ async def generate(file: str):
     help=_("Reload the bot when file changed."),
 )
 @click.option(
+    "--reload-dirs",
+    multiple=True,
+    default=None,
+    help=_("Paths to watch for changes."),
+)
+@click.option(
     "--reload-includes",
     multiple=True,
     default=None,
@@ -348,6 +354,7 @@ async def generate(file: str):
 async def run(
     file: str,
     reload: bool,
+    reload_dirs: Optional[List[str]],
     reload_includes: Optional[List[str]],
     reload_excludes: Optional[List[str]],
     reload_delay: float,
@@ -358,6 +365,9 @@ async def run(
         await Reloader(
             partial(run_project, exist_bot=Path(file)),
             terminate_process,
+            reload_dirs=[Path(i) for i in reload_dirs]
+            if reload_dirs is not None
+            else reload_dirs,
             file_filter=FileFilter(reload_includes, reload_excludes),
             reload_delay=reload_delay,
             cwd=get_project_root(),
