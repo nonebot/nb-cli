@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-10-29 07:13+0000\n"
+"POT-Creation-Date: 2023-11-14 22:04+0800\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -370,14 +370,18 @@ msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
 #: nb_cli/cli/commands/project.py:332
+msgid "Paths to watch for changes."
+msgstr "要监视变化的路径."
+
+#: nb_cli/cli/commands/project.py:338
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:338
+#: nb_cli/cli/commands/project.py:344
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
-#: nb_cli/cli/commands/project.py:345
+#: nb_cli/cli/commands/project.py:351
 msgid "Delay time for reloading in seconds."
 msgstr "重新加载的延迟时间(秒)."
 
@@ -460,3 +464,4 @@ msgstr "无效的模块类型: {module_type}"
 #: nb_cli/handlers/store.py:79
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
+
