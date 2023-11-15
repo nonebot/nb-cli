@@ -365,9 +365,11 @@ async def run(
         await Reloader(
             partial(run_project, exist_bot=Path(file)),
             terminate_process,
-            reload_dirs=[Path(i) for i in reload_dirs]
-            if reload_dirs is not None
-            else reload_dirs,
+            reload_dirs=(
+                [Path(i) for i in reload_dirs]
+                if reload_dirs is not None
+                else reload_dirs
+            ),
             file_filter=FileFilter(reload_includes, reload_excludes),
             reload_delay=reload_delay,
             cwd=get_project_root(),
