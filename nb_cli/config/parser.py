@@ -133,8 +133,7 @@ class ConfigManager:
                 ),
                 None,
             )
-            is not None
-        ):
+        ) is not None:
             del adapters[index]
         self._write_data(data)
 
