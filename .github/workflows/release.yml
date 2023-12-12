@@ -78,7 +78,7 @@ jobs:
         id: image
         run: |
           echo "IMAGE=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
-          echo "SCOPE=${{ env.GITHUB_REF_NAME }}-${{ matrix.python_version }}${{ matrix.python_variant }}-${{ matrix.platform }}" >> $GITHUB_OUTPUT
+          echo "SCOPE=${{ hashFiles('**/poetry.lock') }}-${{ matrix.python_version }}${{ matrix.python_variant }}-${{ matrix.platform }}" >> $GITHUB_OUTPUT
 
       - name: Generate Labels
         uses: docker/metadata-action@v5
@@ -146,13 +146,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Login to Github Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Generate Image Name
         id: image
         run: |
@@ -164,7 +157,6 @@ jobs:
         with:
           images: |
             ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
           flavor: |
             suffix=-py${{ matrix.python_version }}${{ matrix.python_variant }},onlatest=true
           tags: |
@@ -187,7 +179,6 @@ jobs:
         with:
           images: |
             ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
           flavor: |
             suffix=${{ matrix.python_variant }},onlatest=true
           tags: |
