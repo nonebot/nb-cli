@@ -1,0 +1,16 @@
+.devcontainer/
+.github/
+.venv/
+.vscode/
+node_modules/
+website/
+.dockerignore
+.editorconfig
+.gitignore
+.pre-commit-config.yaml
+.prettier*
+.yarnrc
+Dockerfile
+LICENSE
+package.json
+yarn.lock
