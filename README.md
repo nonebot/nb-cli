@@ -74,6 +74,19 @@ _✨ NoneBot2 命令行工具 ✨_
 pipx install nb-cli
 ```
 
+使用 Docker 运行
+
+```shell
+docker pull nonebot/nb-cli:latest
+```
+
+Docker 镜像可以选择以下版本：
+
+- `latest`, `latest-slim`：最新的稳定版本
+- `latest-${python版本}`, `latest-${python版本}-slim`：指定 Python 版本的最新稳定版本
+- `${cli版本}`, `${cli版本}-slim`：指定 CLI 版本的最新稳定版本
+- `${cli版本}-${python版本}`, `${cli版本}-${python版本}-slim`：指定 CLI 和 Python 版本的最新稳定版本
+
 ### 命令行使用
 
 ```shell
@@ -93,10 +106,24 @@ nb --help
 - `nb self` 管理 CLI 内部环境
 - `nb <script>` 运行脚本
 
+Docker 镜像使用
+
+```shell
+docker run --rm -it -v ./:/workspaces nonebot/nb-cli:latest --help
+```
+
+挂载当前目录到容器的 `/workspaces` 目录，然后在容器中运行 `nb` 命令。
+
 ### 交互式使用
 
 ```shell
 nb
+```
+
+Docker 镜像使用
+
+```shell
+docker run --rm -it -v ./:/workspaces nonebot/nb-cli:latest
 ```
 
 ## 开发

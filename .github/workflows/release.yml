@@ -5,6 +5,9 @@ on:
     tags:
       - v*
 
+env:
+  LATEST_PYTHON_VERSION: "3.11"
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -45,9 +48,9 @@ jobs:
       fail-fast: true
       matrix:
         python_version:
-          - 3.9
-          - 3.10
-          - 3.11
+          - "3.9"
+          - "3.10"
+          - "3.11"
         python_variant:
           - ""
           - "-slim"
@@ -99,9 +102,9 @@ jobs:
 
       - name: Export digest
         run: |
-          mkdir -p /tmp/digests
+          mkdir -p /tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
+          touch "/tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}/${digest#sha256:}"
 
       - name: Upload digest
         uses: actions/upload-artifact@v3
@@ -114,6 +117,15 @@ jobs:
   push:
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      matrix:
+        python_version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+        python_variant:
+          - ""
+          - "-slim"
 
     steps:
       - name: Checkout
@@ -153,14 +165,39 @@ jobs:
           images: |
             ${{ github.repository }}
             ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=-py${{ matrix.python_version }}${{ matrix.python_variant }},onlatest=true
           tags: |
-            type=ref,event=branch
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
 
       - name: Create manifest list and push
-        working-directory: /tmp/digests
+        working-directory: /tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}
+        run: |
+          docker buildx imagetools create --dry-run $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ steps.image.outputs.IMAGE }}@sha256:%s ' *)
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ steps.image.outputs.IMAGE }}@sha256:%s ' *)
+
+      - name: Generate Tags
+        uses: docker/metadata-action@v5
+        id: metadata-latest
+        if: matrix.python_version == env.LATEST_PYTHON_VERSION
+        with:
+          images: |
+            ${{ github.repository }}
+            ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=${{ matrix.python_variant }},onlatest=true
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: Create manifest list and push for latest python version
+        if: matrix.python_version == env.LATEST_PYTHON_VERSION
+        working-directory: /tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}
         run: |
           docker buildx imagetools create --dry-run $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ steps.image.outputs.IMAGE }}@sha256:%s ' *)
