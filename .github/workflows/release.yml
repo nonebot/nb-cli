@@ -78,7 +78,7 @@ jobs:
         id: image
         run: |
           echo "IMAGE=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
-          echo "SCOPE=${{ hashFiles('**/poetry.lock') }}-${{ matrix.python_version }}${{ matrix.python_variant }}-${{ matrix.platform }}" >> $GITHUB_OUTPUT
+          echo "SCOPE=${{ hashFiles('**/pdm.lock') }}-${{ matrix.python_version }}${{ matrix.python_variant }}-${{ matrix.platform }}" >> $GITHUB_OUTPUT
 
       - name: Generate Labels
         uses: docker/metadata-action@v5
