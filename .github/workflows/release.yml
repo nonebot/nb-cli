@@ -79,6 +79,8 @@ jobs:
         run: |
           echo "IMAGE=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
           echo "SCOPE=${{ hashFiles('**/pdm.lock') }}-${{ matrix.python_version }}${{ matrix.python_variant }}-${{ matrix.platform }}" >> $GITHUB_OUTPUT
+          platform="${{ matrix.platform }}"
+          echo "ARTIFACT=${{ matrix.python_version }}${{ matrix.python_variant }}-${platform/\//-}-digests" >> $GITHUB_OUTPUT
 
       - name: Generate Labels
         uses: docker/metadata-action@v5
@@ -102,14 +104,14 @@ jobs:
 
       - name: Export digest
         run: |
-          mkdir -p /tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}
+          mkdir -p /tmp/digests/
           digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}/${digest#sha256:}"
+          touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests
+          name: ${{ steps.image.outputs.ARTIFACT }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -134,8 +136,12 @@ jobs:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
-          name: digests
-          path: /tmp/digests
+          path: /tmp/artifacts
+
+      - name: Copy digests
+        run: |
+          mkdir -p /tmp/digests
+          cp /tmp/artifacts/${{ matrix.python_version }}${{ matrix.python_variant }}-*-digests/* /tmp/digests
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -165,7 +171,7 @@ jobs:
             type=semver,pattern={{major}}
 
       - name: Create manifest list and push
-        working-directory: /tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}
+        working-directory: /tmp/digests
         run: |
           docker buildx imagetools create --dry-run $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ steps.image.outputs.IMAGE }}@sha256:%s ' *)
@@ -188,7 +194,7 @@ jobs:
 
       - name: Create manifest list and push for latest python version
         if: matrix.python_version == env.LATEST_PYTHON_VERSION
-        working-directory: /tmp/digests/${{ matrix.python_version }}${{ matrix.python_variant }}
+        working-directory: /tmp/digests
         run: |
           docker buildx imagetools create --dry-run $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf '${{ steps.image.outputs.IMAGE }}@sha256:%s ' *)
