@@ -84,24 +84,6 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["project_name"] = project_name
 
-    drivers = await CheckboxPrompt(
-        _("Which driver(s) would you like to use?"),
-        [Choice(f"{driver.name} ({driver.desc})", driver) for driver in all_drivers],
-        default_select=[
-            index
-            for index, driver in enumerate(all_drivers)
-            if driver.name in DEFAULT_DRIVER
-        ],
-        validator=bool,
-        error_message=_("Chosen drivers is not valid!"),
-    ).prompt_async(style=CLI_DEFAULT_STYLE)
-    context.variables["drivers"] = json.dumps(
-        {d.data.project_link: d.data.dict() for d in drivers}
-    )
-    context.packages.extend(
-        [d.data.project_link for d in drivers if d.data.project_link]
-    )
-
     confirm = False
     adapters = []
     while not confirm:
@@ -125,6 +107,24 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         {a.data.project_link: a.data.dict() for a in adapters}
     )
     context.packages.extend([a.data.project_link for a in adapters])
+
+    drivers = await CheckboxPrompt(
+        _("Which driver(s) would you like to use?"),
+        [Choice(f"{driver.name} ({driver.desc})", driver) for driver in all_drivers],
+        default_select=[
+            index
+            for index, driver in enumerate(all_drivers)
+            if driver.name in DEFAULT_DRIVER
+        ],
+        validator=bool,
+        error_message=_("Chosen drivers is not valid!"),
+    ).prompt_async(style=CLI_DEFAULT_STYLE)
+    context.variables["drivers"] = json.dumps(
+        {d.data.project_link: d.data.dict() for d in drivers}
+    )
+    context.packages.extend(
+        [d.data.project_link for d in drivers if d.data.project_link]
+    )
 
     return context
 

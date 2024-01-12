@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-11-14 22:04+0800\n"
+"POT-Creation-Date: 2024-01-12 07:04+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -269,21 +269,21 @@ msgstr "项目名称:"
 msgid "Invalid project name!"
 msgstr "无效的项目名称!"
 
-#: nb_cli/cli/commands/project.py:88
-msgid "Which driver(s) would you like to use?"
-msgstr "要使用哪些驱动器?"
-
-#: nb_cli/cli/commands/project.py:96
-msgid "Chosen drivers is not valid!"
-msgstr "选择的驱动器不合法!"
-
-#: nb_cli/cli/commands/project.py:109
+#: nb_cli/cli/commands/project.py:91
 msgid "Which adapter(s) would you like to use?"
 msgstr "要使用哪些适配器?"
 
-#: nb_cli/cli/commands/project.py:119
+#: nb_cli/cli/commands/project.py:101
 msgid "You haven't chosen any adapter! Please confirm."
 msgstr "你没有选择任何适配器! 请确认."
+
+#: nb_cli/cli/commands/project.py:112
+msgid "Which driver(s) would you like to use?"
+msgstr "要使用哪些驱动器?"
+
+#: nb_cli/cli/commands/project.py:120
+msgid "Chosen drivers is not valid!"
+msgstr "选择的驱动器不合法!"
 
 #: nb_cli/cli/commands/project.py:137
 msgid "1) In a \"{dir_name}\" folder"
@@ -464,4 +464,3 @@ msgstr "无效的模块类型: {module_type}"
 #: nb_cli/handlers/store.py:79
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
-
