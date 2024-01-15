@@ -10,7 +10,7 @@ on:
       - completed
 
 env:
-  LATEST_PYTHON_VERSION: "3.11"
+  LATEST_PYTHON_VERSION: "3.12"
 
 jobs:
   metadata:
@@ -55,6 +55,7 @@ jobs:
           - "3.9"
           - "3.10"
           - "3.11"
+          - "3.12"
         python_variant:
           - ""
           - "-slim"
