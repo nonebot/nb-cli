@@ -32,6 +32,8 @@ jobs:
         if: github.event_name != 'workflow_run'
         run: |
           gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name' | xargs -0 printf "LATEST_RELEASE=%s" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     runs-on: ubuntu-latest
