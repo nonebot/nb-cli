@@ -20,15 +20,19 @@ jobs:
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     permissions:
       contents: read
+    outputs:
+      LATEST_RELEASE: ${{ steps.workflow.outputs.LATEST_RELEASE || steps.api.outputs.LATEST_RELEASE }}
 
     steps:
       - name: Get latest release from previous workflow
+        id: workflow
         if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
         run: |
           tag=${{ github.event.workflow_run.head_branch }}
           echo "LATEST_RELEASE=${tag#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Get latest release from api
+        id: api
         if: github.event_name != 'workflow_run'
         run: |
           gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name' | xargs -0 printf "LATEST_RELEASE=%s" >> $GITHUB_OUTPUT
