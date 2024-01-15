@@ -45,6 +45,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ needs.metadata.outputs.LATEST_RELEASE }}-${{ matrix.python_version }}${{ matrix.python_variant }}-${{ matrix.platform }}
+      cancel-in-progress: true
     strategy:
       fail-fast: true
       matrix:
@@ -97,6 +100,7 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
+          pull: true
           build-args: |
             PYTHON_IMAGE=${{ matrix.python_version }}
             VARIANT=${{ matrix.python_variant }}
