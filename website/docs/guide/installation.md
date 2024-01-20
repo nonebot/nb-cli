@@ -12,7 +12,7 @@ options:
 
 ## 环境要求
 
-NoneBot CLI 仅支持 Python 3.8 以上版本。
+NoneBot CLI 仅支持 Python 3.9 以上版本。
 
 ## 通过 pipx 安装
 

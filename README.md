@@ -18,7 +18,7 @@ _✨ NoneBot2 命令行工具 ✨_
   <a href="https://pypi.python.org/pypi/nb-cli">
     <img src="https://img.shields.io/pypi/v/nb-cli" alt="pypi">
   </a>
-  <img src="https://img.shields.io/badge/python-3.8+-blue" alt="python">
+  <img src="https://img.shields.io/badge/python-3.9+-blue" alt="python">
   <a href="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml">
     <img src="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml/badge.svg?branch=master&event=push" alt="site"/>
   </a>
