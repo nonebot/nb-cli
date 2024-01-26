@@ -6,11 +6,11 @@
     "types": [
       "node",
       "@docusaurus/module-type-aliases",
-      "docusaurus-theme-nonepress",
+      "docusaurus-theme-nonepress"
     ],
     "resolveJsonModule": true,
     "paths": {
-      "@theme/*": ["./src/theme/*"],
-    },
-  },
+      "@theme/*": ["./src/theme/*"]
+    }
+  }
 }
