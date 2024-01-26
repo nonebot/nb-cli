@@ -10,7 +10,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: pdm-project/setup-pdm@v3
+    - uses: pdm-project/setup-pdm@v4
       name: Setup PDM
       with:
         python-version: ${{ inputs.python-version }}
