@@ -55,7 +55,8 @@ else:
             f"https://cdn.jsdelivr.net/gh/nonebot/registry@results/{module_name}.json",
             f"https://cdn.staticaly.com/gh/nonebot/registry@results/{module_name}.json",
             f"https://jsd.cdn.zzko.cn/gh/nonebot/registry@results/{module_name}.json",
-            f"https://ghproxy.com/https://raw.githubusercontent.com/nonebot/registry/results/{module_name}.json",
+            f"https://mirror.ghproxy.com/https://raw.githubusercontent.com/nonebot/registry/results/{module_name}.json",
+            f"https://gh-proxy.com/https://raw.githubusercontent.com/nonebot/registry/results/{module_name}.json",
         ]
 
         async def _request(url: str) -> httpx.Response:
