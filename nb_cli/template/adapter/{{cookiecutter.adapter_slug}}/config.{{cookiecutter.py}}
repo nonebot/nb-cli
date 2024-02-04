@@ -1,5 +1,5 @@
-from pydantic import Field, Extra, BaseModel
+from pydantic import Field, BaseModel
 
 
-class Config(BaseModel, extra=Extra.ignore):
+class Config(BaseModel):
     ...

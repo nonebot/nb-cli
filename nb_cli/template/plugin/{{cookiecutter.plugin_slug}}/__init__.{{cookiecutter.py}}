@@ -14,7 +14,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 global_config = get_driver().config
-config = Config.parse_obj(global_config)
+config = Config.parse_obj(dict(global_config))
 {% if cookiecutter.sub_plugin %}
 sub_plugins = nonebot.load_plugins(
     str(Path(__file__).parent.joinpath("plugins").resolve())

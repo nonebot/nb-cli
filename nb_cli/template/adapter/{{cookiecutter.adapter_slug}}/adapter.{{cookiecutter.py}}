@@ -28,7 +28,7 @@ class Adapter(BaseAdapter):
     @override
     def __init__(self, driver: Driver, **kwargs: Any):
         super().__init__(driver, **kwargs)
-        self.adapter_config = Config.parse_obj(self.config)
+        self.adapter_config = Config.parse_obj(dict(self.config))
 
     @classmethod
     @override
