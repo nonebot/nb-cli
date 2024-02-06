@@ -66,8 +66,7 @@ def requires_project_root(
 
 if TYPE_CHECKING:
 
-    async def _get_env_python() -> str:
-        ...
+    async def _get_env_python() -> str: ...
 
 else:
 
@@ -106,8 +105,7 @@ if TYPE_CHECKING:
 
     async def get_python_version(
         python_path: Optional[str] = None, cwd: Optional[Path] = None
-    ) -> Dict[str, int]:
-        ...
+    ) -> Dict[str, int]: ...
 
 else:
 
@@ -156,8 +154,7 @@ if TYPE_CHECKING:
 
     async def get_nonebot_version(
         python_path: Optional[str] = None, cwd: Optional[Path] = None
-    ) -> str:
-        ...
+    ) -> str: ...
 
 else:
 
@@ -202,8 +199,7 @@ if TYPE_CHECKING:
 
     async def get_pip_version(
         python_path: Optional[str] = None, cwd: Optional[Path] = None
-    ) -> str:
-        ...
+    ) -> str: ...
 
 else:
 
