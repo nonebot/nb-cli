@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from cookiecutter.main import cookiecutter
 
@@ -23,7 +23,7 @@ def create_adapter(
     )
 
 
-async def list_adapters(query: Optional[str] = None) -> List[Adapter]:
+async def list_adapters(query: Optional[str] = None) -> list[Adapter]:
     adapters = await load_module_data("adapter")
     if query is None:
         return adapters

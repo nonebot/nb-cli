@@ -1,6 +1,6 @@
 import shutil
 from asyncio import create_task, as_completed
-from typing import TYPE_CHECKING, List, Union, Literal, TypeVar, Optional, overload
+from typing import TYPE_CHECKING, Union, Literal, TypeVar, Optional, overload
 
 import httpx
 from wcwidth import wcswidth
@@ -15,24 +15,24 @@ T = TypeVar("T", Adapter, Plugin, Driver)
 if TYPE_CHECKING:
 
     @overload
-    async def load_module_data(module_type: Literal["adapter"]) -> List[Adapter]: ...
+    async def load_module_data(module_type: Literal["adapter"]) -> list[Adapter]: ...
 
     @overload
-    async def load_module_data(module_type: Literal["plugin"]) -> List[Plugin]: ...
+    async def load_module_data(module_type: Literal["plugin"]) -> list[Plugin]: ...
 
     @overload
-    async def load_module_data(module_type: Literal["driver"]) -> List[Driver]: ...
+    async def load_module_data(module_type: Literal["driver"]) -> list[Driver]: ...
 
     async def load_module_data(
         module_type: Literal["adapter", "plugin", "driver"]
-    ) -> Union[List[Adapter], List[Plugin], List[Driver]]: ...
+    ) -> Union[list[Adapter], list[Plugin], list[Driver]]: ...
 
 else:
 
     @cache(ttl=None)
     async def load_module_data(
         module_type: Literal["adapter", "plugin", "driver"]
-    ) -> Union[List[Adapter], List[Plugin], List[Driver]]:
+    ) -> Union[list[Adapter], list[Plugin], list[Driver]]:
         if module_type == "adapter":
             module_class = Adapter
         elif module_type == "plugin":
@@ -45,7 +45,7 @@ else:
             )
         module_name: str = getattr(module_class.__config__, "module_name")
 
-        exceptions: List[Exception] = []
+        exceptions: list[Exception] = []
         urls = [
             f"https://registry.nonebot.dev/{module_name}.json",
             f"https://cdn.jsdelivr.net/gh/nonebot/registry@results/{module_name}.json",
@@ -79,7 +79,7 @@ else:
 
 
 def format_package_results(
-    hits: List[T],
+    hits: list[T],
     name_column_width: Optional[int] = None,
     terminal_width: Optional[int] = None,
 ) -> str:
@@ -93,7 +93,7 @@ def format_package_results(
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
-    lines: List[str] = []
+    lines: list[str] = []
     for hit in hits:
         name = f"{hit.name} ({hit.project_link})"
         summary = hit.desc

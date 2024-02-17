@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, CancelledError
@@ -83,7 +83,7 @@ async def cli(ctx: click.Context):
     command = cast(CLIMainGroup, ctx.command)
 
     # auto discover sub commands and scripts
-    choices: List[Choice[click.Command]] = []
+    choices: list[Choice[click.Command]] = []
     for sub_cmd_name in await run_sync(command.list_commands)(ctx):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(

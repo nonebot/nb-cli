@@ -1,5 +1,5 @@
 import asyncio
-from typing import IO, Any, List, Union, Optional
+from typing import IO, Any, Union, Optional
 
 from .process import create_process
 from .meta import requires_pip, get_default_python
@@ -7,7 +7,7 @@ from .meta import requires_pip, get_default_python
 
 @requires_pip
 async def call_pip(
-    pip_args: Optional[List[str]] = None,
+    pip_args: Optional[list[str]] = None,
     *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
@@ -32,8 +32,8 @@ async def call_pip(
 
 @requires_pip
 async def call_pip_install(
-    package: Union[str, List[str]],
-    pip_args: Optional[List[str]] = None,
+    package: Union[str, list[str]],
+    pip_args: Optional[list[str]] = None,
     *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
@@ -56,8 +56,8 @@ async def call_pip_install(
 
 @requires_pip
 async def call_pip_update(
-    package: Union[str, List[str]],
-    pip_args: Optional[List[str]] = None,
+    package: Union[str, list[str]],
+    pip_args: Optional[list[str]] = None,
     *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
@@ -80,8 +80,8 @@ async def call_pip_update(
 
 @requires_pip
 async def call_pip_uninstall(
-    package: Union[str, List[str]],
-    pip_args: Optional[List[str]] = None,
+    package: Union[str, list[str]],
+    pip_args: Optional[list[str]] = None,
     *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,
@@ -104,7 +104,7 @@ async def call_pip_uninstall(
 
 @requires_pip
 async def call_pip_list(
-    pip_args: Optional[List[str]] = None,
+    pip_args: Optional[list[str]] = None,
     *,
     python_path: Optional[str] = None,
     stdin: Optional[Union[IO[Any], int]] = None,

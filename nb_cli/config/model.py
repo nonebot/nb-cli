@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import Extra, BaseModel
 
 
@@ -33,7 +31,7 @@ class Driver(SimpleInfo):
 
 
 class NoneBotConfig(BaseModel, extra=Extra.allow):
-    adapters: List[SimpleInfo] = []
-    plugins: List[str] = []
-    plugin_dirs: List[str] = []
-    builtin_plugins: List[str] = []
+    adapters: list[SimpleInfo] = []
+    plugins: list[str] = []
+    plugin_dirs: list[str] = []
+    builtin_plugins: list[str] = []

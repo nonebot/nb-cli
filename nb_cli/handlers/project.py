@@ -1,6 +1,6 @@
 import asyncio
 from pathlib import Path
-from typing import IO, Any, Dict, List, Union, Optional
+from typing import IO, Any, Union, Optional
 
 from cookiecutter.main import cookiecutter
 
@@ -19,13 +19,13 @@ from .meta import (
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 
 
-def list_project_templates() -> List[str]:
+def list_project_templates() -> list[str]:
     return sorted(t.name for t in (TEMPLATE_ROOT).iterdir())
 
 
 def create_project(
     project_template: str,
-    context: Optional[Dict[str, Any]] = None,
+    context: Optional[dict[str, Any]] = None,
     output_dir: Optional[str] = None,
     no_input: bool = True,
 ) -> None:
@@ -41,8 +41,8 @@ def create_project(
 
 
 async def generate_run_script(
-    adapters: Optional[List[SimpleInfo]] = None,
-    builtin_plugins: Optional[List[str]] = None,
+    adapters: Optional[list[SimpleInfo]] = None,
+    builtin_plugins: Optional[list[str]] = None,
 ) -> str:
     # only read global config when no data provided
     if adapters is None or builtin_plugins is None:
@@ -59,8 +59,8 @@ async def generate_run_script(
 @requires_project_root
 @requires_nonebot
 async def run_project(
-    adapters: Optional[List[SimpleInfo]] = None,
-    builtin_plugins: Optional[List[str]] = None,
+    adapters: Optional[list[SimpleInfo]] = None,
+    builtin_plugins: Optional[list[str]] = None,
     exist_bot: Path = Path("bot.py"),
     *,
     python_path: Optional[str] = None,

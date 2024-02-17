@@ -1,6 +1,7 @@
 from functools import wraps, partial
+from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import Any, List, TypeVar, Callable, Optional, Coroutine
+from typing import Any, TypeVar, Callable, Optional
 
 import anyio
 import click
@@ -30,7 +31,7 @@ CLI_DEFAULT_STYLE = Style.from_dict(
 
 
 async def find_exact_package(
-    question: str, name: Optional[str], packages: List[T]
+    question: str, name: Optional[str], packages: list[T]
 ) -> T:
     if name is None:
         name = await InputPrompt(question).prompt_async(style=CLI_DEFAULT_STYLE)

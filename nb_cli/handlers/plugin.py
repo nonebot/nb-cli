@@ -1,7 +1,7 @@
 import json
 import asyncio
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from cookiecutter.main import cookiecutter
 
@@ -16,7 +16,7 @@ TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
 
 @requires_nonebot
-async def list_builtin_plugins(*, python_path: Optional[str] = None) -> List[str]:
+async def list_builtin_plugins(*, python_path: Optional[str] = None) -> list[str]:
     if python_path is None:
         python_path = await get_default_python()
 
@@ -48,7 +48,7 @@ def create_plugin(
     )
 
 
-async def list_plugins(query: Optional[str] = None) -> List[Plugin]:
+async def list_plugins(query: Optional[str] = None) -> list[Plugin]:
     plugins = await load_module_data("plugin")
     if query is None:
         return plugins

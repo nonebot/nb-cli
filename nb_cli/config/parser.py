@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, ClassVar, Optional
+from typing import Any, ClassVar, Optional
 
 import tomlkit
 from tomlkit.toml_document import TOMLDocument
@@ -20,7 +20,7 @@ class ConfigManager:
     _global_working_dir: ClassVar[Optional[Path]] = None
     _global_python_path: ClassVar[Optional[str]] = None
     _global_use_venv: ClassVar[bool] = True
-    _path_venv_cache: ClassVar[Dict[Path, Optional[str]]] = {}
+    _path_venv_cache: ClassVar[dict[Path, Optional[str]]] = {}
 
     def __init__(
         self,
@@ -104,7 +104,7 @@ class ConfigManager:
     def _write_data(self, data: TOMLDocument) -> None:
         self.config_file.write_text(tomlkit.dumps(data), encoding=CONFIG_FILE_ENCODING)
 
-    def _get_nonebot_config(self, data: TOMLDocument) -> Dict[str, Any]:
+    def _get_nonebot_config(self, data: TOMLDocument) -> dict[str, Any]:
         return data.get("tool", {}).get("nonebot", {})
 
     def get_nonebot_config(self) -> NoneBotConfig:
@@ -112,8 +112,8 @@ class ConfigManager:
 
     def add_adapter(self, adapter: SimpleInfo) -> None:
         data = self._get_data()
-        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        adapters: list[dict[str, Any]] = table.setdefault("adapters", [])
         if all(a["module_name"] != adapter.module_name for a in adapters):
             t = tomlkit.inline_table()
             t.update(adapter.dict(include={"name", "module_name"}))
@@ -122,8 +122,8 @@ class ConfigManager:
 
     def remove_adapter(self, adapter: SimpleInfo) -> None:
         data = self._get_data()
-        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        adapters: List[Dict[str, Any]] = table.setdefault("adapters", [])
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        adapters: list[dict[str, Any]] = table.setdefault("adapters", [])
         if (
             index := next(
                 (
@@ -139,32 +139,32 @@ class ConfigManager:
 
     def add_plugin(self, plugin: str) -> None:
         data = self._get_data()
-        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: List[str] = table.setdefault("plugins", [])
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        plugins: list[str] = table.setdefault("plugins", [])
         if plugin not in plugins:
             plugins.append(plugin)
         self._write_data(data)
 
     def remove_plugin(self, plugin: str) -> None:
         data = self._get_data()
-        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: List[str] = table.setdefault("plugins", [])
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        plugins: list[str] = table.setdefault("plugins", [])
         if plugin in plugins:
             plugins.remove(plugin)
         self._write_data(data)
 
     def add_builtin_plugin(self, plugin: str) -> None:
         data = self._get_data()
-        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: List[str] = table.setdefault("builtin_plugins", [])
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        plugins: list[str] = table.setdefault("builtin_plugins", [])
         if plugin not in plugins:
             plugins.append(plugin)
         self._write_data(data)
 
     def remove_builtin_plugin(self, plugin: str) -> None:
         data = self._get_data()
-        table: Dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: List[str] = table.setdefault("builtin_plugins", [])
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        plugins: list[str] = table.setdefault("builtin_plugins", [])
         if plugin in plugins:
             plugins.remove(plugin)
         self._write_data(data)

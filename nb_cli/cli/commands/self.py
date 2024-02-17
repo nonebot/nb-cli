@@ -1,5 +1,5 @@
 import sys
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
@@ -25,7 +25,7 @@ async def self(ctx: click.Context):
 
     command = cast(ClickAliasedGroup, ctx.command)
 
-    choices: List[Choice[click.Command]] = []
+    choices: list[Choice[click.Command]] = []
     for sub_cmd_name in await run_sync(command.list_commands)(ctx):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
@@ -57,7 +57,7 @@ async def self(ctx: click.Context):
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     if name is None:
         try:
@@ -76,7 +76,7 @@ async def install(
 )
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def update(pip_args: Optional[List[str]]):
+async def update(pip_args: Optional[list[str]]):
     proc = await call_pip_update("nb-cli", pip_args, python_path=sys.executable)
     await proc.wait()
 
@@ -91,7 +91,7 @@ async def update(pip_args: Optional[List[str]]):
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     if name is None:
         try:
@@ -106,11 +106,12 @@ async def uninstall(
 
 
 @self.command(
+    name="list",
     context_settings={"ignore_unknown_options": True},
     help=_("List installed packages in cli venv."),
 )
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def list(pip_args: Optional[List[str]]):
+async def list_(pip_args: Optional[list[str]]):
     proc = await call_pip_list(pip_args, python_path=sys.executable)
     await proc.wait()

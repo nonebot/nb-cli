@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 from logging import Logger
 from functools import partial
+from typing import Any, Optional
 from dataclasses import field, dataclass
-from typing import Any, Dict, List, Optional
 
 import click
 from noneprompt import (
@@ -59,8 +59,8 @@ class ProjectContext:
         packages: 项目需要安装的包
     """
 
-    variables: Dict[str, Any] = field(default_factory=dict)
-    packages: List[str] = field(default_factory=list)
+    variables: dict[str, Any] = field(default_factory=dict)
+    packages: list[str] = field(default_factory=list)
 
 
 def project_name_validator(name: str) -> bool:
@@ -133,7 +133,7 @@ async def prompt_simple_context(context: ProjectContext) -> ProjectContext:
     dir_name = (
         context.variables["project_name"].lower().replace(" ", "-").replace("-", "_")
     )
-    src_choices: List[Choice[bool]] = [
+    src_choices: list[Choice[bool]] = [
         Choice(_('1) In a "{dir_name}" folder').format(dir_name=dir_name), False),
         Choice(_('2) In a "src" folder'), True),
     ]
@@ -178,7 +178,7 @@ async def create(
     output_dir: Optional[str],
     template: Optional[str],
     python_interpreter: Optional[str],
-    pip_args: Optional[List[str]],
+    pip_args: Optional[list[str]],
 ):
     if not template:
         templates = list_project_templates()
@@ -354,9 +354,9 @@ async def generate(file: str):
 async def run(
     file: str,
     reload: bool,
-    reload_dirs: Optional[List[str]],
-    reload_includes: Optional[List[str]],
-    reload_excludes: Optional[List[str]],
+    reload_dirs: Optional[list[str]],
+    reload_includes: Optional[list[str]],
+    reload_excludes: Optional[list[str]],
     reload_delay: float,
 ):
     if reload:

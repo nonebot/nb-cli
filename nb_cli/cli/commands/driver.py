@@ -1,4 +1,4 @@
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
@@ -26,7 +26,7 @@ async def driver(ctx: click.Context):
 
     command = cast(ClickAliasedGroup, ctx.command)
 
-    choices: List[Choice[click.Command]] = []
+    choices: list[Choice[click.Command]] = []
     for sub_cmd_name in await run_sync(command.list_commands)(ctx):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
@@ -48,9 +48,11 @@ async def driver(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@driver.command(help=_("List nonebot drivers published on nonebot homepage."))
+@driver.command(
+    name="list", help=_("List nonebot drivers published on nonebot homepage.")
+)
 @run_async
-async def list():
+async def list_():
     drivers = await list_drivers()
     click.echo(format_package_results(drivers))
 
@@ -77,7 +79,7 @@ async def search(name: Optional[str]):
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         driver = await find_exact_package(
@@ -101,7 +103,7 @@ async def install(
 @click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         driver = await find_exact_package(
@@ -127,7 +129,7 @@ async def update(
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         driver = await find_exact_package(

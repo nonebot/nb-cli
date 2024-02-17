@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt, CancelledError
@@ -29,7 +29,7 @@ async def plugin(ctx: click.Context):
 
     command = cast(ClickAliasedGroup, ctx.command)
 
-    choices: List[Choice[click.Command]] = []
+    choices: list[Choice[click.Command]] = []
     for sub_cmd_name in await run_sync(command.list_commands)(ctx):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
@@ -51,9 +51,11 @@ async def plugin(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@plugin.command(help=_("List nonebot plugins published on nonebot homepage."))
+@plugin.command(
+    name="list", help=_("List nonebot plugins published on nonebot homepage.")
+)
 @run_async
-async def list():
+async def list_():
     plugins = await list_plugins()
     click.echo(format_package_results(plugins))
 
@@ -80,7 +82,7 @@ async def search(name: Optional[str]):
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -112,7 +114,7 @@ async def install(
 @click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -137,7 +139,7 @@ async def update(
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         plugin = await find_exact_package(
@@ -196,7 +198,7 @@ async def create(
             ctx.exit()
 
     if output_dir is None:
-        detected: List[Choice[None]] = [
+        detected: list[Choice[None]] = [
             Choice(str(d))
             for d in Path(".").glob("**/plugins/")
             if d.is_dir()

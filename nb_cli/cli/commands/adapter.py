@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
@@ -29,7 +29,7 @@ async def adapter(ctx: click.Context):
 
     command = cast(ClickAliasedGroup, ctx.command)
 
-    choices: List[Choice[click.Command]] = []
+    choices: list[Choice[click.Command]] = []
     for sub_cmd_name in await run_sync(command.list_commands)(ctx):
         if sub_cmd := await run_sync(command.get_command)(ctx, sub_cmd_name):
             choices.append(
@@ -51,9 +51,11 @@ async def adapter(ctx: click.Context):
     await run_sync(ctx.invoke)(sub_cmd)
 
 
-@adapter.command(help=_("List nonebot adapters published on nonebot homepage."))
+@adapter.command(
+    name="list", help=_("List nonebot adapters published on nonebot homepage.")
+)
 @run_async
-async def list():
+async def list_():
     adapters = await list_adapters()
     click.echo(format_package_results(adapters))
 
@@ -80,7 +82,7 @@ async def search(name: Optional[str]):
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         adapter = await find_exact_package(
@@ -112,7 +114,7 @@ async def install(
 @click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         adapter = await find_exact_package(
@@ -137,7 +139,7 @@ async def update(
 @click.pass_context
 @run_async
 async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[List[str]]
+    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
 ):
     try:
         adapter = await find_exact_package(
@@ -186,7 +188,7 @@ async def create(
         except CancelledError:
             ctx.exit()
     if output_dir is None:
-        detected: List[Choice[None]] = [
+        detected: list[Choice[None]] = [
             Choice(str(x))
             for x in Path(".").glob("**/adapters/")
             if x.is_dir()

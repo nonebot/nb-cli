@@ -2,8 +2,9 @@ import signal
 import asyncio
 import threading
 from types import FrameType
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import List, Callable, Optional, Generator
+from typing import Callable, Optional
 
 from nb_cli.consts import WINDOWS
 
@@ -14,7 +15,7 @@ HANDLED_SIGNALS = (
 if WINDOWS:
     HANDLED_SIGNALS += (signal.SIGBREAK,)  # Windows signal 21. Sent by Ctrl+Break.
 
-handlers: List[Callable[[int, Optional[FrameType]], None]] = []
+handlers: list[Callable[[int, Optional[FrameType]], None]] = []
 
 
 class _ShieldContext:

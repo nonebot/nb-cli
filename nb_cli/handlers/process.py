@@ -5,8 +5,9 @@ import subprocess
 from pathlib import Path
 from functools import wraps
 from contextlib import nullcontext
+from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import IO, Any, Set, Union, Callable, Optional, Coroutine
+from typing import IO, Any, Union, Callable, Optional
 
 from nb_cli.consts import WINDOWS
 
@@ -18,7 +19,7 @@ P = ParamSpec("P")
 def ensure_process_terminated(
     func: Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]
 ) -> Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]:
-    tasks: Set[asyncio.Task] = set()
+    tasks: set[asyncio.Task] = set()
 
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> asyncio.subprocess.Process:

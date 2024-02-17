@@ -1,7 +1,8 @@
 import asyncio
 import logging
 from pathlib import Path
-from typing import Any, List, Callable, Optional, Coroutine
+from collections.abc import Coroutine
+from typing import Any, Callable, Optional
 
 from watchfiles import awatch
 
@@ -12,7 +13,7 @@ from .signal import remove_signal_handler, register_signal_handler
 
 class FileFilter:
     def __init__(
-        self, includes: Optional[List[str]] = None, excludes: Optional[List[str]] = None
+        self, includes: Optional[list[str]] = None, excludes: Optional[list[str]] = None
     ):
         includes = includes or []
         excludes = excludes or []
@@ -66,7 +67,7 @@ class Reloader:
             [asyncio.subprocess.Process], Coroutine[Any, Any, None]
         ],
         *,
-        reload_dirs: Optional[List[Path]] = None,
+        reload_dirs: Optional[list[Path]] = None,
         file_filter: Optional[FileFilter] = None,
         reload_delay: float = 0.5,
         cwd: Optional[Path] = None,
@@ -79,7 +80,7 @@ class Reloader:
         self.cwd = (cwd or Path.cwd()).resolve()
         self.logger = logger
 
-        self.reload_dirs: List[Path] = []
+        self.reload_dirs: list[Path] = []
         for directory in reload_dirs or []:
             directory = directory.resolve()
             if self.cwd not in directory.parents:
@@ -110,7 +111,7 @@ class Reloader:
     def __aiter__(self):
         return self
 
-    async def __anext__(self) -> Optional[List[Path]]:
+    async def __anext__(self) -> Optional[list[Path]]:
         return await self.should_restart()
 
     async def run(self) -> None:
@@ -161,7 +162,7 @@ class Reloader:
         if self.logger:
             self.logger.info(_("Stopped reloader."))
 
-    async def should_restart(self) -> Optional[List[Path]]:
+    async def should_restart(self) -> Optional[list[Path]]:
         changes = await self.watcher.__anext__()
         if changes:
             unique_paths = {Path(c[1]) for c in changes}

@@ -2,17 +2,9 @@ import json
 import asyncio
 from pathlib import Path
 from functools import wraps
+from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Dict,
-    TypeVar,
-    Callable,
-    Optional,
-    Coroutine,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, TypeVar, Callable, Optional, cast
 
 from nb_cli import _, cache
 from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
@@ -105,14 +97,14 @@ if TYPE_CHECKING:
 
     async def get_python_version(
         python_path: Optional[str] = None, cwd: Optional[Path] = None
-    ) -> Dict[str, int]: ...
+    ) -> dict[str, int]: ...
 
 else:
 
     @cache(ttl=None)
     async def get_python_version(
         python_path: Optional[str] = None, cwd: Optional[Path] = None
-    ) -> Dict[str, int]:
+    ) -> dict[str, int]:
         if python_path is None:
             python_path = await get_default_python(cwd)
 
