@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-01-12 07:04+0000\n"
+"POT-Creation-Date: 2024-02-17 09:42+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.13.1\n"
+"Generated-By: Babel 2.14.0\n"
 
 #: nb_cli/cli/__init__.py:51
 msgid "The working directory."
@@ -421,19 +421,19 @@ msgstr "无法找到项目根目录! {config_file} 文件不存在."
 msgid "Using python: {python_path}"
 msgstr "使用 Python: {python_path}"
 
-#: nb_cli/handlers/meta.py:92
+#: nb_cli/handlers/meta.py:91
 msgid "Cannot find a valid Python interpreter."
 msgstr "无法找到可用的 Python 解释器."
 
-#: nb_cli/handlers/meta.py:147
+#: nb_cli/handlers/meta.py:145
 msgid "Python {major}.{minor} is not supported."
 msgstr "Python {major}.{minor} 不受支持."
 
-#: nb_cli/handlers/meta.py:196
+#: nb_cli/handlers/meta.py:193
 msgid "NoneBot is not installed."
 msgstr "NoneBot 未安装."
 
-#: nb_cli/handlers/meta.py:242
+#: nb_cli/handlers/meta.py:238
 msgid "pip is not installed."
 msgstr "pip 未安装."
 
@@ -457,10 +457,10 @@ msgstr "正在终止进程 [{pid}]..."
 msgid "Stopped reloader."
 msgstr "停止重载监视"
 
-#: nb_cli/handlers/store.py:48
+#: nb_cli/handlers/store.py:44
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/store.py:79
+#: nb_cli/handlers/store.py:76
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
