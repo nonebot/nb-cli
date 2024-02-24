@@ -1,7 +1,8 @@
 from typing import Optional
 
-from .store import Driver, load_module_data
 from nb_cli.compat import model_dump
+
+from .store import Driver, load_module_data
 
 
 async def list_drivers(query: Optional[str] = None) -> list[Driver]:

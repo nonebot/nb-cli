@@ -9,7 +9,7 @@ from nb_cli import _
 from nb_cli.log import SUCCESS
 from nb_cli.consts import WINDOWS
 from nb_cli.exceptions import ProjectNotFoundError
-from nb_cli.compat import type_validate_python, model_dump
+from nb_cli.compat import model_dump, type_validate_python
 
 from .model import SimpleInfo, NoneBotConfig
 

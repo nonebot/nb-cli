@@ -6,9 +6,9 @@ import httpx
 from wcwidth import wcswidth
 
 from nb_cli import _, cache
+from nb_cli.compat import type_validate_python
 from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.config import Driver, Plugin, Adapter
-from nb_cli.compat import type_validate_python
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 

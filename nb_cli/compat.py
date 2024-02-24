@@ -4,19 +4,19 @@
 """
 
 import contextlib
+from collections.abc import Generator
 from dataclasses import dataclass, is_dataclass
 from typing_extensions import Self, get_args, get_origin, is_typeddict
 from typing import (
     TYPE_CHECKING,
     Any,
-    Annotated,
     Union,
     TypeVar,
     Callable,
     Optional,
     Protocol,
+    Annotated,
 )
-from collections.abc import Generator
 
 from pydantic import VERSION, BaseModel
 
@@ -51,11 +51,13 @@ __all__ = (
     "custom_validation",
 )
 
+
 def origin_is_annotated(origin: Optional[type[Any]]) -> bool:
     """判断是否是 Annotated 类型"""
     with contextlib.suppress(TypeError):
         return origin is not None and issubclass(origin, Annotated)
     return False
+
 
 if PYDANTIC_V2:  # pragma: pydantic-v2
     from pydantic_core import CoreSchema, core_schema
@@ -231,6 +233,7 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
             classmethod(__get_pydantic_core_schema__),
         )
         return class_
+
 else:  # pragma: pydantic-v1
     from pydantic import Extra
     from pydantic import parse_obj_as, parse_raw_as

@@ -1,5 +1,7 @@
 from pydantic import BaseModel
+
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
+
 
 class SimpleInfo(BaseModel):
     name: str
