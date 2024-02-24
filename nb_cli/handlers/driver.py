@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .store import Driver, load_module_data
+from nb_cli.compat import model_dump
 
 
 async def list_drivers(query: Optional[str] = None) -> list[Driver]:
@@ -11,5 +12,5 @@ async def list_drivers(query: Optional[str] = None) -> list[Driver]:
     return [
         driver
         for driver in drivers
-        if any(query in value for value in driver.dict().values())
+        if any(query in value for value in model_dump(driver).values())
     ]

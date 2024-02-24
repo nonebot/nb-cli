@@ -9,6 +9,7 @@ from nb_cli import _
 from nb_cli.log import SUCCESS
 from nb_cli.consts import WINDOWS
 from nb_cli.exceptions import ProjectNotFoundError
+from nb_cli.compat import type_validate_python, model_dump
 
 from .model import SimpleInfo, NoneBotConfig
 
@@ -108,7 +109,9 @@ class ConfigManager:
         return data.get("tool", {}).get("nonebot", {})
 
     def get_nonebot_config(self) -> NoneBotConfig:
-        return NoneBotConfig.parse_obj(self._get_nonebot_config(self._get_data()))
+        return type_validate_python(
+            NoneBotConfig, self._get_nonebot_config(self._get_data())
+        )
 
     def add_adapter(self, adapter: SimpleInfo) -> None:
         data = self._get_data()
@@ -116,7 +119,7 @@ class ConfigManager:
         adapters: list[dict[str, Any]] = table.setdefault("adapters", [])
         if all(a["module_name"] != adapter.module_name for a in adapters):
             t = tomlkit.inline_table()
-            t.update(adapter.dict(include={"name", "module_name"}))
+            t.update(model_dump(adapter, include={"name", "module_name"}))
             adapters.append(t)
         self._write_data(data)
 

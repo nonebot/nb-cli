@@ -74,6 +74,7 @@ executionEnvironments = [
   { root = "./website", pythonVersion = "3.10" },
   { root = "./", pythonVersion = "3.9" },
 ]
+defineConstant = { PYDANTIC_V2 = true }
 
 [tool.black]
 line-length = 88
