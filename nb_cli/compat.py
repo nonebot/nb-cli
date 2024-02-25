@@ -4,34 +4,15 @@
 """
 
 import contextlib
-from collections.abc import Generator
 from dataclasses import dataclass, is_dataclass
+from typing import Any, Union, TypeVar, Optional, Annotated
 from typing_extensions import Self, get_args, get_origin, is_typeddict
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Union,
-    TypeVar,
-    Callable,
-    Optional,
-    Protocol,
-    Annotated,
-)
 
 from pydantic import VERSION, BaseModel
 
 T = TypeVar("T")
 
 PYDANTIC_V2 = int(VERSION.split(".", 1)[0]) == 2
-
-if TYPE_CHECKING:
-
-    class _CustomValidationClass(Protocol):
-        @classmethod
-        def __get_validators__(cls) -> Generator[Callable[..., Any], None, None]: ...
-
-    CVC = TypeVar("CVC", bound=_CustomValidationClass)
-
 
 __all__ = (
     "Required",
@@ -48,7 +29,6 @@ __all__ = (
     "model_dump",
     "type_validate_python",
     "type_validate_json",
-    "custom_validation",
 )
 
 
@@ -60,9 +40,8 @@ def origin_is_annotated(origin: Optional[type[Any]]) -> bool:
 
 
 if PYDANTIC_V2:  # pragma: pydantic-v2
-    from pydantic_core import CoreSchema, core_schema
+    from pydantic import TypeAdapter
     from pydantic._internal._repr import display_as_type
-    from pydantic import TypeAdapter, GetCoreSchemaHandler
     from pydantic.fields import FieldInfo as BaseFieldInfo
 
     Required = Ellipsis
@@ -212,28 +191,6 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
         """Validate JSON with given type."""
         return TypeAdapter(type_).validate_json(data)
 
-    def __get_pydantic_core_schema__(
-        cls: type["_CustomValidationClass"],
-        source_type: Any,
-        handler: GetCoreSchemaHandler,
-    ) -> CoreSchema:
-        validators = list(cls.__get_validators__())
-        if len(validators) == 1:
-            return core_schema.no_info_plain_validator_function(validators[0])
-        return core_schema.chain_schema(
-            [core_schema.no_info_plain_validator_function(func) for func in validators]
-        )
-
-    def custom_validation(class_: type["CVC"]) -> type["CVC"]:
-        """Use pydantic v1 like validator generator in pydantic v2"""
-
-        setattr(
-            class_,
-            "__get_pydantic_core_schema__",
-            classmethod(__get_pydantic_core_schema__),
-        )
-        return class_
-
 else:  # pragma: pydantic-v1
     from pydantic import Extra
     from pydantic import parse_obj_as, parse_raw_as
@@ -371,7 +328,3 @@ else:  # pragma: pydantic-v1
     def type_validate_json(type_: type[T], data: Union[str, bytes]) -> T:
         """Validate JSON with given type."""
         return parse_raw_as(type_, data)
-
-    def custom_validation(class_: type["CVC"]) -> type["CVC"]:
-        """Do nothing in pydantic v1"""
-        return class_
