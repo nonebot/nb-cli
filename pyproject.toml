@@ -24,7 +24,7 @@ dependencies = [
   "cashews ~=6.0",
   "wcwidth ~=0.2",
   "tomlkit ~=0.10",
-  "pydantic !=2.5.0,!=2.5.1,<3.0.0,>=1.10.0",
+  "pydantic >=1.10.0,<3.0.0,!=2.5.0,!=2.5.1",
   "watchfiles ~=0.16",
   "cookiecutter ~=2.2",
   "virtualenv ~=20.21",
