@@ -19,6 +19,7 @@ from noneprompt import (
 
 from nb_cli import _
 from nb_cli.log import ClickHandler
+from nb_cli.compat import model_dump
 from nb_cli.config import ConfigManager
 from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.exceptions import ModuleLoadFailed
@@ -104,7 +105,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         )
 
     context.variables["adapters"] = json.dumps(
-        {a.data.project_link: a.data.dict() for a in adapters}
+        {a.data.project_link: model_dump(a.data) for a in adapters}
     )
     context.packages.extend([a.data.project_link for a in adapters])
 
@@ -120,7 +121,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         error_message=_("Chosen drivers is not valid!"),
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["drivers"] = json.dumps(
-        {d.data.project_link: d.data.dict() for d in drivers}
+        {d.data.project_link: model_dump(d.data) for d in drivers}
     )
     context.packages.extend(
         [d.data.project_link for d in drivers if d.data.project_link]

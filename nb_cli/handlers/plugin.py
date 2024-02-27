@@ -6,6 +6,7 @@ from typing import Optional
 from cookiecutter.main import cookiecutter
 
 from nb_cli.config import Plugin
+from nb_cli.compat import model_dump
 
 from . import templates
 from .process import create_process
@@ -56,5 +57,5 @@ async def list_plugins(query: Optional[str] = None) -> list[Plugin]:
     return [
         plugin
         for plugin in plugins
-        if any(query in value for value in plugin.dict().values())
+        if any(query in value for value in model_dump(plugin).values())
     ]

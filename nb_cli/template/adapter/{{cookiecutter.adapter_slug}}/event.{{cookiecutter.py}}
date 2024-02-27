@@ -2,6 +2,7 @@ from typing_extensions import override
 
 from pydantic import BaseModel
 from nonebot.adapters import Event as BaseEvent
+from nonebot.compat import model_dump
 
 from .message import Message
 
@@ -18,7 +19,7 @@ class Event(BaseEvent):
 
     @override
     def get_event_description(self) -> str:
-        return str(self.dict())
+        return str(model_dump(self))
 
     @override
     def get_message(self) -> Message:

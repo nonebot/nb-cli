@@ -6,6 +6,7 @@ import httpx
 from wcwidth import wcswidth
 
 from nb_cli import _, cache
+from nb_cli.compat import type_validate_python
 from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.config import Driver, Plugin, Adapter
 
@@ -64,7 +65,7 @@ else:
             try:
                 resp = await future
                 items = resp.json()
-                result = [module_class.parse_obj(item) for item in items]
+                result = type_validate_python(list[module_class], items)
                 for task in tasks:
                     if not task.done():
                         task.cancel()
