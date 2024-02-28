@@ -44,7 +44,7 @@ else:
             raise ValueError(
                 _("Invalid module type: {module_type}").format(module_type=module_type)
             )
-        module_name: str = getattr(module_class.__config__, "module_name")
+        module_name: str = module_class.__module_name__
 
         exceptions: list[Exception] = []
         urls = [

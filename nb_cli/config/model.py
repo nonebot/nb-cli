@@ -9,27 +9,24 @@ class SimpleInfo(BaseModel):
 
 
 class Adapter(SimpleInfo):
+    __module_name__ = "adapters"
+
     project_link: str
     desc: str
-
-    class Config:
-        module_name = "adapters"
 
 
 class Plugin(SimpleInfo):
+    __module_name__ = "plugins"
+
     project_link: str
     desc: str
-
-    class Config:
-        module_name = "plugins"
 
 
 class Driver(SimpleInfo):
+    __module_name__ = "drivers"
+
     project_link: str
     desc: str
-
-    class Config:
-        module_name = "drivers"
 
 
 class NoneBotConfig(BaseModel):
