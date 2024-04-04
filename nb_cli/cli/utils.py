@@ -3,8 +3,9 @@ from collections.abc import Coroutine
 from typing_extensions import ParamSpec
 from typing import Any, TypeVar, Callable, Optional
 
-import anyio
 import click
+import anyio.to_thread
+import anyio.from_thread
 from noneprompt import InputPrompt
 from prompt_toolkit.styles import Style
 

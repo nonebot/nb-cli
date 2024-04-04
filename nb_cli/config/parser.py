@@ -43,7 +43,7 @@ class ConfigManager:
     @staticmethod
     def _locate_project_root(cwd: Optional[Path] = None) -> Path:
         cwd = (cwd or Path.cwd()).resolve()
-        for dir in (cwd,) + tuple(cwd.parents):
+        for dir in (cwd, *cwd.parents):
             if dir.joinpath(CONFIG_FILE).is_file():
                 return dir
         raise ProjectNotFoundError(

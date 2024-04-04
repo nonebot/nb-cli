@@ -18,19 +18,19 @@ classifiers = [
 requires-python = ">=3.9, <4.0"
 dependencies = [
   "click ~=8.1",
-  "anyio ~=3.6",
   "httpx ~=0.18",
   "jinja2 ~=3.0",
-  "cashews ~=6.0",
   "wcwidth ~=0.2",
   "tomlkit ~=0.10",
   "watchfiles ~=0.16",
+  "anyio >=3.6, < 5.0",
   "cookiecutter ~=2.2",
   "virtualenv ~=20.21",
+  "cashews >=6.0, <8.0",
   "typing-extensions ~=4.4",
   "pyfiglet >=1.0.1, <2.0.0",
   "noneprompt >=0.1.9, <1.0.0",
-  "pydantic >=1.10.0,<3.0.0,!=2.5.0,!=2.5.1",
+  "pydantic >=1.10.0, <3.0.0, !=2.5.0, !=2.5.1",
   "importlib-metadata >=4.6; python_version < '3.10'",
 ]
 
@@ -41,7 +41,7 @@ repository = "https://github.com/nonebot/nb-cli"
 [tool.pdm.dev-dependencies]
 i18n = ["babel ~=2.11"]
 dev = [
-  "ruff ~=0.2.0",
+  "ruff ~=0.3.0",
   "isort ~=5.10",
   "black >=22.3.0",
   "nonemoji ~=0.1",
@@ -98,8 +98,31 @@ line-length = 88
 target-version = "py39"
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "UP", "C", "T", "PT", "Q"]
-ignore = ["E402", "C901", "UP037"]
+select = [
+  "F",     # Pyflakes
+  "W",     # pycodestyle warnings
+  "E",     # pycodestyle errors
+  "UP",    # pyupgrade
+  "ASYNC", # flake8-async
+  "C4",    # flake8-comprehensions
+  "T10",   # flake8-debugger
+  "T20",   # flake8-print
+  "PYI",   # flake8-pyi
+  "PT",    # flake8-pytest-style
+  "Q",     # flake8-quotes
+  "RUF",   # Ruff-specific rules
+]
+ignore = [
+  "E402",   # module-import-not-at-top-of-file
+  "UP037",  # quoted-annotation
+  "RUF001", # ambiguous-unicode-character-string
+  "RUF002", # ambiguous-unicode-character-docstring
+  "RUF003", # ambiguous-unicode-character-comment
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
 
 [build-system]
 requires = ["pdm-backend", "babel~=2.11"]

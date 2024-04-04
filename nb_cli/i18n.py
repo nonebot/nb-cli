@@ -8,7 +8,7 @@ from .consts import WINDOWS
 
 
 def _get_win_locale_with_ctypes() -> Optional[str]:
-    import ctypes  # noqa: F811
+    import ctypes
 
     kernel32 = ctypes.windll.kernel32
     lcid: int = kernel32.GetUserDefaultUILanguage()

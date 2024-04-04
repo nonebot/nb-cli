@@ -209,7 +209,7 @@ async def create(
         try:
             output_dir = (
                 await ListPrompt(
-                    _("Where to store the plugin?"), detected + [Choice(_("Other"))]
+                    _("Where to store the plugin?"), [*detected, Choice(_("Other"))]
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
             ).name
             if output_dir == _("Other"):
