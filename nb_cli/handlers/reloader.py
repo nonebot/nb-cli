@@ -31,7 +31,7 @@ class FileFilter:
         ]
         self.exclude_dirs = []
         for e in excludes:
-            p = Path(e)
+            p = Path(e).expanduser()
             try:
                 is_dir = p.is_dir()
             except OSError:  # pragma: no cover
@@ -39,7 +39,7 @@ class FileFilter:
                 is_dir = False
 
             if is_dir:
-                self.exclude_dirs.append(p)
+                self.exclude_dirs.append(p.resolve())
             else:
                 self.excludes.append(e)
         self.excludes = list(set(self.excludes))
@@ -165,7 +165,7 @@ class Reloader:
     async def should_restart(self) -> Optional[list[Path]]:
         changes = await self.watcher.__anext__()
         if changes:
-            unique_paths = {Path(c[1]) for c in changes}
+            unique_paths = {Path(c[1]).resolve() for c in changes}
             return [p for p in unique_paths if self.watch_filter(p)]
         return None
 
