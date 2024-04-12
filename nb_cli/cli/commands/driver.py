@@ -87,8 +87,6 @@ async def install(
         )
     except CancelledError:
         ctx.exit()
-    except Exception:
-        ctx.exit(1)
 
     if driver.project_link:
         proc = await call_pip_install(driver.project_link, pip_args)
@@ -111,8 +109,6 @@ async def update(
         )
     except CancelledError:
         ctx.exit()
-    except Exception:
-        ctx.exit(1)
 
     if driver.project_link:
         proc = await call_pip_update(driver.project_link, pip_args)
@@ -137,8 +133,6 @@ async def uninstall(
         )
     except CancelledError:
         ctx.exit()
-    except Exception:
-        ctx.exit(1)
 
     if package := driver.project_link:
         if package.startswith("nonebot2[") and package.endswith("]"):

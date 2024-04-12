@@ -200,7 +200,7 @@ async def create(
             context = await inject_prompt(context)
     except ModuleLoadFailed as e:
         click.secho(repr(e), fg="red")
-        ctx.exit()
+        ctx.exit(1)
     except CancelledError:
         ctx.exit()
 
@@ -271,7 +271,7 @@ async def create(
                     ).format(builtin_plugin=loaded_builtin_plugins, e=e),
                     fg="red",
                 )
-                ctx.exit()
+                ctx.exit(1)
         else:
             click.secho(
                 _(

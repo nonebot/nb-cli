@@ -90,8 +90,6 @@ async def install(
         )
     except CancelledError:
         ctx.exit()
-    except Exception:
-        ctx.exit(1)
 
     try:
         GLOBAL_CONFIG.add_adapter(adapter)
@@ -122,8 +120,6 @@ async def update(
         )
     except CancelledError:
         ctx.exit()
-    except Exception:
-        ctx.exit(1)
 
     proc = await call_pip_update(adapter.project_link, pip_args)
     await proc.wait()
@@ -147,8 +143,6 @@ async def uninstall(
         )
     except CancelledError:
         ctx.exit()
-    except Exception:
-        ctx.exit(1)
 
     try:
         GLOBAL_CONFIG.remove_adapter(adapter)
