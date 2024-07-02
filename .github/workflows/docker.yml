@@ -147,7 +147,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: /tmp/artifacts
-          pattern: '*-digests'
+          pattern: "*-digests"
 
       - name: Copy digests
         run: |
