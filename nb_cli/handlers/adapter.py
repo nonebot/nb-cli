@@ -32,5 +32,10 @@ async def list_adapters(query: Optional[str] = None) -> list[Adapter]:
     return [
         adapter
         for adapter in adapters
-        if any(query in value for value in model_dump(adapter).values())
+        if any(
+            query in value
+            for value in model_dump(
+                adapter, include={"name", "module_name", "project_link", "desc"}
+            ).values()
+        )
     ]

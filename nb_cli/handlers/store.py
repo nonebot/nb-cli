@@ -1,4 +1,5 @@
 import shutil
+from statistics import median_high
 from asyncio import create_task, as_completed
 from typing import TYPE_CHECKING, Union, Literal, TypeVar, Optional, overload
 
@@ -25,14 +26,14 @@ if TYPE_CHECKING:
     async def load_module_data(module_type: Literal["driver"]) -> list[Driver]: ...
 
     async def load_module_data(
-        module_type: Literal["adapter", "plugin", "driver"]
+        module_type: Literal["adapter", "plugin", "driver"],
     ) -> Union[list[Adapter], list[Plugin], list[Driver]]: ...
 
 else:
 
     @cache(ttl=None)
     async def load_module_data(
-        module_type: Literal["adapter", "plugin", "driver"]
+        module_type: Literal["adapter", "plugin", "driver"],
     ) -> Union[list[Adapter], list[Plugin], list[Driver]]:
         if module_type == "adapter":
             module_class = Adapter
@@ -79,6 +80,13 @@ else:
         )
 
 
+def split_text_by_wcswidth(text: str, width: int):
+    _width = width
+    while wcswidth(text[:_width]) > width:
+        _width = _width - 1
+    return text[:_width], text[_width:]
+
+
 def format_package_results(
     hits: list[T],
     name_column_width: Optional[int] = None,
@@ -88,29 +96,49 @@ def format_package_results(
         return ""
 
     if name_column_width is None:
-        name_column_width = (
-            max(wcswidth(f"{hit.name} ({hit.project_link})") for hit in hits) + 4
+        name_column_width = median_high(
+            wcswidth(f"{hit.name} ({hit.project_link})") for hit in hits
         )
     if terminal_width is None:
         terminal_width = shutil.get_terminal_size()[0]
 
+    desc_width = terminal_width - name_column_width - 8
+
     lines: list[str] = []
     for hit in hits:
-        name = f"{hit.name} ({hit.project_link})"
-        summary = hit.desc
-        target_width = terminal_width - name_column_width - 5
-        if target_width > 10:
-            # wrap and indent summary to fit terminal
-            summary_lines = []
-            while wcswidth(summary) > target_width:
-                tmp_length = target_width
-                while wcswidth(summary[:tmp_length]) > target_width:
-                    tmp_length = tmp_length - 1
-                summary_lines.append(summary[:tmp_length])
-                summary = summary[tmp_length:]
-            summary_lines.append(summary)
-            summary = ("\n" + " " * (name_column_width + 3)).join(summary_lines)
+        is_official = "👍" if hit.is_official else "  "
+        valid = "  "
+        if isinstance(hit, Plugin):
+            valid = "✅" if hit.valid else "❌"
+        name = hit.name.replace("\n", "")
+        link = f"({hit.project_link})"
+        desc = hit.desc.replace("\n", "")
+        # wrap and indent summary to fit terminal
+        is_first_line = True
+        while (
+            wcswidth(f"{name} {link}") > name_column_width
+            or wcswidth(desc) > desc_width
+        ):
+            name_column, name = split_text_by_wcswidth(name, name_column_width)
+            if name_column == "":
+                name_column, link = split_text_by_wcswidth(link, name_column_width)
+            desc_column, desc = split_text_by_wcswidth(desc, desc_width)
+            lines.append(
+                name_column
+                + " " * (name_column_width - wcswidth(name_column))
+                + (f" {valid} {is_official} " if is_first_line else " " * 7)
+                + desc_column
+                + " " * (desc_width - wcswidth(desc_column))
+            )
+            is_first_line = False
 
-        lines.append(f"{name + ' ' * (name_column_width - wcswidth(name))} - {summary}")
+        name_column = f"{name} {link}".strip()
+        lines.append(
+            name_column
+            + " " * (name_column_width - wcswidth(name_column))
+            + (f" {valid} {is_official} " if is_first_line else " " * 7)
+            + desc
+            + " " * (desc_width - wcswidth(desc))
+        )
 
     return "\n".join(lines)

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+from typing import Optional
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
 
 
@@ -13,6 +14,7 @@ class Adapter(SimpleInfo):
 
     project_link: str
     desc: str
+    is_official: Optional[bool] = None
 
 
 class Plugin(SimpleInfo):
@@ -20,6 +22,8 @@ class Plugin(SimpleInfo):
 
     project_link: str
     desc: str
+    is_official: Optional[bool] = None
+    valid: Optional[bool] = None
 
 
 class Driver(SimpleInfo):
@@ -27,10 +31,10 @@ class Driver(SimpleInfo):
 
     project_link: str
     desc: str
+    is_official: Optional[bool] = None
 
 
 class NoneBotConfig(BaseModel):
-
     if PYDANTIC_V2:  # pragma: pydantic-v2
         model_config = ConfigDict(extra="allow")
     else:  # pragma: pydantic-v1
