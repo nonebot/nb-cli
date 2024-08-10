@@ -1,6 +1,7 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
-from typing import Optional
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
 
 
