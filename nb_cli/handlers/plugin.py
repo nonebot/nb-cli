@@ -57,5 +57,10 @@ async def list_plugins(query: Optional[str] = None) -> list[Plugin]:
     return [
         plugin
         for plugin in plugins
-        if any(query in value for value in model_dump(plugin).values())
+        if any(
+            query in value
+            for value in model_dump(
+                plugin, include={"name", "module_name", "project_link", "desc"}
+            ).values()
+        )
     ]
