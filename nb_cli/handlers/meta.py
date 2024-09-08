@@ -9,11 +9,7 @@ from typing import TYPE_CHECKING, Any, TypeVar, Callable, Optional, cast
 from nb_cli import _, cache
 from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager, NoneBotConfig
-from nb_cli.exceptions import (
-    PipNotInstalledError,
-    PythonInterpreterError,
-    NoneBotNotInstalledError,
-)
+from nb_cli.exceptions import PipError, NoneBotError, PythonInterpreterError
 
 from . import templates
 from .process import create_process, create_process_shell
@@ -66,6 +62,8 @@ else:
     async def _get_env_python() -> str:
         python_to_try = WINDOWS_DEFAULT_PYTHON if WINDOWS else DEFAULT_PYTHON
 
+        stdout, stderr = None, None
+
         for python in python_to_try:
             proc = await create_process_shell(
                 f"{python} -W ignore -c "
@@ -75,13 +73,14 @@ else:
             stdout, stderr = await proc.communicate()
             if proc.returncode == 0:
                 try:
-                    if executable := json.loads(stdout.strip()):
+                    if executable := json.loads(stdout.splitlines()[-1].strip()):
                         return executable
                 except Exception:
                     continue
         raise PythonInterpreterError(
             _("Cannot find a valid Python interpreter.")
-            + (f" stdout={stdout!r}" if stdout else "")
+            + (f"\nstdout:\n{stdout}" if stdout else "")
+            + (f"\nstderr:\n{stderr}" if stderr else "")
         )
 
 
@@ -118,7 +117,21 @@ else:
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, stderr = await proc.communicate()
-        return json.loads(stdout.strip())
+        if proc.returncode != 0:
+            raise PythonInterpreterError(
+                _("Failed to get Python version.")
+                + _("Exit code {code}").format(code=proc.returncode)
+                + (f"\nstdout:\n{stdout}" if stdout else "")
+                + (f"\nstderr:\n{stderr}" if stderr else "")
+            )
+        try:
+            return json.loads(stdout.splitlines()[-1].strip())
+        except Exception as e:
+            raise PythonInterpreterError(
+                _("Failed to get Python version.")
+                + (f"\nstdout:\n{stdout}" if stdout else "")
+                + (f"\nstderr:\n{stderr}" if stderr else "")
+            ) from e
 
 
 def requires_python(
@@ -167,7 +180,21 @@ else:
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, stderr = await proc.communicate()
-        return json.loads(stdout.strip())
+        if proc.returncode != 0:
+            raise NoneBotError(
+                _("Failed to get NoneBot version.")
+                + _("Exit code {code}").format(code=proc.returncode)
+                + (f"\nstdout:\n{stdout}" if stdout else "")
+                + (f"\nstderr:\n{stderr}" if stderr else "")
+            )
+        try:
+            return json.loads(stdout.splitlines()[-1].strip())
+        except Exception as e:
+            raise NoneBotError(
+                _("Failed to get NoneBot version.")
+                + (f"\nstdout:\n{stdout}" if stdout else "")
+                + (f"\nstderr:\n{stderr}" if stderr else "")
+            ) from e
 
 
 def requires_nonebot(
@@ -182,7 +209,7 @@ def requires_nonebot(
         ):
             return await func(*args, **kwargs)
 
-        raise NoneBotNotInstalledError(_("NoneBot is not installed."))
+        raise NoneBotError(_("NoneBot is not installed."))
 
     return wrapper
 
@@ -212,7 +239,21 @@ else:
             stdout=asyncio.subprocess.PIPE,
         )
         stdout, stderr = await proc.communicate()
-        return json.loads(stdout.strip())
+        if proc.returncode != 0:
+            raise PipError(
+                _("Failed to get pip version.")
+                + _("Exit code {code}").format(code=proc.returncode)
+                + (f"\nstdout:\n{stdout}" if stdout else "")
+                + (f"\nstderr:\n{stderr}" if stderr else "")
+            )
+        try:
+            return json.loads(stdout.splitlines()[-1].strip())
+        except Exception as e:
+            raise PipError(
+                _("Failed to get pip version.")
+                + (f"\nstdout:\n{stdout}" if stdout else "")
+                + (f"\nstderr:\n{stderr}" if stderr else "")
+            ) from e
 
 
 def requires_pip(
@@ -227,6 +268,6 @@ def requires_pip(
         ):
             return await func(*args, **kwargs)
 
-        raise PipNotInstalledError(_("pip is not installed."))
+        raise PipError(_("pip is not installed."))
 
     return wrapper

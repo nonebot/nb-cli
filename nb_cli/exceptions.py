@@ -6,11 +6,11 @@ class PythonInterpreterError(RuntimeError):
     """Raised when the Python version is not supported."""
 
 
-class PipNotInstalledError(RuntimeError):
+class PipError(RuntimeError):
     """Raised when pip is not installed."""
 
 
-class NoneBotNotInstalledError(RuntimeError):
+class NoneBotError(RuntimeError):
     """Raised when NoneBot is not installed."""
 
 
