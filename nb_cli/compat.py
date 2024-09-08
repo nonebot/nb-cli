@@ -3,7 +3,6 @@
 为兼容 Pydantic V1 与 V2 版本，定义了一系列兼容函数与类供使用。
 """
 
-import contextlib
 from dataclasses import dataclass, is_dataclass
 from typing import Any, Union, TypeVar, Optional, Annotated
 from typing_extensions import Self, get_args, get_origin, is_typeddict
@@ -34,9 +33,7 @@ __all__ = (
 
 def origin_is_annotated(origin: Optional[type[Any]]) -> bool:
     """判断是否是 Annotated 类型"""
-    with contextlib.suppress(TypeError):
-        return origin is not None and issubclass(origin, Annotated)
-    return False
+    return origin is Annotated
 
 
 if PYDANTIC_V2:  # pragma: pydantic-v2
