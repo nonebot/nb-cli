@@ -60,7 +60,7 @@ def handle_signal(signum: int, frame: Optional[FrameType]) -> None:
 
 
 def register_signal_handler(
-    handler: Callable[[int, Optional[FrameType]], None]
+    handler: Callable[[int, Optional[FrameType]], None],
 ) -> None:
     handlers.append(handler)
 

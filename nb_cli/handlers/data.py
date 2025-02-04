@@ -8,7 +8,7 @@ WINDOWS = sys.platform.startswith("win") or (sys.platform == "cli" and os.name =
 
 # -- Windows support functions --
 def _get_win_folder_from_registry(
-    csidl_name: Literal["CSIDL_APPDATA", "CSIDL_COMMON_APPDATA", "CSIDL_LOCAL_APPDATA"]
+    csidl_name: Literal["CSIDL_APPDATA", "CSIDL_COMMON_APPDATA", "CSIDL_LOCAL_APPDATA"],
 ) -> Path:
     """
     This is a fallback technique at best. I'm not sure if using the
@@ -32,7 +32,7 @@ def _get_win_folder_from_registry(
 
 
 def _get_win_folder_with_ctypes(
-    csidl_name: Literal["CSIDL_APPDATA", "CSIDL_COMMON_APPDATA", "CSIDL_LOCAL_APPDATA"]
+    csidl_name: Literal["CSIDL_APPDATA", "CSIDL_COMMON_APPDATA", "CSIDL_LOCAL_APPDATA"],
 ) -> Path:
     csidl_const = {
         "CSIDL_APPDATA": 26,
