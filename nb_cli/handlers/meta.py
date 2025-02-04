@@ -42,7 +42,7 @@ def get_project_root(cwd: Optional[Path] = None) -> Path:
 
 
 def requires_project_root(
-    func: Callable[P, Coroutine[Any, Any, R]]
+    func: Callable[P, Coroutine[Any, Any, R]],
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -135,7 +135,7 @@ else:
 
 
 def requires_python(
-    func: Callable[P, Coroutine[Any, Any, R]]
+    func: Callable[P, Coroutine[Any, Any, R]],
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -198,7 +198,7 @@ else:
 
 
 def requires_nonebot(
-    func: Callable[P, Coroutine[Any, Any, R]]
+    func: Callable[P, Coroutine[Any, Any, R]],
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     @requires_python
@@ -257,7 +257,7 @@ else:
 
 
 def requires_pip(
-    func: Callable[P, Coroutine[Any, Any, R]]
+    func: Callable[P, Coroutine[Any, Any, R]],
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     @requires_python

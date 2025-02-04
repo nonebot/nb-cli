@@ -17,7 +17,7 @@ P = ParamSpec("P")
 
 
 def ensure_process_terminated(
-    func: Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]
+    func: Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]],
 ) -> Callable[P, Coroutine[Any, Any, asyncio.subprocess.Process]]:
     tasks: set[asyncio.Task] = set()
 
