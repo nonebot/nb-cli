@@ -1,38 +1,49 @@
+import json
 import shutil
+import typing
+import contextlib
 from statistics import median_high
+from datetime import datetime, timedelta
 from asyncio import create_task, as_completed
 from typing import TYPE_CHECKING, Union, Literal, TypeVar, Optional, overload
 
+import anyio
 import httpx
+import nonestorage
 from wcwidth import wcswidth
 
 from nb_cli import _, cache
-from nb_cli.compat import type_validate_python
-from nb_cli.exceptions import ModuleLoadFailed
 from nb_cli.config import Driver, Plugin, Adapter
+from nb_cli.exceptions import ModuleLoadFailed, LocalCacheExpired
+from nb_cli.compat import type_validate_json, type_validate_python
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 
+LOCAL_CACHE_DIR = nonestorage.user_cache_dir("nb-cli")
+LOCAL_CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
 
-if TYPE_CHECKING:
 
-    @overload
-    async def load_module_data(module_type: Literal["adapter"]) -> list[Adapter]: ...
-
-    @overload
-    async def load_module_data(module_type: Literal["plugin"]) -> list[Plugin]: ...
+if not TYPE_CHECKING:
 
     @overload
-    async def load_module_data(module_type: Literal["driver"]) -> list[Driver]: ...
+    async def download_module_data(
+        module_type: Literal["adapter"],
+    ) -> list[Adapter]: ...
 
-    async def load_module_data(
+    @overload
+    async def download_module_data(module_type: Literal["plugin"]) -> list[Plugin]: ...
+
+    @overload
+    async def download_module_data(module_type: Literal["driver"]) -> list[Driver]: ...
+
+    async def download_module_data(
         module_type: Literal["adapter", "plugin", "driver"],
     ) -> Union[list[Adapter], list[Plugin], list[Driver]]: ...
 
 else:
 
     @cache(ttl=None)
-    async def load_module_data(
+    async def download_module_data(
         module_type: Literal["adapter", "plugin", "driver"],
     ) -> Union[list[Adapter], list[Plugin], list[Driver]]:
         if module_type == "adapter":
@@ -70,6 +81,12 @@ else:
                 for task in tasks:
                     if not task.done():
                         task.cancel()
+                with contextlib.suppress():
+                    # attempt to save cache, pass even if failed
+                    async with await anyio.open_file(
+                        LOCAL_CACHE_DIR / f"{module_name}.json", "w", encoding="utf-8"
+                    ) as f:
+                        json.dump(items, f, ensure_ascii=False)
                 return result  # type: ignore
             except Exception as e:
                 exceptions.append(e)
@@ -78,6 +95,88 @@ else:
             _("Failed to get {module_type} list.").format(module_type=module_type),
             exceptions,
         )
+
+
+@overload
+def load_local_module_data(
+    module_type: Literal["adapter"], *, ignore_mtime: bool = False
+) -> list[Adapter]: ...
+
+
+@overload
+def load_local_module_data(
+    module_type: Literal["plugin"], *, ignore_mtime: bool = False
+) -> list[Plugin]: ...
+
+
+@overload
+def load_local_module_data(
+    module_type: Literal["driver"], *, ignore_mtime: bool = False
+) -> list[Driver]: ...
+
+
+def load_local_module_data(
+    module_type: Literal["adapter", "plugin", "driver"],
+    *,
+    ignore_mtime: bool = False,
+) -> Union[list[Adapter], list[Plugin], list[Driver]]:
+    if module_type == "adapter":
+        ModuleClass = Adapter
+    elif module_type == "plugin":
+        ModuleClass = Plugin
+    elif module_type == "driver":
+        ModuleClass = Driver
+    else:
+        raise ValueError(
+            _("Invalid module type: {module_type}").format(module_type=module_type)
+        )
+    module_name: str = ModuleClass.__module_name__
+
+    datafile = LOCAL_CACHE_DIR / f"{module_name}.json"
+    try:
+        if ignore_mtime or datetime.now() - datetime.fromtimestamp(
+            datafile.stat().st_mtime
+        ) < timedelta(hours=12):
+            return typing.cast(
+                Union[list[Adapter], list[Plugin], list[Driver]],
+                type_validate_json(list[ModuleClass], datafile.read_text("utf-8")),
+            )
+    except Exception as exc:
+        raise ModuleLoadFailed(
+            _("Invalid local cache of module type: {module_type}").format(
+                module_type=module_type
+            ),
+            exc,
+        )
+    raise LocalCacheExpired()
+
+
+@overload
+async def load_module_data(module_type: Literal["adapter"]) -> list[Adapter]: ...
+
+
+@overload
+async def load_module_data(module_type: Literal["plugin"]) -> list[Plugin]: ...
+
+
+@overload
+async def load_module_data(module_type: Literal["driver"]) -> list[Driver]: ...
+
+
+async def load_module_data(
+    module_type: Literal["adapter", "plugin", "driver"],
+) -> Union[list[Adapter], list[Plugin], list[Driver]]:
+    try:
+        return load_local_module_data(module_type)
+    except ModuleLoadFailed:  # local cache file is missing or broken
+        return await download_module_data(module_type)
+    except LocalCacheExpired:  # local cache file is expired
+        pass  # continue trying
+
+    try:
+        return await download_module_data(module_type)
+    except ModuleLoadFailed:
+        return load_local_module_data(module_type, ignore_mtime=True)
 
 
 def split_text_by_wcswidth(text: str, width: int):

@@ -15,4 +15,8 @@ class NoneBotError(RuntimeError):
 
 
 class ProjectNotFoundError(RuntimeError):
-    """Raised when project root directory not found"""
+    """Raised when project root directory not found."""
+
+
+class LocalCacheExpired(RuntimeError):
+    """Raised when local metadata cache is outdated."""
