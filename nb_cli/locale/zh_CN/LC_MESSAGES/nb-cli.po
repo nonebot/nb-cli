@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2024-09-08 08:37+0000\n"
+"POT-Creation-Date: 2025-07-05 15:52+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -474,10 +474,15 @@ msgstr "正在终止进程 [{pid}]..."
 msgid "Stopped reloader."
 msgstr "停止重载监视"
 
-#: nb_cli/handlers/store.py:46
+#: nb_cli/handlers/store.py:57 nb_cli/handlers/store.py:131
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/store.py:78
+#: nb_cli/handlers/store.py:95
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
+
+#: nb_cli/handlers/store.py:146
+msgid "Invalid local cache of module type: {module_type}"
+msgstr "无效的模块类型缓存: {module_type}"
+
