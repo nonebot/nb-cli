@@ -1,13 +1,13 @@
 import json
 import shutil
 import typing
-import contextlib
 from statistics import median_high
 from datetime import datetime, timedelta
 from asyncio import create_task, as_completed
 from typing import TYPE_CHECKING, Union, Literal, TypeVar, Optional, overload
 
 import anyio
+import click
 import httpx
 import nonestorage
 from wcwidth import wcswidth
@@ -81,12 +81,19 @@ else:
                 for task in tasks:
                     if not task.done():
                         task.cancel()
-                with contextlib.suppress():
+                try:
                     # attempt to save cache, pass even if failed
                     async with await anyio.open_file(
                         LOCAL_CACHE_DIR / f"{module_name}.json", "w", encoding="utf-8"
                     ) as f:
                         await f.write(json.dumps(items, ensure_ascii=False))
+                except Exception:
+                    click.secho(
+                        _(
+                            "WARNING: Failed to cache data for module {module_type}."
+                        ).format(module_type=module_type),
+                        fg="yellow",
+                    )
                 return result  # type: ignore
             except Exception as e:
                 exceptions.append(e)
@@ -176,7 +183,15 @@ async def load_module_data(
     try:
         return await download_module_data(module_type)
     except ModuleLoadFailed:
-        return load_local_module_data(module_type, allow_expired=True)
+        res = load_local_module_data(module_type, allow_expired=True)
+        click.secho(
+            _(
+                "WARNING: Failed to download latest data of module {module_type}. "
+                "Expired cache is used."
+            ).format(module_type=module_type),
+            fg="yellow",
+        )
+        return res
 
 
 def split_text_by_wcswidth(text: str, width: int):
