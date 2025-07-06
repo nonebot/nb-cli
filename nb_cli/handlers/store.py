@@ -99,26 +99,26 @@ else:
 
 @overload
 def load_local_module_data(
-    module_type: Literal["adapter"], *, ignore_mtime: bool = False
+    module_type: Literal["adapter"], *, allow_expired: bool = False
 ) -> list[Adapter]: ...
 
 
 @overload
 def load_local_module_data(
-    module_type: Literal["plugin"], *, ignore_mtime: bool = False
+    module_type: Literal["plugin"], *, allow_expired: bool = False
 ) -> list[Plugin]: ...
 
 
 @overload
 def load_local_module_data(
-    module_type: Literal["driver"], *, ignore_mtime: bool = False
+    module_type: Literal["driver"], *, allow_expired: bool = False
 ) -> list[Driver]: ...
 
 
 def load_local_module_data(
     module_type: Literal["adapter", "plugin", "driver"],
     *,
-    ignore_mtime: bool = False,
+    allow_expired: bool = False,
 ) -> Union[list[Adapter], list[Plugin], list[Driver]]:
     if module_type == "adapter":
         ModuleClass = Adapter
@@ -134,7 +134,7 @@ def load_local_module_data(
 
     datafile = LOCAL_CACHE_DIR / f"{module_name}.json"
     try:
-        if ignore_mtime or datetime.now() - datetime.fromtimestamp(
+        if allow_expired or datetime.now() - datetime.fromtimestamp(
             datafile.stat().st_mtime
         ) < timedelta(hours=12):
             return typing.cast(
@@ -176,7 +176,7 @@ async def load_module_data(
     try:
         return await download_module_data(module_type)
     except ModuleLoadFailed:
-        return load_local_module_data(module_type, ignore_mtime=True)
+        return load_local_module_data(module_type, allow_expired=True)
 
 
 def split_text_by_wcswidth(text: str, width: int):
