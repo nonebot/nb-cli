@@ -23,7 +23,7 @@ LOCAL_CACHE_DIR = nonestorage.user_cache_dir("nb-cli")
 LOCAL_CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
 
 
-if not TYPE_CHECKING:
+if TYPE_CHECKING:
 
     @overload
     async def download_module_data(
