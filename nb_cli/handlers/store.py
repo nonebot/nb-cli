@@ -86,7 +86,7 @@ else:
                     async with await anyio.open_file(
                         LOCAL_CACHE_DIR / f"{module_name}.json", "w", encoding="utf-8"
                     ) as f:
-                        json.dump(items, f, ensure_ascii=False)
+                        await f.write(json.dumps(items, ensure_ascii=False))
                 return result  # type: ignore
             except Exception as e:
                 exceptions.append(e)
