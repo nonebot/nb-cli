@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-05 15:52+0000\n"
+"POT-Creation-Date: 2025-07-06 17:17+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -474,15 +474,25 @@ msgstr "正在终止进程 [{pid}]..."
 msgid "Stopped reloader."
 msgstr "停止重载监视"
 
-#: nb_cli/handlers/store.py:57 nb_cli/handlers/store.py:131
+#: nb_cli/handlers/store.py:57 nb_cli/handlers/store.py:138
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/store.py:95
+#: nb_cli/handlers/store.py:92
+msgid "WARNING: Failed to cache data for module {module_type}."
+msgstr "警告: {module_type} 模块类型缓存失败."
+
+#: nb_cli/handlers/store.py:102
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
 
-#: nb_cli/handlers/store.py:146
+#: nb_cli/handlers/store.py:153
 msgid "Invalid local cache of module type: {module_type}"
 msgstr "无效的模块类型缓存: {module_type}"
+
+#: nb_cli/handlers/store.py:188
+msgid ""
+"WARNING: Failed to download latest data of module {module_type}. Expired "
+"cache is used."
+msgstr "警告: 无法下载最新的 {module_type} 模块类型缓存，当前正在使用旧的缓存."
 
