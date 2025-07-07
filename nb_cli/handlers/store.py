@@ -9,18 +9,17 @@ from typing import TYPE_CHECKING, Union, Literal, TypeVar, Optional, overload
 import anyio
 import click
 import httpx
-import nonestorage
 from wcwidth import wcswidth
 
 from nb_cli import _, cache
+from nb_cli.handlers.data import CACHE_DIR
 from nb_cli.config import Driver, Plugin, Adapter
 from nb_cli.exceptions import ModuleLoadFailed, LocalCacheExpired
 from nb_cli.compat import type_validate_json, type_validate_python
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 
-LOCAL_CACHE_DIR = nonestorage.user_cache_dir("nb-cli")
-LOCAL_CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
+CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
 
 
 if TYPE_CHECKING:
@@ -84,7 +83,7 @@ else:
                 try:
                     # attempt to save cache, pass even if failed
                     async with await anyio.open_file(
-                        LOCAL_CACHE_DIR / f"{module_name}.json", "w", encoding="utf-8"
+                        CACHE_DIR / f"{module_name}.json", "w", encoding="utf-8"
                     ) as f:
                         await f.write(json.dumps(items, ensure_ascii=False))
                 except Exception:
@@ -139,7 +138,7 @@ def load_local_module_data(
         )
     module_name: str = ModuleClass.__module_name__
 
-    datafile = LOCAL_CACHE_DIR / f"{module_name}.json"
+    datafile = CACHE_DIR / f"{module_name}.json"
     try:
         if allow_expired or datetime.now() - datetime.fromtimestamp(
             datafile.stat().st_mtime
