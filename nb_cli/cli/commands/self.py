@@ -5,6 +5,7 @@ import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
+from nb_cli.cli.commands.cache import cache
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
     call_pip_list,
@@ -115,3 +116,6 @@ async def uninstall(
 async def list_(pip_args: Optional[list[str]]):
     proc = await call_pip_list(pip_args, python_path=sys.executable)
     await proc.wait()
+
+
+self.add_command(cache)

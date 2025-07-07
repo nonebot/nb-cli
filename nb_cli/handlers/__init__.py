@@ -38,6 +38,7 @@ from .data import CONFIG_DIR as CONFIG_DIR
 
 # package
 from .store import load_module_data as load_module_data
+from .store import download_module_data as download_module_data
 from .store import format_package_results as format_package_results
 
 # isort: split

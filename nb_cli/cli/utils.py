@@ -1,7 +1,7 @@
 from functools import wraps, partial
 from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import Any, TypeVar, Callable, Optional
+from typing import Any, Literal, TypeVar, Callable, Optional
 
 import click
 import anyio.to_thread
@@ -71,3 +71,61 @@ def run_async(func: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
         return anyio.from_thread.run(partial(func, *args, **kwargs))
 
     return wrapper
+
+
+def humanize_data_size(
+    bytes_: int,
+    *,
+    precision: int = 3,
+    threshold: float = 0.92,
+    use_si: bool = False,
+    negative_size: Literal["error", "n/a", "negative"] = "error",
+) -> str:
+    """
+    Convert a byte count into a human-readable string (e.g., '1.23 MiB').
+
+    Args:
+        bytes_ (int): The number of bytes to convert.
+        precision (int): Number of decimal places in the output.
+        threshold (float): Factor used to determine when to switch to a higher unit.
+        use_si (bool): If True, use base-1000 units (MB, GB); otherwise use
+            base-1024 (MiB, GiB).
+        negative_size (Literal["error", "n/a", "negative"]): strategy to control how to
+            process negative size.
+
+    Returns:
+        str: Human-readable size string.
+
+    Raises:
+        ValueError: If bytes_ is negative and `negative_size` is set 'error'.
+    """
+    neg = ""
+    if bytes_ < 0:
+        if negative_size == "error":
+            raise ValueError("size should be no less than 0.")
+        elif negative_size == "n/a":
+            return "N/A"
+        elif negative_size == "negative":
+            bytes_ = -bytes_
+            neg = "-"
+
+    prefix = ["K", "M", "G", "T", "P", "E"]  # currently only 'M' is reachable at most
+    if use_si:
+        base = 1000
+        unit = "B"
+    else:
+        base = 1024
+        unit = "iB"
+
+    unit_limit = base * threshold
+
+    if bytes_ < unit_limit:
+        return f"{neg}{bytes_} B"
+
+    result: float = bytes_
+    for p in prefix:
+        result /= base
+        if result < unit_limit:
+            return f"{neg}{result:.{precision}g} {p}{unit}"
+
+    return f"{neg}{result:.{precision}} {prefix[-1]}{unit}"  # size too large
