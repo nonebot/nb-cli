@@ -130,16 +130,16 @@ def load_local_module_data(
     allow_expired: bool = False,
 ) -> Union[list[Adapter], list[Plugin], list[Driver]]:
     if module_type == "adapter":
-        ModuleClass = Adapter
+        module_class = Adapter
     elif module_type == "plugin":
-        ModuleClass = Plugin
+        module_class = Plugin
     elif module_type == "driver":
-        ModuleClass = Driver
+        module_class = Driver
     else:
         raise ValueError(
             _("Invalid module type: {module_type}").format(module_type=module_type)
         )
-    module_name: str = ModuleClass.__module_name__
+    module_name: str = module_class.__module_name__
 
     datafile = CACHE_DIR / f"{module_name}.json"
     try:
@@ -148,7 +148,7 @@ def load_local_module_data(
         ) < timedelta(hours=12):
             return typing.cast(
                 Union[list[Adapter], list[Plugin], list[Driver]],
-                type_validate_json(list[ModuleClass], datafile.read_text("utf-8")),
+                type_validate_json(list[module_class], datafile.read_text("utf-8")),
             )
     except Exception as exc:
         raise ModuleLoadFailed(
