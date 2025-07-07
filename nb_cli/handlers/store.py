@@ -19,7 +19,10 @@ from nb_cli.compat import type_validate_json, type_validate_python
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 
-CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
+try:
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
+except Exception:
+    click.secho(_("WARNING: Cache directory is unavailable."), fg="yellow")
 
 
 if TYPE_CHECKING:
