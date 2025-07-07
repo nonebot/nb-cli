@@ -60,6 +60,9 @@ def _filesize(
 @cache.command(name="status", help=_("Show current usage of caches."))
 @run_async
 async def status():
+    click.echo(
+        _("Cache location: {cache_dir}").format(cache_dir=str(CACHE_DIR.absolute()))
+    )
     adapter_current = _filesize(CACHE_DIR / "adapters.json")
     adapter_unpublished = _filesize(CACHE_DIR / "adapters_unpublished.json")
     adapter_total = _filesize(
