@@ -57,7 +57,7 @@ def _filesize(
     return humanize_data_size(size, precision=precision, use_si=si, negative_size="n/a")
 
 
-@cache.command(name="status", help=_("Display current status of caches."))
+@cache.command(name="status", help=_("Show current usage of caches."))
 @run_async
 async def status():
     adapter_current = _filesize(CACHE_DIR / "adapters.json")
