@@ -15,7 +15,7 @@ from nb_cli import _, cache
 from nb_cli.handlers.data import CACHE_DIR
 from nb_cli.config import Driver, Plugin, Adapter
 from nb_cli.exceptions import ModuleLoadFailed, LocalCacheExpired
-from nb_cli.compat import type_validate_json, type_validate_python
+from nb_cli.compat import model_dump, type_validate_json, type_validate_python
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 
@@ -23,6 +23,55 @@ try:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)  # ensure cache dir exists
 except Exception:
     click.secho(_("WARNING: Cache directory is unavailable."), fg="yellow")
+
+
+def _compile_module_index(modules: list[T]) -> dict[tuple[str, str], T]:
+    return {(mod.name, mod.module_name): mod for mod in modules}
+
+
+def get_unpublished_modules(
+    newer: list[T], current: list[T], historical_unpublished: list[T]
+) -> list[T]:
+    # NOTE: This function requires calculation.
+    # Working with larger data can be slow, which is harmful to the async runtime.
+    # Consider wrapping in something like to_thread if data size grows:
+    # e.g., result = await asyncio.to_thread(
+    #     get_unpublished_modules, newer, current, historical
+    # )
+    # or result = await anyio.to_process.run_sync(
+    #     get_unpublished_modules
+    # )(newer, current, historical)
+    newer_index = _compile_module_index(newer)
+    current_index = _compile_module_index(current + historical_unpublished)
+    return [current_index[k] for k in set(current_index) - set(newer_index)]
+
+
+async def dump_unpublished_modules(module_class: type[T], newer: list[T]) -> None:
+    from nb_cli.cli.utils import run_sync  # avoid circular import error
+
+    module_name: str = module_class.__module_name__
+
+    if (path_current := CACHE_DIR / f"{module_name}.json").is_file():
+        async with await anyio.open_file(path_current) as fcurrent:
+            current = type_validate_json(list[module_class], await fcurrent.read())
+    else:
+        current: list[T] = []
+
+    if (path_historical := CACHE_DIR / f"{module_name}_unpublished.json").is_file():
+        async with await anyio.open_file(path_historical) as fhistorical:
+            historical = type_validate_json(
+                list[module_class], await fhistorical.read()
+            )
+    else:
+        historical: list[T] = []
+
+    result = await run_sync(get_unpublished_modules)(newer, current, historical)
+    async with await anyio.open_file(
+        CACHE_DIR / f"{module_name}_unpublished.json", "w", encoding="utf-8"
+    ) as fnew:
+        await fnew.write(
+            json.dumps([model_dump(x) for x in result], ensure_ascii=False)
+        )
 
 
 if TYPE_CHECKING:
@@ -93,6 +142,16 @@ else:
                     click.secho(
                         _(
                             "WARNING: Failed to cache data for module {module_type}."
+                        ).format(module_type=module_type),
+                        fg="yellow",
+                    )
+                try:
+                    await dump_unpublished_modules(module_class, result)  # type: ignore
+                except Exception:
+                    click.secho(
+                        _(
+                            "WARNING: Failed to update unpublished data for module "
+                            "{module_type}."
                         ).format(module_type=module_type),
                         fg="yellow",
                     )
