@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-07 14:17+0000\n"
+"POT-Creation-Date: 2025-07-07 16:18+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -478,23 +478,27 @@ msgstr "停止重载监视"
 msgid "WARNING: Cache directory is unavailable."
 msgstr "警告: 缓存目录不可用."
 
-#: nb_cli/handlers/store.py:59 nb_cli/handlers/store.py:140
+#: nb_cli/handlers/store.py:108 nb_cli/handlers/store.py:199
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/store.py:94
+#: nb_cli/handlers/store.py:143
 msgid "WARNING: Failed to cache data for module {module_type}."
-msgstr "警告: {module_type} 模块类型缓存失败."
+msgstr "警告: {module_type} 模块类型数据缓存失败."
 
-#: nb_cli/handlers/store.py:104
+#: nb_cli/handlers/store.py:152
+msgid "WARNING: Failed to update unpublished data for module {module_type}."
+msgstr "警告: {module_type} 模块类型下架数据更新失败."
+
+#: nb_cli/handlers/store.py:163
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
 
-#: nb_cli/handlers/store.py:155
+#: nb_cli/handlers/store.py:214
 msgid "Invalid local cache of module type: {module_type}"
 msgstr "无效的模块类型缓存: {module_type}"
 
-#: nb_cli/handlers/store.py:190
+#: nb_cli/handlers/store.py:249
 msgid ""
 "WARNING: Failed to download latest data of module {module_type}. Expired "
 "cache is used."
