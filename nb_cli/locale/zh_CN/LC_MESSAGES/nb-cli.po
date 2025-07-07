@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-07 16:18+0000\n"
+"POT-Creation-Date: 2025-07-07 18:34+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -31,8 +31,8 @@ msgid "Auto detect virtual environment."
 msgstr "自动检测虚拟环境."
 
 #: nb_cli/cli/__init__.py:92 nb_cli/cli/commands/adapter.py:38
-#: nb_cli/cli/commands/driver.py:35 nb_cli/cli/commands/plugin.py:38
-#: nb_cli/cli/commands/self.py:34
+#: nb_cli/cli/commands/cache.py:33 nb_cli/cli/commands/driver.py:35
+#: nb_cli/cli/commands/plugin.py:38 nb_cli/cli/commands/self.py:35
 msgid "Run subcommand {sub_cmd.name!r}"
 msgstr "运行子命令 {sub_cmd.name!r}"
 
@@ -41,8 +41,8 @@ msgid "Welcome to NoneBot CLI!"
 msgstr "欢迎使用 NoneBot CLI!"
 
 #: nb_cli/cli/__init__.py:104 nb_cli/cli/commands/adapter.py:45
-#: nb_cli/cli/commands/driver.py:42 nb_cli/cli/commands/plugin.py:45
-#: nb_cli/cli/commands/self.py:41
+#: nb_cli/cli/commands/cache.py:40 nb_cli/cli/commands/driver.py:42
+#: nb_cli/cli/commands/plugin.py:45 nb_cli/cli/commands/self.py:42
 msgid "What do you want to do?"
 msgstr "你想要进行什么操作?"
 
@@ -136,6 +136,74 @@ msgstr "输出目录不是一个文件夹!"
 #: nb_cli/cli/commands/plugin.py:224
 msgid "Invalid output dir!"
 msgstr "无效的输出目录!"
+
+#: nb_cli/cli/commands/cache.py:17
+msgid "Manage CLI data caches."
+msgstr "管理 CLI 数据缓存."
+
+#: nb_cli/cli/commands/cache.py:60
+msgid "Show current usage of caches."
+msgstr "展示当前缓存使用情况."
+
+#: nb_cli/cli/commands/cache.py:96
+msgid "Module Type     Current         Unpublished     Total"
+msgstr "模块类型        当前            已下架          总计"
+
+#: nb_cli/cli/commands/cache.py:98
+msgid ""
+"Adapter         {adapter_current:<15} {adapter_unpublished:<15} "
+"{adapter_total:<15}"
+msgstr ""
+"适配器          {adapter_current:<15} {adapter_unpublished:<15} "
+"{adapter_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:108
+msgid ""
+"Driver          {driver_current:<15} {driver_unpublished:<15} "
+"{driver_total:<15}"
+msgstr ""
+"驱动器          {driver_current:<15} {driver_unpublished:<15} "
+"{driver_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:118
+msgid ""
+"Plugin          {plugin_current:<15} {plugin_unpublished:<15} "
+"{plugin_total:<15}"
+msgstr ""
+"插件            {plugin_current:<15} {plugin_unpublished:<15} "
+"{plugin_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:128
+msgid ""
+"(Total)         {total_current:<15} {total_unpublished:<15} "
+"{total_total:<15}"
+msgstr ""
+"(总计)          {total_current:<15} {total_unpublished:<15} "
+"{total_total:<15}"
+
+#: nb_cli/cli/commands/cache.py:144
+msgid "ERROR: Failed to update data cache for module {module_type}."
+msgstr "错误: {module_type} 模块类型数据缓存更新失败."
+
+#: nb_cli/cli/commands/cache.py:151
+msgid "Successfully updated data cache for module {module_type}."
+msgstr "成功更新 {module_type} 模块类型的数据缓存."
+
+#: nb_cli/cli/commands/cache.py:157
+msgid "Update all types of caches."
+msgstr "更新所有类型的缓存."
+
+#: nb_cli/cli/commands/cache.py:164
+msgid "Update plugins cache."
+msgstr "更新插件缓存."
+
+#: nb_cli/cli/commands/cache.py:170
+msgid "Update adapters cache."
+msgstr "更新适配器缓存."
+
+#: nb_cli/cli/commands/cache.py:176
+msgid "Update driver cache."
+msgstr "更新驱动器缓存."
 
 #: nb_cli/cli/commands/driver.py:19
 msgid "Manage bot driver."
@@ -385,31 +453,31 @@ msgstr "要忽略变化的文件."
 msgid "Delay time for reloading in seconds."
 msgstr "重新加载的延迟时间(秒)."
 
-#: nb_cli/cli/commands/self.py:18
+#: nb_cli/cli/commands/self.py:19
 msgid "Manage NB CLI."
 msgstr "管理 NB CLI."
 
-#: nb_cli/cli/commands/self.py:53
+#: nb_cli/cli/commands/self.py:54
 msgid "Install package to cli venv."
 msgstr "在 cli 虚拟环境中安装包."
 
-#: nb_cli/cli/commands/self.py:65
+#: nb_cli/cli/commands/self.py:66
 msgid "Package name you want to install?"
 msgstr "要安装的包名?"
 
-#: nb_cli/cli/commands/self.py:75
+#: nb_cli/cli/commands/self.py:76
 msgid "Update cli self."
 msgstr "更新 cli."
 
-#: nb_cli/cli/commands/self.py:87
+#: nb_cli/cli/commands/self.py:88
 msgid "Uninstall package from cli venv."
 msgstr "从 cli 虚拟环境中卸载包."
 
-#: nb_cli/cli/commands/self.py:99
+#: nb_cli/cli/commands/self.py:100
 msgid "Package name you want to uninstall?"
 msgstr "要卸载的包名?"
 
-#: nb_cli/cli/commands/self.py:111
+#: nb_cli/cli/commands/self.py:112
 msgid "List installed packages in cli venv."
 msgstr "列出 cli 虚拟环境中已安装的包."
 
@@ -503,4 +571,7 @@ msgid ""
 "WARNING: Failed to download latest data of module {module_type}. Expired "
 "cache is used."
 msgstr "警告: 无法下载最新的 {module_type} 模块类型缓存. 当前正在使用旧的缓存."
+
+#~ msgid "Display current status of caches."
+#~ msgstr ""
 
