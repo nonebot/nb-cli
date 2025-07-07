@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-07 18:41+0000\n"
+"POT-Creation-Date: 2025-07-07 18:53+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -145,15 +145,19 @@ msgstr "管理 CLI 数据缓存."
 msgid "Show current usage of caches."
 msgstr "展示当前缓存使用情况."
 
-#: nb_cli/cli/commands/cache.py:64
+#: nb_cli/cli/commands/cache.py:62
+msgid "Show sizes under 1000-based SI units."
+msgstr "使用 1000 进制的 SI 单位 (KB/MB/GB/...) 显示大小."
+
+#: nb_cli/cli/commands/cache.py:67
 msgid "Cache location: {cache_dir}"
 msgstr "缓存位置: {cache_dir}"
 
-#: nb_cli/cli/commands/cache.py:99
+#: nb_cli/cli/commands/cache.py:105
 msgid "Module Type     Current         Unpublished     Total"
 msgstr "模块类型        当前            已下架          总计"
 
-#: nb_cli/cli/commands/cache.py:101
+#: nb_cli/cli/commands/cache.py:107
 msgid ""
 "Adapter         {adapter_current:<15} {adapter_unpublished:<15} "
 "{adapter_total:<15}"
@@ -161,7 +165,7 @@ msgstr ""
 "适配器          {adapter_current:<15} {adapter_unpublished:<15} "
 "{adapter_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:111
+#: nb_cli/cli/commands/cache.py:117
 msgid ""
 "Driver          {driver_current:<15} {driver_unpublished:<15} "
 "{driver_total:<15}"
@@ -169,7 +173,7 @@ msgstr ""
 "驱动器          {driver_current:<15} {driver_unpublished:<15} "
 "{driver_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:121
+#: nb_cli/cli/commands/cache.py:127
 msgid ""
 "Plugin          {plugin_current:<15} {plugin_unpublished:<15} "
 "{plugin_total:<15}"
@@ -177,7 +181,7 @@ msgstr ""
 "插件            {plugin_current:<15} {plugin_unpublished:<15} "
 "{plugin_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:131
+#: nb_cli/cli/commands/cache.py:137
 msgid ""
 "(Total)         {total_current:<15} {total_unpublished:<15} "
 "{total_total:<15}"
@@ -185,27 +189,27 @@ msgstr ""
 "(总计)          {total_current:<15} {total_unpublished:<15} "
 "{total_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:147
+#: nb_cli/cli/commands/cache.py:153
 msgid "ERROR: Failed to update data cache for module {module_type}."
 msgstr "错误: {module_type} 模块类型数据缓存更新失败."
 
-#: nb_cli/cli/commands/cache.py:154
+#: nb_cli/cli/commands/cache.py:160
 msgid "Successfully updated data cache for module {module_type}."
 msgstr "成功更新 {module_type} 模块类型的数据缓存."
 
-#: nb_cli/cli/commands/cache.py:160
+#: nb_cli/cli/commands/cache.py:166
 msgid "Update all types of caches."
 msgstr "更新所有类型的缓存."
 
-#: nb_cli/cli/commands/cache.py:167
+#: nb_cli/cli/commands/cache.py:173
 msgid "Update plugins cache."
 msgstr "更新插件缓存."
 
-#: nb_cli/cli/commands/cache.py:173
+#: nb_cli/cli/commands/cache.py:179
 msgid "Update adapters cache."
 msgstr "更新适配器缓存."
 
-#: nb_cli/cli/commands/cache.py:179
+#: nb_cli/cli/commands/cache.py:185
 msgid "Update driver cache."
 msgstr "更新驱动器缓存."
 

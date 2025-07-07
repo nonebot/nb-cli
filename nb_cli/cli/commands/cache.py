@@ -58,35 +58,40 @@ def _filesize(
 
 
 @cache.command(name="status", help=_("Show current usage of caches."))
+@click.option(
+    "--si", is_flag=True, default=False, help=_("Show sizes under 1000-based SI units.")
+)
 @run_async
-async def status():
+async def status(si: bool = False):
     click.echo(
         _("Cache location: {cache_dir}").format(cache_dir=str(CACHE_DIR.absolute()))
     )
-    adapter_current = _filesize(CACHE_DIR / "adapters.json")
-    adapter_unpublished = _filesize(CACHE_DIR / "adapters_unpublished.json")
+    adapter_current = _filesize(CACHE_DIR / "adapters.json", si=si)
+    adapter_unpublished = _filesize(CACHE_DIR / "adapters_unpublished.json", si=si)
     adapter_total = _filesize(
-        CACHE_DIR / "adapters.json", CACHE_DIR / "adapters_unpublished.json"
+        CACHE_DIR / "adapters.json", CACHE_DIR / "adapters_unpublished.json", si=si
     )
-    driver_current = _filesize(CACHE_DIR / "drivers.json")
-    driver_unpublished = _filesize(CACHE_DIR / "drivers_unpublished.json")
+    driver_current = _filesize(CACHE_DIR / "drivers.json", si=si)
+    driver_unpublished = _filesize(CACHE_DIR / "drivers_unpublished.json", si=si)
     driver_total = _filesize(
-        CACHE_DIR / "drivers.json", CACHE_DIR / "drivers_unpublished.json"
+        CACHE_DIR / "drivers.json", CACHE_DIR / "drivers_unpublished.json", si=si
     )
-    plugin_current = _filesize(CACHE_DIR / "plugins.json")
-    plugin_unpublished = _filesize(CACHE_DIR / "plugins_unpublished.json")
+    plugin_current = _filesize(CACHE_DIR / "plugins.json", si=si)
+    plugin_unpublished = _filesize(CACHE_DIR / "plugins_unpublished.json", si=si)
     plugin_total = _filesize(
-        CACHE_DIR / "plugins.json", CACHE_DIR / "plugins_unpublished.json"
+        CACHE_DIR / "plugins.json", CACHE_DIR / "plugins_unpublished.json", si=si
     )
     total_current = _filesize(
         CACHE_DIR / "adapters.json",
         CACHE_DIR / "drivers.json",
         CACHE_DIR / "plugins.json",
+        si=si,
     )
     total_unpublished = _filesize(
         CACHE_DIR / "adapters_unpublished.json",
         CACHE_DIR / "drivers_unpublished.json",
         CACHE_DIR / "plugins_unpublished.json",
+        si=si,
     )
     total_total = _filesize(
         CACHE_DIR / "adapters.json",
@@ -95,6 +100,7 @@ async def status():
         CACHE_DIR / "drivers_unpublished.json",
         CACHE_DIR / "plugins.json",
         CACHE_DIR / "plugins_unpublished.json",
+        si=si,
     )
     click.echo(_("Module Type     Current         Unpublished     Total"))
     click.echo(
