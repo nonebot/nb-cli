@@ -59,7 +59,11 @@ def _filesize(
 
 @cache.command(name="status", help=_("Show current usage of caches."))
 @click.option(
-    "--si", is_flag=True, default=False, help=_("Show sizes under 1000-based SI units.")
+    "--si",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Show sizes under 1000-based SI units."),
 )
 @run_async
 async def status(si: bool = False):
@@ -163,26 +167,42 @@ async def _update_module_data(module_type: Literal["adapter", "plugin", "driver"
         )
 
 
-@cache.command(name="update_all", help=_("Update all types of caches."))
+@cache.command(name="update", help=_("Update local cache."))
+@click.argument("module_type", type=str, nargs=1, default="all")
 @run_async
-async def update_all():
-    for mod in "adapter", "plugin", "driver":
-        await _update_module_data(mod)
+async def update(module_type: str):
+    if module_type == "all":
+        for mod in "adapter", "plugin", "driver":
+            await _update_module_data(mod)
+        return
+
+    if module_type not in ("adapter", "plugin", "driver"):
+        click.secho(
+            _("ERROR: Invalid module type: {module_type}").format(
+                module_type=module_type
+            ),
+            fg="red",
+        )
+        return
+    await _update_module_data(module_type)
 
 
-@cache.command(name="update_plugins", help=_("Update plugins cache."))
+@cache.command(name="update-adapter", help=_("Update local cache for adapters."))
+@click.pass_context
 @run_async
-async def update_plugins():
-    await _update_module_data("plugin")
+async def update_adapter(ctx: click.Context):
+    await run_sync(ctx.invoke)(update, module_type="adapter")
 
 
-@cache.command(name="update_adapter", help=_("Update adapters cache."))
+@cache.command(name="update-plugin", help=_("Update local cache for plugins."))
+@click.pass_context
 @run_async
-async def update_adapters():
-    await _update_module_data("adapter")
+async def update_plugin(ctx: click.Context):
+    await run_sync(ctx.invoke)(update, module_type="plugin")
 
 
-@cache.command(name="update_driver", help=_("Update driver cache."))
+@cache.command(name="update-driver", help=_("Update local cache for drivers."))
+@click.pass_context
 @run_async
-async def update_drivers():
-    await _update_module_data("driver")
+async def update_driver(ctx: click.Context):
+    await run_sync(ctx.invoke)(update, module_type="driver")
