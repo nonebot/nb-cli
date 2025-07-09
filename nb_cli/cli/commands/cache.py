@@ -1,8 +1,9 @@
+import os
 from pathlib import Path
 from typing import Literal, cast
 
 import click
-from noneprompt import Choice, ListPrompt, CancelledError
+from noneprompt import Choice, ListPrompt, ConfirmPrompt, CancelledError
 
 from nb_cli import _
 from nb_cli.handlers.data import CACHE_DIR
@@ -206,3 +207,68 @@ async def update_plugin(ctx: click.Context):
 @run_async
 async def update_driver(ctx: click.Context):
     await run_sync(ctx.invoke)(update, module_type="driver")
+
+
+@cache.command(
+    name="clear-unpublished", help=_("Clear local caches of unpublished modules.")
+)
+@click.option(
+    "-y",
+    "--noconfirm",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Clear caches without confirm."),
+)
+@click.pass_context
+@run_async
+async def clear_unpublished(ctx: click.Context, noconfirm: bool = False):
+    await run_sync(ctx.invoke)(clear, unpublished_only=True, noconfirm=noconfirm)
+
+
+@cache.command(name="clear", help=_("Clear local caches."))
+@click.option(
+    "--unpublished-only",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Only clear caches for unpublished module types."),
+)
+@click.option(
+    "-y",
+    "--noconfirm",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Clear caches without confirm."),
+)
+@run_async
+async def clear(unpublished_only: bool = False, noconfirm: bool = False):
+    if not noconfirm:
+        confirm = await ConfirmPrompt(
+            _("Are you sure to clear these caches?"), default_choice=True
+        ).prompt_async(style=CLI_DEFAULT_STYLE)
+        if not confirm:
+            return
+
+    for f in (
+        CACHE_DIR / "adapters_unpublished.json",
+        CACHE_DIR / "drivers_unpublished.json",
+        CACHE_DIR / "plugins_unpublished.json",
+    ):
+        if f.is_file():
+            await run_sync(os.remove)(f)
+
+    if unpublished_only:
+        click.echo(_("Successfully cleared unpublished caches."))
+        return
+
+    for f in (
+        CACHE_DIR / "adapters.json",
+        CACHE_DIR / "drivers.json",
+        CACHE_DIR / "plugins.json",
+    ):
+        if f.is_file():
+            await run_sync(os.remove)(f)
+
+    click.echo(_("Successfully cleared all caches."))
