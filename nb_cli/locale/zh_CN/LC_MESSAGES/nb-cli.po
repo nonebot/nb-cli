@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-09 13:55+0000\n"
+"POT-Creation-Date: 2025-07-09 17:29+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -31,7 +31,7 @@ msgid "Auto detect virtual environment."
 msgstr "自动检测虚拟环境."
 
 #: nb_cli/cli/__init__.py:92 nb_cli/cli/commands/adapter.py:38
-#: nb_cli/cli/commands/cache.py:33 nb_cli/cli/commands/driver.py:35
+#: nb_cli/cli/commands/cache.py:34 nb_cli/cli/commands/driver.py:35
 #: nb_cli/cli/commands/plugin.py:38 nb_cli/cli/commands/self.py:35
 msgid "Run subcommand {sub_cmd.name!r}"
 msgstr "运行子命令 {sub_cmd.name!r}"
@@ -41,7 +41,7 @@ msgid "Welcome to NoneBot CLI!"
 msgstr "欢迎使用 NoneBot CLI!"
 
 #: nb_cli/cli/__init__.py:104 nb_cli/cli/commands/adapter.py:45
-#: nb_cli/cli/commands/cache.py:40 nb_cli/cli/commands/driver.py:42
+#: nb_cli/cli/commands/cache.py:41 nb_cli/cli/commands/driver.py:42
 #: nb_cli/cli/commands/plugin.py:45 nb_cli/cli/commands/self.py:42
 msgid "What do you want to do?"
 msgstr "你想要进行什么操作?"
@@ -137,27 +137,27 @@ msgstr "输出目录不是一个文件夹!"
 msgid "Invalid output dir!"
 msgstr "无效的输出目录!"
 
-#: nb_cli/cli/commands/cache.py:17
+#: nb_cli/cli/commands/cache.py:18
 msgid "Manage CLI data caches."
 msgstr "管理 CLI 数据缓存."
 
-#: nb_cli/cli/commands/cache.py:60
+#: nb_cli/cli/commands/cache.py:61
 msgid "Show current usage of caches."
 msgstr "展示当前缓存使用情况."
 
-#: nb_cli/cli/commands/cache.py:66
+#: nb_cli/cli/commands/cache.py:67
 msgid "Show sizes under 1000-based SI units."
 msgstr "使用 1000 进制的 SI 单位 (KB/MB/GB/...) 显示大小."
 
-#: nb_cli/cli/commands/cache.py:71
+#: nb_cli/cli/commands/cache.py:72
 msgid "Cache location: {cache_dir}"
 msgstr "缓存位置: {cache_dir}"
 
-#: nb_cli/cli/commands/cache.py:109
+#: nb_cli/cli/commands/cache.py:110
 msgid "Module Type     Current         Unpublished     Total"
 msgstr "模块类型        当前            已下架          总计"
 
-#: nb_cli/cli/commands/cache.py:111
+#: nb_cli/cli/commands/cache.py:112
 msgid ""
 "Adapter         {adapter_current:<15} {adapter_unpublished:<15} "
 "{adapter_total:<15}"
@@ -165,7 +165,7 @@ msgstr ""
 "适配器          {adapter_current:<15} {adapter_unpublished:<15} "
 "{adapter_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:121
+#: nb_cli/cli/commands/cache.py:122
 msgid ""
 "Driver          {driver_current:<15} {driver_unpublished:<15} "
 "{driver_total:<15}"
@@ -173,7 +173,7 @@ msgstr ""
 "驱动器          {driver_current:<15} {driver_unpublished:<15} "
 "{driver_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:131
+#: nb_cli/cli/commands/cache.py:132
 msgid ""
 "Plugin          {plugin_current:<15} {plugin_unpublished:<15} "
 "{plugin_total:<15}"
@@ -181,7 +181,7 @@ msgstr ""
 "插件            {plugin_current:<15} {plugin_unpublished:<15} "
 "{plugin_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:141
+#: nb_cli/cli/commands/cache.py:142
 msgid ""
 "(Total)         {total_current:<15} {total_unpublished:<15} "
 "{total_total:<15}"
@@ -189,21 +189,61 @@ msgstr ""
 "(总计)          {total_current:<15} {total_unpublished:<15} "
 "{total_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:157
+#: nb_cli/cli/commands/cache.py:158
 msgid "ERROR: Failed to update data cache for module {module_type}."
 msgstr "错误: {module_type} 模块类型数据缓存更新失败."
 
-#: nb_cli/cli/commands/cache.py:164
+#: nb_cli/cli/commands/cache.py:165
 msgid "Successfully updated data cache for module {module_type}."
 msgstr "成功更新 {module_type} 模块类型的数据缓存."
 
-#: nb_cli/cli/commands/cache.py:170
+#: nb_cli/cli/commands/cache.py:171
 msgid "Update local cache."
 msgstr "更新本地缓存."
 
-#: nb_cli/cli/commands/cache.py:186
+#: nb_cli/cli/commands/cache.py:182
 msgid "ERROR: Invalid module type: {module_type}"
 msgstr "错误: 无效的模块类型: {module_type}"
+
+#: nb_cli/cli/commands/cache.py:191
+msgid "Update local cache for adapters."
+msgstr "更新适配器信息本地缓存."
+
+#: nb_cli/cli/commands/cache.py:198
+msgid "Update local cache for plugins."
+msgstr "更新插件信息本地缓存."
+
+#: nb_cli/cli/commands/cache.py:205
+msgid "Update local cache for drivers."
+msgstr "更新驱动器信息本地缓存."
+
+#: nb_cli/cli/commands/cache.py:213
+msgid "Clear local caches of unpublished modules."
+msgstr "清除已下架模块的本地缓存."
+
+#: nb_cli/cli/commands/cache.py:221 nb_cli/cli/commands/cache.py:243
+msgid "Clear caches without confirm."
+msgstr "不再次确认，直接清除缓存."
+
+#: nb_cli/cli/commands/cache.py:229
+msgid "Clear local caches."
+msgstr "清除本地缓存."
+
+#: nb_cli/cli/commands/cache.py:235
+msgid "Only clear caches for unpublished module types."
+msgstr "仅清除已下架模块缓存."
+
+#: nb_cli/cli/commands/cache.py:249
+msgid "Are you sure to clear these caches?"
+msgstr "你确定要清除这些缓存吗?"
+
+#: nb_cli/cli/commands/cache.py:263
+msgid "Successfully cleared unpublished caches."
+msgstr "成功清除已下架模块缓存."
+
+#: nb_cli/cli/commands/cache.py:274
+msgid "Successfully cleared all caches."
+msgstr "成功清除所有缓存."
 
 #: nb_cli/cli/commands/driver.py:19
 msgid "Manage bot driver."
@@ -571,3 +611,4 @@ msgid ""
 "WARNING: Failed to download latest data of module {module_type}. Expired "
 "cache is used."
 msgstr "警告: 无法下载最新的 {module_type} 模块类型缓存. 当前正在使用旧的缓存."
+
