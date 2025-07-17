@@ -1,8 +1,16 @@
 from typing import Optional
+from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
+
+
+class Tag(BaseModel):
+    """标签"""
+
+    label: str
+    color: str
 
 
 class SimpleInfo(BaseModel):
@@ -14,25 +22,55 @@ class Adapter(SimpleInfo):
     __module_name__ = "adapters"
 
     project_link: str
+    name: str
     desc: str
+    author: str
+    homepage: str
+    tags: list[Tag]
     is_official: Optional[bool] = None
+    time: datetime
+    version: str
+
+    @field_serializer("time")
+    def time_serializer(self, dt: datetime):
+        return dt.isoformat()
 
 
 class Plugin(SimpleInfo):
     __module_name__ = "plugins"
 
     project_link: str
+    name: str
     desc: str
+    author: str
+    homepage: str
+    tags: list[Tag]
     is_official: Optional[bool] = None
     valid: Optional[bool] = None
+    time: datetime
+    version: str
+
+    @field_serializer("time")
+    def time_serializer(self, dt: datetime):
+        return dt.isoformat()
 
 
 class Driver(SimpleInfo):
     __module_name__ = "drivers"
 
     project_link: str
+    name: str
     desc: str
+    author: str
+    homepage: str
+    tags: list[Tag]
     is_official: Optional[bool] = None
+    time: datetime
+    version: str
+
+    @field_serializer("time")
+    def time_serializer(self, dt: datetime):
+        return dt.isoformat()
 
 
 class NoneBotConfig(BaseModel):
