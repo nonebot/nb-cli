@@ -53,7 +53,13 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
 
     @staticmethod
     @abstractmethod
-    def remove_adapter(ctx: Any, adapter: Union[PackageInfo, SimpleInfo]) -> None:
+    def remove_adapter(ctx: Any, adapter: Union[PackageInfo, SimpleInfo]) -> bool:
+        """
+        删除适配器的文档体操作。
+
+        Returns:
+            can_uninstall (bool): 表示是否可以执行卸载操作
+        """
         raise NotImplementedError
 
     @staticmethod
@@ -63,7 +69,13 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
 
     @staticmethod
     @abstractmethod
-    def remove_plugin(ctx: Any, plugin: Union[PackageInfo, str]) -> None:
+    def remove_plugin(ctx: Any, plugin: Union[PackageInfo, str]) -> bool:
+        """
+        删除插件的文档体操作。
+
+        Returns:
+            can_uninstall (bool): 表示是否可以执行卸载操作
+        """
         raise NotImplementedError
 
 
@@ -185,12 +197,19 @@ class ConfigManager:
         self.policy.add_adapter(adapters, adapter)
         self._write_data(data)
 
-    def remove_adapter(self, adapter: PackageInfo) -> None:
+    def remove_adapter(self, adapter: PackageInfo) -> bool:
+        """
+        删除适配器操作。
+
+        Returns:
+            can_uninstall (bool): 表示是否可以执行卸载操作。
+        """
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         adapters: dict[str, list[dict[str, str]]] = table.setdefault("adapters", {})
-        self.policy.remove_adapter(adapters, adapter)
+        can_remove = self.policy.remove_adapter(adapters, adapter)
         self._write_data(data)
+        return can_remove
 
     def add_plugin(self, plugin: PackageInfo) -> None:
         data = self._get_data()
@@ -199,12 +218,19 @@ class ConfigManager:
         self.policy.add_plugin(plugins, plugin)
         self._write_data(data)
 
-    def remove_plugin(self, plugin: PackageInfo) -> None:
+    def remove_plugin(self, plugin: PackageInfo) -> bool:
+        """
+        删除插件操作。
+
+        Returns:
+            can_uninstall (bool): 表示是否可以执行卸载操作。
+        """
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         plugins: dict[str, list[str]] = table.setdefault("plugins", {})
-        self.policy.remove_plugin(plugins, plugin)
+        can_remove = self.policy.remove_plugin(plugins, plugin)
         self._write_data(data)
+        return can_remove
 
     def add_builtin_plugin(self, plugin: str) -> None:
         data = self._get_data()
@@ -250,9 +276,9 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
     @staticmethod
     def remove_adapter(
         ctx: dict[str, list[dict[str, str]]], adapter: Union[PackageInfo, SimpleInfo]
-    ) -> None:
+    ) -> bool:
         if isinstance(adapter, PackageInfo) and adapter.project_link not in ctx:
-            return
+            return True
         adapter_data = ctx.setdefault(
             adapter.project_link if isinstance(adapter, PackageInfo) else "@local", []
         )
@@ -269,6 +295,8 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
             del adapter_data[index]
         if isinstance(adapter, PackageInfo) and not adapter_data:
             del ctx[adapter.project_link]
+            return True
+        return False
 
     @staticmethod
     def add_plugin(ctx: dict[str, list[str]], plugin: Union[PackageInfo, str]) -> None:
@@ -283,9 +311,9 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
     @staticmethod
     def remove_plugin(
         ctx: dict[str, list[str]], plugin: Union[PackageInfo, str]
-    ) -> None:
+    ) -> bool:
         if isinstance(plugin, PackageInfo) and plugin.project_link not in ctx:
-            return
+            return True
         plugin_data = ctx.setdefault(
             "@local" if isinstance(plugin, str) else plugin.project_link, []
         )
@@ -295,6 +323,8 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
             )
         if isinstance(plugin, PackageInfo) and not plugin_data:
             del ctx[plugin.project_link]
+            return True
+        return False
 
 
 class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
@@ -327,7 +357,7 @@ class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
             ctx.append(t)
 
     @staticmethod
-    def remove_adapter(ctx: list[dict[str, Any]], adapter: SimpleInfo) -> None:
+    def remove_adapter(ctx: list[dict[str, Any]], adapter: SimpleInfo) -> bool:
         if (
             index := next(
                 (
@@ -339,6 +369,7 @@ class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
             )
         ) is not None:
             del ctx[index]
+        return True
 
     @staticmethod
     def add_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> None:
@@ -347,7 +378,8 @@ class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
             ctx.append(plugin_)
 
     @staticmethod
-    def remove_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> None:
+    def remove_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> bool:
         plugin_ = plugin if isinstance(plugin, str) else plugin.module_name
         if plugin_ in ctx:
             ctx.remove(plugin_)
+        return True

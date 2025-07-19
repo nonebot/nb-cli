@@ -145,16 +145,18 @@ async def uninstall(
         ctx.exit()
 
     try:
-        GLOBAL_CONFIG.remove_adapter(adapter)
+        can_uninstall = GLOBAL_CONFIG.remove_adapter(adapter)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove adapter {adapter.name} from config: {e}").format(
                 adapter=adapter, e=e
             )
         )
+        can_uninstall = False
 
-    proc = await call_pip_uninstall(adapter.project_link, pip_args)
-    await proc.wait()
+    if can_uninstall:
+        proc = await call_pip_uninstall(adapter.project_link, pip_args)
+        await proc.wait()
 
 
 @adapter.command(aliases=["new"], help=_("Create a new nonebot adapter."))

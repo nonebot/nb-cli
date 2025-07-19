@@ -145,16 +145,18 @@ async def uninstall(
         ctx.exit()
 
     try:
-        GLOBAL_CONFIG.remove_plugin(plugin)
+        can_uninstall = GLOBAL_CONFIG.remove_plugin(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(
                 plugin=plugin, e=e
             )
         )
+        can_uninstall = False
 
-    proc = await call_pip_uninstall(plugin.project_link, pip_args)
-    await proc.wait()
+    if can_uninstall:
+        proc = await call_pip_uninstall(plugin.project_link, pip_args)
+        await proc.wait()
 
 
 @plugin.command(aliases=["new"], help=_("Create a new nonebot plugin."))
