@@ -16,7 +16,7 @@ requires-python = ">=3.9, <4.0"
 {%- endif -%}
 {%- endfor -%}
 {% for adapter in cookiecutter.nonebot.adapters.values() -%}
-{% set adapter_str = '"%s>=%s"'|format(adapter.project_link, adapter.version) -%}
+{% set adapter_str = '"%s>=%s"'|format(adapter[0].project_link, adapter[0].version) -%}
 {% set _ = dependencies.append(adapter_str) -%}
 {%- endfor -%}
 dependencies = [
@@ -24,16 +24,23 @@ dependencies = [
 ]
 
 [tool.nonebot]
-{% set adapters = [] -%}
-{% for adapter in cookiecutter.nonebot.adapters.values() -%}
+plugin_dirs = ["{{ cookiecutter.custom.source_dir }}/plugins"]
+builtin_plugins = []
+
+[tool.nonebot.adapters]
+{% for package, adapters in cookiecutter.nonebot.adapters.items() -%}
+{% set adapters_ = [] -%}
+{% for adapter in adapters -%}
 {% set name = adapter.name -%}
 {% set module_name = adapter.module_name -%}
 {% set adapter_str = '{ name = "%s", module_name = "%s" }'|format(name, module_name) -%}
-{% set _ = adapters.append(adapter_str) -%}
+{% set _ = adapters_.append(adapter_str) -%}
 {%- endfor -%}
-adapters = [
-    {{ adapters|join(",\n")|indent(4) }}
+{{ package }} = [
+    {{ adapters_|join(",\n")|indent(4) }}
 ]
-plugins = []
-plugin_dirs = ["{{ cookiecutter.custom.source_dir }}/plugins"]
-builtin_plugins = []
+{% endfor -%}
+"@local" = []
+
+[tool.nonebot.plugins]
+"@local" = []

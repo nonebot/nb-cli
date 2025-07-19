@@ -104,10 +104,13 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )
 
-    context.variables["adapters"] = json.dumps(
-        {a.data.project_link: model_dump(a.data) for a in adapters}
+    _adapters = {}
+    for a in adapters:
+        _adapters.setdefault(a.data.project_link, []).append(model_dump(a.data))
+    context.variables["adapters"] = json.dumps(_adapters)
+    context.packages.extend(
+        [f"{a.data.project_link}>={a.data.version}" for a in adapters]
     )
-    context.packages.extend([a.data.project_link for a in adapters])
 
     drivers = await CheckboxPrompt(
         _("Which driver(s) would you like to use?"),
@@ -124,7 +127,11 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         {d.data.project_link: model_dump(d.data) for d in drivers}
     )
     context.packages.extend(
-        [d.data.project_link for d in drivers if d.data.project_link]
+        [
+            f"{d.data.project_link}>={d.data.version}"
+            for d in drivers
+            if d.data.project_link
+        ]
     )
 
     return context
@@ -240,7 +247,7 @@ async def create(
         config_manager = ConfigManager(working_dir=project_dir, use_venv=use_venv)
 
         proc = await call_pip_install(
-            ["nonebot2", *context.packages],
+            ["nonebot2", *set(context.packages)],
             pip_args,
             python_path=config_manager.python_path,
         )
@@ -289,7 +296,7 @@ async def create(
         ),
         fg="green",
     )
-    click.secho(f"  {' '.join(context.packages)}", fg="green")
+    click.secho(f"  {' '.join(set(context.packages))}", fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
     click.secho("  nb run --reload", fg="green")
