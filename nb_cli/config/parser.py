@@ -1,3 +1,4 @@
+import string
 import logging
 import weakref
 from pathlib import Path
@@ -190,6 +191,52 @@ class ConfigManager:
     def get_nonebot_config(self) -> Union[NoneBotConfig, LegacyNoneBotConfig]:
         return self.policy.get_nonebot_config()
 
+    def add_dependency(self, dependency: Union[str, PackageInfo]) -> None:
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        dep = dependency if isinstance(dependency, str) else dependency.project_link
+        if not any(
+            d.startswith(dep)
+            and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+            for d in deps
+        ):
+            deps.append(
+                dep if isinstance(dependency, str) else f"{dep}>={dependency.version}"
+            )
+        self._write_data(data)
+
+    def update_dependency(self, dependency: PackageInfo) -> None:
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        dep = dependency.project_link
+        filtered = [
+            (i, d)
+            for i, d in enumerate(deps)
+            if d.startswith(dep)
+            and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+        ]
+        for seq, (i, d) in enumerate(filtered):
+            if seq == 0:
+                deps[i] = f"{dep}>={dependency.version}"
+            else:
+                deps.remove(d)
+        if not filtered:
+            deps.append(f"{dep}>={dependency.version}")
+        self._write_data(data)
+
+    def remove_dependency(self, dependency: Union[str, PackageInfo]) -> None:
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        dep = dependency if isinstance(dependency, str) else dependency.project_link
+        for d in [
+            d
+            for d in deps
+            if d.startswith(dep)
+            and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+        ]:
+            deps.remove(d)
+        self._write_data(data)
+
     def add_adapter(self, adapter: PackageInfo) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
@@ -317,7 +364,7 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
         plugin_data = ctx.setdefault(
             "@local" if isinstance(plugin, str) else plugin.project_link, []
         )
-        if plugin in plugin_data:
+        if (plugin if isinstance(plugin, str) else plugin.module_name) in plugin_data:
             plugin_data.remove(
                 plugin if isinstance(plugin, str) else plugin.module_name
             )

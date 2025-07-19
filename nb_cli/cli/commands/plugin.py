@@ -77,12 +77,18 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot plugin to current project."),
 )
+@click.option(
+    "--no-restrict-version", nargs=1, is_flag=True, flag_value=True, default=False
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
+    ctx: click.Context,
+    no_restrict_version: bool,
+    name: Optional[str],
+    pip_args: Optional[list[str]],
 ):
     try:
         plugin = await find_exact_package(
@@ -100,8 +106,30 @@ async def install(
             )
         )
 
-    proc = await call_pip_install(plugin.project_link, pip_args)
-    await proc.wait()
+    pkg = (
+        plugin.project_link
+        if no_restrict_version
+        else f"{plugin.project_link}>={plugin.version}"
+    )
+    proc = await call_pip_install(pkg, pip_args)
+    if await proc.wait() != 0:
+        click.secho(
+            _(
+                "Errors occurred in installing plugin {plugin.name}\n"
+                "    *** Try `nb plugin install` command with `--no-restrict-version` "
+                "option to resolve under loose restrictions may work."
+            ).format(plugin=plugin),
+            fg="red",
+        )
+
+    try:
+        GLOBAL_CONFIG.add_dependency(plugin)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to add plugin {plugin.name} to dependencies: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
 
 @plugin.command(
@@ -123,6 +151,15 @@ async def update(
 
     proc = await call_pip_update(plugin.project_link, pip_args)
     await proc.wait()
+
+    try:
+        GLOBAL_CONFIG.update_dependency(plugin)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to update plugin {plugin.name} to dependencies: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
 
 @plugin.command(
@@ -146,6 +183,8 @@ async def uninstall(
 
     try:
         can_uninstall = GLOBAL_CONFIG.remove_plugin(plugin)
+        if can_uninstall:
+            GLOBAL_CONFIG.remove_dependency(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(

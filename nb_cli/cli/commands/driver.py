@@ -4,6 +4,7 @@ import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
+from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
 from nb_cli.handlers import (
@@ -92,6 +93,15 @@ async def install(
         proc = await call_pip_install(driver.project_link, pip_args)
         await proc.wait()
 
+    try:
+        GLOBAL_CONFIG.add_dependency(driver)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to add driver {driver.name} to dependencies: {e}").format(
+                driver=driver, e=e
+            )
+        )
+
 
 @driver.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot driver.")
@@ -114,6 +124,15 @@ async def update(
         proc = await call_pip_update(driver.project_link, pip_args)
         await proc.wait()
 
+    try:
+        GLOBAL_CONFIG.update_dependency(driver)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to update driver {driver.name} to dependencies: {e}").format(
+                driver=driver, e=e
+            )
+        )
+
 
 @driver.command(
     aliases=["remove"],
@@ -133,6 +152,16 @@ async def uninstall(
         )
     except CancelledError:
         ctx.exit()
+
+    try:
+        GLOBAL_CONFIG.remove_dependency(driver)
+        GLOBAL_CONFIG.add_dependency("nonebot2")  # hold a nonebot2 package
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to remove driver {driver.name} from dependencies: {e}").format(
+                driver=driver, e=e
+            )
+        )
 
     if package := driver.project_link:
         if package.startswith("nonebot2[") and package.endswith("]"):
