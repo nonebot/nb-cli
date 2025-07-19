@@ -92,7 +92,7 @@ async def install(
         ctx.exit()
 
     try:
-        GLOBAL_CONFIG.add_plugin(plugin.module_name)
+        GLOBAL_CONFIG.add_plugin(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to config: {e}").format(
@@ -145,7 +145,7 @@ async def uninstall(
         ctx.exit()
 
     try:
-        GLOBAL_CONFIG.remove_plugin(plugin.module_name)
+        GLOBAL_CONFIG.remove_plugin(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(

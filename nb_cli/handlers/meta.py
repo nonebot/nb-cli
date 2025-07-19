@@ -4,12 +4,17 @@ from pathlib import Path
 from functools import wraps
 from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import TYPE_CHECKING, Any, TypeVar, Callable, Optional, cast
+from typing import TYPE_CHECKING, Any, Union, TypeVar, Callable, Optional, cast
 
 from nb_cli import _, cache
 from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
-from nb_cli.config import GLOBAL_CONFIG, ConfigManager, NoneBotConfig
 from nb_cli.exceptions import PipError, NoneBotError, PythonInterpreterError
+from nb_cli.config import (
+    GLOBAL_CONFIG,
+    ConfigManager,
+    NoneBotConfig,
+    LegacyNoneBotConfig,
+)
 
 from . import templates
 from .process import create_process, create_process_shell
@@ -32,7 +37,7 @@ def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
 
 
-def get_nonebot_config() -> NoneBotConfig:
+def get_nonebot_config() -> Union[NoneBotConfig, LegacyNoneBotConfig]:
     return GLOBAL_CONFIG.get_nonebot_config()
 
 

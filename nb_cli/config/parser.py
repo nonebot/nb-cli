@@ -1,20 +1,70 @@
 import logging
+import weakref
 from pathlib import Path
-from typing import Any, ClassVar, Optional
+from abc import ABCMeta, abstractmethod
+from typing import Any, Union, Generic, TypeVar, ClassVar, Optional
 
+import click
 import tomlkit
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli import _
 from nb_cli.log import SUCCESS
 from nb_cli.consts import WINDOWS
-from nb_cli.exceptions import ProjectNotFoundError
 from nb_cli.compat import model_dump, type_validate_python
+from nb_cli.exceptions import ProjectInvalidError, ProjectNotFoundError
 
-from .model import SimpleInfo, NoneBotConfig
+from .model import SimpleInfo, PackageInfo, NoneBotConfig, LegacyNoneBotConfig
 
 CONFIG_FILE = "pyproject.toml"
 CONFIG_FILE_ENCODING = "utf-8"
+
+_T_config = TypeVar("_T_config", NoneBotConfig, LegacyNoneBotConfig)
+
+
+class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
+    policies: ClassVar[list[type["_ConfigPolicy[Any]"]]] = []
+
+    def __init__(self, origin: "ConfigManager"):
+        self._origin = weakref.ref(origin)
+
+    def __init_subclass__(cls) -> None:
+        cls.policies.append(cls)
+
+    @property
+    def origin(self) -> "ConfigManager":
+        if origin_ := self._origin():
+            return origin_
+        raise ReferenceError("Cannot get ConfigManager origin.")
+
+    @staticmethod
+    @abstractmethod
+    def test_format(cfg: dict[str, Any]) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_nonebot_config(self) -> _T_config:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def add_adapter(ctx: Any, adapter: Union[PackageInfo, SimpleInfo]) -> None:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def remove_adapter(ctx: Any, adapter: Union[PackageInfo, SimpleInfo]) -> None:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def add_plugin(ctx: Any, plugin: Union[PackageInfo, str]) -> None:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def remove_plugin(ctx: Any, plugin: Union[PackageInfo, str]) -> None:
+        raise NotImplementedError
 
 
 class ConfigManager:
@@ -22,6 +72,7 @@ class ConfigManager:
     _global_python_path: ClassVar[Optional[str]] = None
     _global_use_venv: ClassVar[bool] = True
     _path_venv_cache: ClassVar[dict[Path, Optional[str]]] = {}
+    _policy: _ConfigPolicy[Any]
 
     def __init__(
         self,
@@ -37,8 +88,24 @@ class ConfigManager:
         self._logger = logger
 
     @property
+    def policy(self) -> _ConfigPolicy[Any]:
+        if not hasattr(self, "_policy"):
+            self._policy = self._select_policy()
+        return self._policy
+
+    @property
     def working_dir(self) -> Path:
         return (self._working_dir or self._global_working_dir or Path.cwd()).resolve()
+
+    def _select_policy(self) -> _ConfigPolicy[Any]:
+        cfg = self._get_nonebot_config(self._get_data())
+        if isinstance(cfg.setdefault("plugin_dirs", []), list) and isinstance(
+            cfg.setdefault("builtin_plugins", []), list
+        ):
+            for policy in _ConfigPolicy.policies:
+                if policy.test_format(cfg):
+                    return policy(self)
+        raise ProjectInvalidError(_("Invalid project config format."))
 
     @staticmethod
     def _locate_project_root(cwd: Optional[Path] = None) -> Path:
@@ -61,7 +128,7 @@ class ConfigManager:
         return self.project_root.joinpath(CONFIG_FILE)
 
     @staticmethod
-    def _detact_virtual_env(cwd: Optional[Path] = None) -> Optional[str]:
+    def _detect_virtual_env(cwd: Optional[Path] = None) -> Optional[str]:
         cwd = (cwd or Path.cwd()).resolve()
         for venv_dir in cwd.iterdir():
             if venv_dir.is_dir() and (venv_dir / "pyvenv.cfg").is_file():
@@ -84,7 +151,7 @@ class ConfigManager:
             if cwd in self._path_venv_cache:
                 return self._path_venv_cache[cwd]
 
-            if venv_python := self._detact_virtual_env(cwd):
+            if venv_python := self._detect_virtual_env(cwd):
                 self._path_venv_cache[cwd] = venv_python
                 if self._logger:
                     self._logger.log(
@@ -108,52 +175,35 @@ class ConfigManager:
     def _get_nonebot_config(self, data: TOMLDocument) -> dict[str, Any]:
         return data.get("tool", {}).get("nonebot", {})
 
-    def get_nonebot_config(self) -> NoneBotConfig:
-        return type_validate_python(
-            NoneBotConfig, self._get_nonebot_config(self._get_data())
-        )
+    def get_nonebot_config(self) -> Union[NoneBotConfig, LegacyNoneBotConfig]:
+        return self.policy.get_nonebot_config()
 
-    def add_adapter(self, adapter: SimpleInfo) -> None:
+    def add_adapter(self, adapter: PackageInfo) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        adapters: list[dict[str, Any]] = table.setdefault("adapters", [])
-        if all(a["module_name"] != adapter.module_name for a in adapters):
-            t = tomlkit.inline_table()
-            t.update(model_dump(adapter, include={"name", "module_name"}))
-            adapters.append(t)
+        adapters: dict[str, list[dict[str, str]]] = table.setdefault("adapters", {})
+        self.policy.add_adapter(adapters, adapter)
         self._write_data(data)
 
-    def remove_adapter(self, adapter: SimpleInfo) -> None:
+    def remove_adapter(self, adapter: PackageInfo) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        adapters: list[dict[str, Any]] = table.setdefault("adapters", [])
-        if (
-            index := next(
-                (
-                    i
-                    for i, a in enumerate(adapters)
-                    if a["module_name"] == adapter.module_name
-                ),
-                None,
-            )
-        ) is not None:
-            del adapters[index]
+        adapters: dict[str, list[dict[str, str]]] = table.setdefault("adapters", {})
+        self.policy.remove_adapter(adapters, adapter)
         self._write_data(data)
 
-    def add_plugin(self, plugin: str) -> None:
+    def add_plugin(self, plugin: PackageInfo) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: list[str] = table.setdefault("plugins", [])
-        if plugin not in plugins:
-            plugins.append(plugin)
+        plugins: dict[str, list[str]] = table.setdefault("plugins", {})
+        self.policy.add_plugin(plugins, plugin)
         self._write_data(data)
 
-    def remove_plugin(self, plugin: str) -> None:
+    def remove_plugin(self, plugin: PackageInfo) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: list[str] = table.setdefault("plugins", [])
-        if plugin in plugins:
-            plugins.remove(plugin)
+        plugins: dict[str, list[str]] = table.setdefault("plugins", {})
+        self.policy.remove_plugin(plugins, plugin)
         self._write_data(data)
 
     def add_builtin_plugin(self, plugin: str) -> None:
@@ -171,3 +221,133 @@ class ConfigManager:
         if plugin in plugins:
             plugins.remove(plugin)
         self._write_data(data)
+
+
+class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
+    @staticmethod
+    def test_format(cfg: dict[str, Any]) -> bool:
+        return isinstance(cfg.setdefault("adapters", {}), dict) and isinstance(
+            cfg.setdefault("plugins", {}), dict
+        )
+
+    def get_nonebot_config(self) -> NoneBotConfig:
+        return type_validate_python(
+            NoneBotConfig, self.origin._get_nonebot_config(self.origin._get_data())
+        )
+
+    @staticmethod
+    def add_adapter(
+        ctx: dict[str, list[dict[str, str]]], adapter: Union[PackageInfo, SimpleInfo]
+    ) -> None:
+        adapter_data = ctx.setdefault(
+            adapter.project_link if isinstance(adapter, PackageInfo) else "@local", []
+        )
+        if all(a["module_name"] != adapter.module_name for a in adapter_data):
+            t = tomlkit.inline_table()
+            t.update(model_dump(adapter, include={"name", "module_name"}))
+            adapter_data.append(t)
+
+    @staticmethod
+    def remove_adapter(
+        ctx: dict[str, list[dict[str, str]]], adapter: Union[PackageInfo, SimpleInfo]
+    ) -> None:
+        if isinstance(adapter, PackageInfo) and adapter.project_link not in ctx:
+            return
+        adapter_data = ctx.setdefault(
+            adapter.project_link if isinstance(adapter, PackageInfo) else "@local", []
+        )
+        if (
+            index := next(
+                (
+                    i
+                    for i, a in enumerate(adapter_data)
+                    if a["module_name"] == adapter.module_name
+                ),
+                None,
+            )
+        ) is not None:
+            del adapter_data[index]
+        if isinstance(adapter, PackageInfo) and not adapter_data:
+            del ctx[adapter.project_link]
+
+    @staticmethod
+    def add_plugin(ctx: dict[str, list[str]], plugin: Union[PackageInfo, str]) -> None:
+        plugin_data = ctx.setdefault(
+            "@local" if isinstance(plugin, str) else plugin.project_link, []
+        )
+        if plugin not in plugin_data:
+            plugin_data.append(
+                plugin if isinstance(plugin, str) else plugin.module_name
+            )
+
+    @staticmethod
+    def remove_plugin(
+        ctx: dict[str, list[str]], plugin: Union[PackageInfo, str]
+    ) -> None:
+        if isinstance(plugin, PackageInfo) and plugin.project_link not in ctx:
+            return
+        plugin_data = ctx.setdefault(
+            "@local" if isinstance(plugin, str) else plugin.project_link, []
+        )
+        if plugin in plugin_data:
+            plugin_data.remove(
+                plugin if isinstance(plugin, str) else plugin.module_name
+            )
+        if isinstance(plugin, PackageInfo) and not plugin_data:
+            del ctx[plugin.project_link]
+
+
+class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
+    @staticmethod
+    def test_format(cfg: dict[str, Any]) -> bool:
+        result = isinstance(cfg.setdefault("adapters", []), list) and isinstance(
+            cfg.setdefault("plugins", []), list
+        )
+        if result:
+            click.secho(
+                _(
+                    "WARNING: Legacy configuration format detected.\n"
+                    "    *** Use `nb upgrade-format` to upgrade to the new format."
+                ),
+                fg="yellow",
+            )
+        return result
+
+    def get_nonebot_config(self) -> LegacyNoneBotConfig:
+        return type_validate_python(
+            LegacyNoneBotConfig,
+            self.origin._get_nonebot_config(self.origin._get_data()),
+        )
+
+    @staticmethod
+    def add_adapter(ctx: list[dict[str, Any]], adapter: SimpleInfo) -> None:
+        if all(a["module_name"] != adapter.module_name for a in ctx):
+            t = tomlkit.inline_table()
+            t.update(model_dump(adapter, include={"name", "module_name"}))
+            ctx.append(t)
+
+    @staticmethod
+    def remove_adapter(ctx: list[dict[str, Any]], adapter: SimpleInfo) -> None:
+        if (
+            index := next(
+                (
+                    i
+                    for i, a in enumerate(ctx)
+                    if a["module_name"] == adapter.module_name
+                ),
+                None,
+            )
+        ) is not None:
+            del ctx[index]
+
+    @staticmethod
+    def add_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> None:
+        plugin_ = plugin if isinstance(plugin, str) else plugin.module_name
+        if plugin_ not in ctx:
+            ctx.append(plugin_)
+
+    @staticmethod
+    def remove_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> None:
+        plugin_ = plugin if isinstance(plugin, str) else plugin.module_name
+        if plugin_ in ctx:
+            ctx.remove(plugin_)

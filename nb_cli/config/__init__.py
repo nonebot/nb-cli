@@ -8,6 +8,7 @@ from .model import Adapter as Adapter
 from .model import SimpleInfo as SimpleInfo
 from .model import NoneBotConfig as NoneBotConfig
 from .parser import ConfigManager as ConfigManager
+from .model import LegacyNoneBotConfig as LegacyNoneBotConfig
 
 _logger = Logger(__name__)
 _logger.addHandler(ClickHandler())

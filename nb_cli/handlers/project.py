@@ -48,7 +48,7 @@ async def generate_run_script(
     if adapters is None or builtin_plugins is None:
         bot_config = get_nonebot_config()
         if adapters is None:
-            adapters = bot_config.adapters
+            adapters = bot_config.get_adapters()
         if builtin_plugins is None:
             builtin_plugins = bot_config.builtin_plugins
 
@@ -73,7 +73,7 @@ async def run_project(
     if adapters is None or builtin_plugins is None:
         bot_config = get_nonebot_config()
         if adapters is None:
-            adapters = bot_config.adapters
+            adapters = bot_config.get_adapters()
         if builtin_plugins is None:
             builtin_plugins = bot_config.builtin_plugins
 

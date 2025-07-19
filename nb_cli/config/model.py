@@ -1,3 +1,5 @@
+import operator
+import functools
 from typing import Optional
 from datetime import datetime
 
@@ -18,16 +20,8 @@ class SimpleInfo(BaseModel):
     module_name: str
 
 
-class Adapter(SimpleInfo):
-    __module_name__ = "adapters"
-
+class PackageInfo(SimpleInfo):
     project_link: str
-    name: str
-    desc: str
-    author: str
-    homepage: str
-    tags: list[Tag]
-    is_official: Optional[bool] = None
     time: datetime
     version: str
 
@@ -36,10 +30,20 @@ class Adapter(SimpleInfo):
         return dt.isoformat()
 
 
-class Plugin(SimpleInfo):
+class Adapter(PackageInfo):
+    __module_name__ = "adapters"
+
+    name: str
+    desc: str
+    author: str
+    homepage: str
+    tags: list[Tag]
+    is_official: Optional[bool] = None
+
+
+class Plugin(PackageInfo):
     __module_name__ = "plugins"
 
-    project_link: str
     name: str
     desc: str
     author: str
@@ -47,33 +51,40 @@ class Plugin(SimpleInfo):
     tags: list[Tag]
     is_official: Optional[bool] = None
     valid: Optional[bool] = None
-    time: datetime
-    version: str
-
-    @field_serializer("time")
-    def time_serializer(self, dt: datetime):
-        return dt.isoformat()
 
 
-class Driver(SimpleInfo):
+class Driver(PackageInfo):
     __module_name__ = "drivers"
 
-    project_link: str
     name: str
     desc: str
     author: str
     homepage: str
     tags: list[Tag]
     is_official: Optional[bool] = None
-    time: datetime
-    version: str
-
-    @field_serializer("time")
-    def time_serializer(self, dt: datetime):
-        return dt.isoformat()
 
 
 class NoneBotConfig(BaseModel):
+    if PYDANTIC_V2:  # pragma: pydantic-v2
+        model_config = ConfigDict(extra="allow")
+    else:  # pragma: pydantic-v1
+
+        class Config(ConfigDict):
+            extra = "allow"  # type: ignore
+
+    adapters: dict[str, list[SimpleInfo]] = {}
+    plugins: dict[str, list[str]] = {}
+    plugin_dirs: list[str] = []
+    builtin_plugins: list[str] = []
+
+    def get_adapters(self) -> list[SimpleInfo]:
+        return functools.reduce(operator.iadd, self.adapters.values(), [])
+
+    def get_plugins(self) -> list[str]:
+        return functools.reduce(operator.iadd, self.plugins.values(), [])
+
+
+class LegacyNoneBotConfig(BaseModel):
     if PYDANTIC_V2:  # pragma: pydantic-v2
         model_config = ConfigDict(extra="allow")
     else:  # pragma: pydantic-v1
@@ -85,3 +96,9 @@ class NoneBotConfig(BaseModel):
     plugins: list[str] = []
     plugin_dirs: list[str] = []
     builtin_plugins: list[str] = []
+
+    def get_adapters(self) -> list[SimpleInfo]:
+        return self.adapters
+
+    def get_plugins(self) -> list[str]:
+        return self.plugins

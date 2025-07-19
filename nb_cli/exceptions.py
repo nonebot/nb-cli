@@ -18,5 +18,9 @@ class ProjectNotFoundError(RuntimeError):
     """Raised when project root directory not found."""
 
 
+class ProjectInvalidError(RuntimeError):
+    """Raised when project config is invalid."""
+
+
 class LocalCacheExpired(RuntimeError):
     """Raised when local metadata cache is outdated."""
