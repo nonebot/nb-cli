@@ -1,6 +1,7 @@
 import re
 import sys
 import json
+import shlex
 from pathlib import Path
 from logging import Logger
 from functools import partial
@@ -8,6 +9,7 @@ from typing import Any, Optional
 from dataclasses import field, dataclass
 
 import click
+import nonestorage
 from noneprompt import (
     Choice,
     ListPrompt,
@@ -135,6 +137,55 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             if d.data.project_link
         ]
     )
+
+    localstore_mode_text = [
+        _("User global (default, suitable for single instance in single user)"),
+        _("Current project (suitable for multiple/portable instances)"),
+        _(
+            "User global (isolate by project name, suitable for multiple instances in"
+            " single user)"
+        ),
+        _("Custom storage location (for advanced users)"),
+    ]
+
+    context.variables["environment"] = {}
+    localstore_mode = await ListPrompt(
+        _("Which strategy of local storage would you like to use?"),
+        choices=[
+            Choice(localstore_mode_text[0], "global"),
+            Choice(localstore_mode_text[1], "project"),
+            Choice(localstore_mode_text[2], "global_isolated"),
+            Choice(localstore_mode_text[3], "custom"),
+        ],
+    ).prompt_async(style=CLI_DEFAULT_STYLE)
+    if localstore_mode.data == "project":
+        context.variables["environment"]["LOCALSTORE_USE_CWD"] = "true"
+    elif localstore_mode.data == "global_isolated":
+        context.variables["environment"]["LOCALSTORE_CACHE_DIR"] = shlex.quote(
+            str(nonestorage.user_cache_dir(f"nonebot2-{project_name}"))
+        )
+        context.variables["environment"]["LOCALSTORE_DATA_DIR"] = shlex.quote(
+            str(nonestorage.user_data_dir(f"nonebot2-{project_name}"))
+        )
+        context.variables["environment"]["LOCALSTORE_CONFIG_DIR"] = shlex.quote(
+            str(nonestorage.user_config_dir(f"nonebot2-{project_name}"))
+        )
+    elif localstore_mode.data == "custom":
+        context.variables["environment"]["LOCALSTORE_CACHE_DIR"] = shlex.quote(
+            await InputPrompt(
+                _("Cache directory to use:"),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        )
+        context.variables["environment"]["LOCALSTORE_DATA_DIR"] = shlex.quote(
+            await InputPrompt(
+                _("Data directory to use:"),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        )
+        context.variables["environment"]["LOCALSTORE_CONFIG_DIR"] = shlex.quote(
+            await InputPrompt(
+                _("Config directory to use:"),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        )
 
     return context
 
