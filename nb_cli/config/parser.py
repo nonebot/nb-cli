@@ -197,14 +197,19 @@ class ConfigManager:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
         if isinstance(config, NoneBotConfig):
-            table["adapters"] = {
-                p: [model_dump(a, include={"name", "module_name"}) for a in s]
-                for p, s in config.adapters.items()
-            }
+            table["adapters"] = {}
+            for p, s in config.adapters.items():
+                table["adapters"][p] = []
+                for a in s:
+                    t = tomlkit.inline_table()
+                    t.update(model_dump(a, include={"name", "module_name"}))
+                    table["adapters"][p].append(t)
         elif isinstance(config, LegacyNoneBotConfig):
-            table["adapters"] = [
-                model_dump(a, include={"name", "module_name"}) for a in config.adapters
-            ]
+            table["adapters"] = []
+            for a in config.adapters:
+                t = tomlkit.inline_table()
+                t.update(model_dump(a, include={"name", "module_name"}))
+                table["adapters"].append(t)
         else:
             raise ValueError(f"Invalid config: {config!r}")
         table["plugins"] = config.plugins
