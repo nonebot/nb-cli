@@ -20,6 +20,8 @@ from .model import SimpleInfo, PackageInfo, NoneBotConfig, LegacyNoneBotConfig
 CONFIG_FILE = "pyproject.toml"
 CONFIG_FILE_ENCODING = "utf-8"
 
+VALID_PACKAGE_NAME_CHARS = string.ascii_letters + string.digits + "-_"
+
 _T_config = TypeVar("_T_config", NoneBotConfig, LegacyNoneBotConfig)
 
 
@@ -227,7 +229,7 @@ class ConfigManager:
             dep = dependency if isinstance(dependency, str) else dependency.project_link
             if not any(
                 d.startswith(dep)
-                and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+                and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
                 for d in deps
             ):
                 deps.append(
@@ -246,7 +248,7 @@ class ConfigManager:
                 (i, d)
                 for i, d in enumerate(deps)
                 if d.startswith(dep)
-                and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+                and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
             ]
             for seq, (i, d) in enumerate(filtered):
                 if seq == 0:
@@ -266,7 +268,7 @@ class ConfigManager:
                 d
                 for d in deps
                 if d.startswith(dep)
-                and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+                and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
             ]:
                 deps.remove(d)
         self._write_data(data)
