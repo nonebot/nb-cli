@@ -61,7 +61,7 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
         删除适配器的文档体操作。
 
         Returns:
-            can_uninstall (bool): 表示是否可以执行卸载操作
+            bool: 表示是否可以执行卸载操作
         """
         raise NotImplementedError
 
@@ -77,7 +77,7 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
         删除插件的文档体操作。
 
         Returns:
-            can_uninstall (bool): 表示是否可以执行卸载操作
+            bool: 表示是否可以执行卸载操作
         """
         raise NotImplementedError
 
@@ -297,7 +297,7 @@ class ConfigManager:
         删除适配器操作。
 
         Returns:
-            can_uninstall (bool): 表示是否可以执行卸载操作。
+            bool: 表示是否可以执行卸载操作。
         """
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
@@ -321,7 +321,7 @@ class ConfigManager:
         删除插件操作。
 
         Returns:
-            can_uninstall (bool): 表示是否可以执行卸载操作。
+            bool: 表示是否可以执行卸载操作。
         """
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})

@@ -90,8 +90,7 @@ def humanize_data_size(
         threshold (float): Factor used to determine when to switch to a higher unit.
         use_si (bool): If True, use base-1000 units (MB, GB); otherwise use
             base-1024 (MiB, GiB).
-        negative_size (Literal["error", "n/a", "negative"]): strategy to control how to
-            process negative size.
+        negative_size: strategy to control how to process negative size.
 
     Returns:
         str: Human-readable size string.
