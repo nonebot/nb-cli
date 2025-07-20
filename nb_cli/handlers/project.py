@@ -16,6 +16,7 @@ from nb_cli.config import (
 )
 
 from . import templates
+from .driver import list_drivers
 from .plugin import list_plugins
 from .adapter import list_adapters
 from .process import create_process
@@ -134,6 +135,8 @@ async def upgrade_project_format() -> None:
 
     all_adapters = _index_by_module_name(await list_adapters())
     all_plugins = _index_by_module_name(await list_plugins())
+    nonebot_pkg = next(iter(await list_drivers("~none"))).model_copy()
+    nonebot_pkg.project_link = "nonebot2"
 
     new_adapters: dict[str, list[SimpleInfo]] = {"@local": []}
     new_plugins: dict[str, list[str]] = {"@local": []}
@@ -175,7 +178,7 @@ async def upgrade_project_format() -> None:
     )
 
     GLOBAL_CONFIG.update_nonebot_config(new_config)
-    GLOBAL_CONFIG.add_dependency("nonebot2", *packages)
+    GLOBAL_CONFIG.update_dependency(nonebot_pkg, *packages)
 
 
 @requires_project_root
