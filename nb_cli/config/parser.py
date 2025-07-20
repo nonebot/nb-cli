@@ -191,57 +191,89 @@ class ConfigManager:
     def get_nonebot_config(self) -> Union[NoneBotConfig, LegacyNoneBotConfig]:
         return self.policy.get_nonebot_config()
 
-    def add_dependency(self, dependency: Union[str, PackageInfo]) -> None:
-        data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
-        dep = dependency if isinstance(dependency, str) else dependency.project_link
-        if not any(
-            d.startswith(dep)
-            and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
-            for d in deps
-        ):
-            deps.append(
-                dep if isinstance(dependency, str) else f"{dep}>={dependency.version}"
-            )
-        self._write_data(data)
-
-    def update_dependency(self, dependency: PackageInfo) -> None:
-        data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
-        dep = dependency.project_link
-        filtered = [
-            (i, d)
-            for i, d in enumerate(deps)
-            if d.startswith(dep)
-            and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
-        ]
-        for seq, (i, d) in enumerate(filtered):
-            if seq == 0:
-                deps[i] = f"{dep}>={dependency.version}"
-            else:
-                deps.remove(d)
-        if not filtered:
-            deps.append(f"{dep}>={dependency.version}")
-        self._write_data(data)
-
-    def remove_dependency(self, dependency: Union[str, PackageInfo]) -> None:
-        data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
-        dep = dependency if isinstance(dependency, str) else dependency.project_link
-        for d in [
-            d
-            for d in deps
-            if d.startswith(dep)
-            and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
-        ]:
-            deps.remove(d)
-        self._write_data(data)
-
-    def add_adapter(self, adapter: PackageInfo) -> None:
+    def update_nonebot_config(
+        self, config: Union[NoneBotConfig, LegacyNoneBotConfig]
+    ) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        adapters: dict[str, list[dict[str, str]]] = table.setdefault("adapters", {})
-        self.policy.add_adapter(adapters, adapter)
+        if isinstance(config, NoneBotConfig):
+            table["adapters"] = {
+                p: [model_dump(a, include={"name", "module_name"}) for a in s]
+                for p, s in config.adapters.items()
+            }
+        elif isinstance(config, LegacyNoneBotConfig):
+            table["adapters"] = [
+                model_dump(a, include={"name", "module_name"}) for a in config.adapters
+            ]
+        else:
+            raise ValueError(f"Invalid config: {config!r}")
+        table["plugins"] = config.plugins
+        table["plugin_dirs"] = config.plugin_dirs
+        table["builtin_plugins"] = config.builtin_plugins
+        self._write_data(data)
+        self._policy = self._select_policy()  # update access policy
+
+    def add_dependency(self, *dependencies: Union[str, PackageInfo]) -> None:
+        if not dependencies:
+            return
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        for dependency in dependencies:
+            dep = dependency if isinstance(dependency, str) else dependency.project_link
+            if not any(
+                d.startswith(dep)
+                and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+                for d in deps
+            ):
+                deps.append(
+                    dep
+                    if isinstance(dependency, str)
+                    else f"{dep}>={dependency.version}"
+                )
+        self._write_data(data)
+
+    def update_dependency(self, *dependencies: PackageInfo) -> None:
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        for dependency in dependencies:
+            dep = dependency.project_link
+            filtered = [
+                (i, d)
+                for i, d in enumerate(deps)
+                if d.startswith(dep)
+                and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+            ]
+            for seq, (i, d) in enumerate(filtered):
+                if seq == 0:
+                    deps[i] = f"{dep}>={dependency.version}"
+                else:
+                    deps.remove(d)
+            if not filtered:
+                deps.append(f"{dep}>={dependency.version}")
+        self._write_data(data)
+
+    def remove_dependency(self, *dependencies: Union[str, PackageInfo]) -> None:
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        for dependency in dependencies:
+            dep = dependency if isinstance(dependency, str) else dependency.project_link
+            for d in [
+                d
+                for d in deps
+                if d.startswith(dep)
+                and d.removeprefix(dep)[0] not in string.ascii_letters + string.digits
+            ]:
+                deps.remove(d)
+        self._write_data(data)
+
+    def add_adapter(self, *adapters: PackageInfo) -> None:
+        if not adapters:
+            return
+        data = self._get_data()
+        table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
+        tb_adapters: dict[str, list[dict[str, str]]] = table.setdefault("adapters", {})
+        for adapter in adapters:
+            self.policy.add_adapter(tb_adapters, adapter)
         self._write_data(data)
 
     def remove_adapter(self, adapter: PackageInfo) -> bool:
@@ -258,11 +290,14 @@ class ConfigManager:
         self._write_data(data)
         return can_remove
 
-    def add_plugin(self, plugin: PackageInfo) -> None:
+    def add_plugin(self, *plugins: PackageInfo) -> None:
+        if not plugins:
+            return
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
-        plugins: dict[str, list[str]] = table.setdefault("plugins", {})
-        self.policy.add_plugin(plugins, plugin)
+        tb_plugins: dict[str, list[str]] = table.setdefault("plugins", {})
+        for plugin in plugins:
+            self.policy.add_plugin(tb_plugins, plugin)
         self._write_data(data)
 
     def remove_plugin(self, plugin: PackageInfo) -> bool:
