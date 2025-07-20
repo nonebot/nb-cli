@@ -38,6 +38,8 @@ from nb_cli.handlers import (
     generate_run_script,
     list_builtin_plugins,
     list_project_templates,
+    upgrade_project_format,
+    downgrade_project_format,
 )
 
 VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
@@ -386,3 +388,27 @@ async def run(
     else:
         proc = await run_project(exist_bot=Path(file))
         await proc.wait()
+
+
+@click.command(
+    cls=ClickAliasedCommand, help=_("Upgrade the project format of your bot.")
+)
+@run_async
+async def upgrade_format():
+    if await ConfirmPrompt(
+        _("Are you sure to upgrade the project format?"), True
+    ).prompt_async(style=CLI_DEFAULT_STYLE):
+        await upgrade_project_format()
+        click.echo(_("Successfully upgraded project format."))
+
+
+@click.command(
+    cls=ClickAliasedCommand, help=_("Downgrade the project format of your bot.")
+)
+@run_async
+async def downgrade_format():
+    if await ConfirmPrompt(
+        _("Are you sure to downgrade the project format?"), True
+    ).prompt_async(style=CLI_DEFAULT_STYLE):
+        await downgrade_project_format()
+        click.echo(_("Successfully downgraded project format."))
