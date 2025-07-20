@@ -117,7 +117,7 @@ async def install(
             _(
                 "Errors occurred in installing plugin {plugin.name}\n"
                 "    *** Try `nb plugin install` command with `--no-restrict-version` "
-                "option to resolve under loose restrictions may work."
+                "option to resolve under loose version constraints may work."
             ).format(plugin=plugin),
             fg="red",
         )

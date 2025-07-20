@@ -117,7 +117,7 @@ async def install(
             _(
                 "Errors occurred in installing adapter {adapter.name}\n"
                 "    *** Try `nb adapter install` command with `--no-restrict-version` "
-                "option to resolve under loose restrictions may work."
+                "option to resolve under loose version constraints may work."
             ).format(adapter=adapter),
             fg="red",
         )
