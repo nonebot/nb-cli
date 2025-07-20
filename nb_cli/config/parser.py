@@ -228,8 +228,11 @@ class ConfigManager:
         for dependency in dependencies:
             dep = dependency if isinstance(dependency, str) else dependency.project_link
             if not any(
-                d.startswith(dep)
-                and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
+                d == dep
+                or (
+                    d.startswith(dep)
+                    and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
+                )
                 for d in deps
             ):
                 deps.append(
@@ -247,8 +250,11 @@ class ConfigManager:
             filtered = [
                 (i, d)
                 for i, d in enumerate(deps)
-                if d.startswith(dep)
-                and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
+                if d == dep
+                or (
+                    d.startswith(dep)
+                    and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
+                )
             ]
             for seq, (i, d) in enumerate(filtered):
                 if seq == 0:
@@ -267,8 +273,11 @@ class ConfigManager:
             for d in [
                 d
                 for d in deps
-                if d.startswith(dep)
-                and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
+                if d == dep
+                or (
+                    d.startswith(dep)
+                    and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
+                )
             ]:
                 deps.remove(d)
         self._write_data(data)
