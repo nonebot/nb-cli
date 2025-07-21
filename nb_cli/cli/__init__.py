@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Optional, cast
 
 import click
-from noneprompt import Choice, ListPrompt, CancelledError
+from noneprompt import Choice, ListPrompt, ConfirmPrompt, CancelledError
 
 from nb_cli import _, __version__
 from nb_cli.handlers import draw_logo
@@ -14,6 +14,22 @@ from .customize import CLIMainGroup as CLIMainGroup
 from .utils import CLI_DEFAULT_STYLE as CLI_DEFAULT_STYLE
 from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import ClickAliasedCommand as ClickAliasedCommand
+
+
+@click.command  # this command only appears in interactive mode.
+@click.pass_context
+@run_async
+async def exit_(ctx: click.Context):
+    if await ConfirmPrompt(_("Are you sure to exit NB CLI?"), True).prompt_async(
+        style=CLI_DEFAULT_STYLE
+    ):
+        ctx.exit()
+
+
+@click.command  # this command only appears in interactive mode.
+def back_():
+    # nothing to do, just to keep a command to avoid type violation
+    return
 
 
 def _set_global_working_dir(
@@ -93,21 +109,25 @@ async def cli(ctx: click.Context):
                     sub_cmd,
                 )
             )
+    _exit_choice = Choice(_("Exit NB CLI."), exit_)
+    choices.append(_exit_choice)
 
     click.secho(draw_logo(), fg="cyan", bold=True)
     click.echo("\n\b")
     click.secho(_("Welcome to NoneBot CLI!"), fg="green", bold=True)
 
-    # prompt user to choose
-    try:
-        result = await ListPrompt(
-            _("What do you want to do?"), choices=choices
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
-    except CancelledError:
-        ctx.exit()
+    while True:
+        # prompt user to choose
+        try:
+            result = await ListPrompt(
+                _("What do you want to do?"), choices=choices
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            result = _exit_choice
 
-    sub_cmd = result.data
-    await run_sync(ctx.invoke)(sub_cmd)
+        sub_cmd = result.data
+        ctx.params["can_back_to_parent"] = True
+        await run_sync(ctx.invoke)(sub_cmd)
 
 
 from .commands import (

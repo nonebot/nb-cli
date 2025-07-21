@@ -7,7 +7,14 @@ from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
-from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
+from nb_cli.cli import (
+    CLI_DEFAULT_STYLE,
+    ClickAliasedGroup,
+    back_,
+    exit_,
+    run_sync,
+    run_async,
+)
 from nb_cli.handlers import (
     list_adapters,
     create_adapter,
@@ -39,16 +46,25 @@ async def adapter(ctx: click.Context):
                     sub_cmd,
                 )
             )
+    if ctx.parent and ctx.parent.params.get("can_back_to_parent", False):
+        _exit_choice = Choice(_("Back to top level."), back_)
+    else:
+        _exit_choice = Choice(_("Exit NB CLI."), exit_)
+    choices.append(_exit_choice)
 
-    try:
-        result = await ListPrompt(
-            _("What do you want to do?"), choices=choices
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
-    except CancelledError:
-        ctx.exit()
+    while True:
+        try:
+            result = await ListPrompt(
+                _("What do you want to do?"), choices=choices
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            result = _exit_choice
 
-    sub_cmd = result.data
-    await run_sync(ctx.invoke)(sub_cmd)
+        sub_cmd = result.data
+        if sub_cmd == back_:
+            return
+        ctx.params["can_back_to_parent"] = True
+        await run_sync(ctx.invoke)(sub_cmd)
 
 
 @adapter.command(
