@@ -8,7 +8,7 @@ docs_build/_build
 .docusaurus
 website/docs/api/**/*.md
 website/static/packages/*.whl
-!nb_cli/project/{{cookiecutter.project_slug}}/.env
+!nb_cli/template/project/*/{{cookiecutter.computed.project_slug}}/.env*
 
 # Created by https://www.toptal.com/developers/gitignore/api/node,macos,linux,python,windows,jetbrains,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,macos,linux,python,windows,jetbrains,visualstudiocode
