@@ -44,3 +44,60 @@ builtin_plugins = []
 
 [tool.nonebot.plugins]
 "@local" = []
+{% if "ruff" in cookiecutter.nonebot.devtools -%}
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.ruff.lint]
+# For more rules, see https://docs.astral.sh/ruff/rules/.
+select = [
+  "F",     # Pyflakes
+  "W",     # pycodestyle warnings
+  "E",     # pycodestyle errors
+  "I",     # isort
+  "UP",    # pyupgrade
+  "ANN",   # flake8-annotations
+  "ASYNC", # flake8-async
+  "C4",    # flake8-comprehensions
+  "T10",   # flake8-debugger
+  "T20",   # flake8-print
+  "PYI",   # flake8-pyi
+  "Q",     # flake8-quotes
+  "TID",   # flake8-tidy-imports
+  "RUF",   # Ruff-specific rules
+]
+ignore = [
+  "E402",   # module-import-not-at-top-of-file
+  "UP037",  # quoted-annotation
+  "RUF001", # ambiguous-unicode-character-string
+  "RUF002", # ambiguous-unicode-character-docstring
+  "RUF003", # ambiguous-unicode-character-comment
+  "ANN202", # missing-return-type-private-function
+  "ANN401", # any-type
+]
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+{% endif -%}
+{% if "pyright" in cookiecutter.nonebot.devtools or "basedpyright" in cookiecutter.nonebot.devtools %}
+{% if "pyright" in cookiecutter.nonebot.devtools -%}
+[tool.pyright]
+# For Pylance/Pyright configurations, see https://microsoft.github.io/pyright/#/configuration.
+{%- else -%}
+[tool.basedpyright]
+# For BasedPyright configurations, see https://docs.basedpyright.com/latest/configuration/config-files/.
+{%- endif %}
+pythonVersion = "3.9"
+pythonPlatform = "All"
+typeCheckingMode = "standard"
+{%- endif %}
+{% if "mypy" in cookiecutter.nonebot.devtools %}
+[tool.mypy]
+# For MyPy configurations, see https://mypy.readthedocs.io/en/latest/config_file.html.
+python_version = "3.9"
+{% endif -%}

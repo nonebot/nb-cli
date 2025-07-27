@@ -75,6 +75,11 @@ def project_name_validator(name: str) -> bool:
     )
 
 
+def project_devtools_validator(devtools: tuple[Choice[str], ...]) -> bool:
+    expanded = {ch.data for ch in devtools}
+    return bool({"pyright", "basedpyright"} - expanded)
+
+
 async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     click.secho(_("Loading adapters..."))
     all_adapters = await list_adapters()
@@ -203,6 +208,23 @@ async def prompt_simple_context(context: ProjectContext) -> ProjectContext:
             style=CLI_DEFAULT_STYLE
         )
     ).data
+    context.variables["devtools"] = [
+        ch.data
+        for ch in await CheckboxPrompt(
+            _("Which developer tool(s) would you like to use?"),
+            [
+                Choice("Pylance/Pyright" + _(" (Recommended)"), "pyright"),
+                Choice("Ruff" + _(" (Recommended)"), "ruff"),
+                Choice("MyPy", "mypy"),
+                Choice("BasedPyright" + _(" (Advanced user)"), "basedpyright"),
+            ],
+            [0, 1],
+            validator=project_devtools_validator,
+            error_message=_(
+                "Cannot choose 'Pylance/Pyright' and 'BasedPyright' at the same time."
+            ),
+        ).prompt_async(style=CLI_DEFAULT_STYLE)
+    ]
 
     return context
 

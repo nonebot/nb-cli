@@ -31,6 +31,7 @@ repos:
       - id: prettier
         types_or: [javascript, jsx, ts, tsx, markdown, yaml, json]
         stages: [pre-commit]
+        exclude: ^nb_cli/template/project/.*\.json$
 
   - repo: https://github.com/nonebot/nonemoji
     rev: v0.1.4
