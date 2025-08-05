@@ -1,8 +1,8 @@
 {
   "recommendations": [
-{%- set extensions = ['"tamasfe.even-better-toml"'] -%}
+{%- set extensions = ['"tamasfe.even-better-toml"', '"ms-python.python"'] -%}
 {% if "pyright" in cookiecutter.nonebot.devtools -%}
-{% set _ = extensions.append('"ms-python.python"') %}
+{% set _ = extensions.append('"ms-python.vscode-pylance"') %}
 {%- endif -%}
 {% if "mypy" in cookiecutter.nonebot.devtools -%}
 {% set _ = extensions.append('"ms-python.mypy-type-checker"') %}
