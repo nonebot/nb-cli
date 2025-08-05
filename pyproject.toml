@@ -67,6 +67,7 @@ custom-hook = "pdm_build.py"
 run-setuptools = false
 
 [tool.pyright]
+typeCheckingMode = "standard"
 pythonPlatform = "All"
 reportPrivateImportUsage = false
 reportShadowedImports = false
