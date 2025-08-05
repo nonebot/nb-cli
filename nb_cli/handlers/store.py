@@ -74,13 +74,20 @@ async def dump_unpublished_modules(module_class: type[T], newer: list[T]) -> Non
         )
 
 
-async def load_unpublished_modules(module_class: type[T]) -> list[T]:
-    module_name: str = module_class.__module_name__
+if TYPE_CHECKING:
 
-    if (path_historical := CACHE_DIR / f"{module_name}_unpublished.json").is_file():
-        async with await anyio.open_file(path_historical) as fhistorical:
-            return type_validate_json(list[module_class], await fhistorical.read())
-    return []
+    async def load_unpublished_modules(module_class: type[T]) -> list[T]: ...
+
+else:
+
+    @cache(ttl=None)
+    async def load_unpublished_modules(module_class: type[T]) -> list[T]:
+        module_name: str = module_class.__module_name__
+
+        if (path_historical := CACHE_DIR / f"{module_name}_unpublished.json").is_file():
+            async with await anyio.open_file(path_historical) as fhistorical:
+                return type_validate_json(list[module_class], await fhistorical.read())
+        return []
 
 
 if TYPE_CHECKING:
