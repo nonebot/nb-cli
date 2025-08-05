@@ -29,7 +29,7 @@ def _compile_module_index(modules: list[T]) -> dict[tuple[str, str], T]:
     return {(mod.name, mod.module_name): mod for mod in modules}
 
 
-def get_unpublished_modules(
+def _calculate_unpublished_modules(
     newer: list[T], current: list[T], historical_unpublished: list[T]
 ) -> list[T]:
     # NOTE: This function requires calculation.
@@ -65,13 +65,22 @@ async def dump_unpublished_modules(module_class: type[T], newer: list[T]) -> Non
     else:
         historical: list[T] = []
 
-    result = await run_sync(get_unpublished_modules)(newer, current, historical)
+    result = await run_sync(_calculate_unpublished_modules)(newer, current, historical)
     async with await anyio.open_file(
         CACHE_DIR / f"{module_name}_unpublished.json", "w", encoding="utf-8"
     ) as fnew:
         await fnew.write(
             json.dumps([model_dump(x) for x in result], ensure_ascii=False)
         )
+
+
+async def load_unpublished_modules(module_class: type[T]) -> list[T]:
+    module_name: str = module_class.__module_name__
+
+    if (path_historical := CACHE_DIR / f"{module_name}_unpublished.json").is_file():
+        async with await anyio.open_file(path_historical) as fhistorical:
+            return type_validate_json(list[module_class], await fhistorical.read())
+    return []
 
 
 if TYPE_CHECKING:
