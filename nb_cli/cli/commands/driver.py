@@ -93,17 +93,14 @@ async def search(name: Optional[str]):
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def install(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
             _("Driver name to install:"), name, await list_drivers()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     if driver.project_link:
         proc = await call_pip_install(driver.project_link, pip_args)
@@ -124,17 +121,14 @@ async def install(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def update(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
             _("Driver name to update:"), name, await list_drivers()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     if driver.project_link:
         proc = await call_pip_update(driver.project_link, pip_args)
@@ -157,17 +151,14 @@ async def update(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
             _("Driver name to uninstall:"), name, await list_drivers()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
         GLOBAL_CONFIG.remove_dependency(driver)

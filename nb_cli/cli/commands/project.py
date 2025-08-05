@@ -273,7 +273,7 @@ async def create(
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
             ).data
         except CancelledError:
-            ctx.exit()
+            return
 
     context = ProjectContext()
     try:
@@ -284,7 +284,7 @@ async def create(
         click.secho(repr(e), fg="red")
         ctx.exit(1)
     except CancelledError:
-        ctx.exit()
+        return
 
     create_project(template, {"nonebot": context.variables}, output_dir)
 
@@ -293,7 +293,7 @@ async def create(
             _("Install dependencies now?"), default_choice=True
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
-        ctx.exit()
+        return
 
     use_venv = False
     project_dir_name = context.variables["project_name"].replace(" ", "-")
@@ -306,7 +306,7 @@ async def create(
                 _("Create virtual environment?"), default_choice=True
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
         if use_venv:
             click.secho(
@@ -341,7 +341,7 @@ async def create(
                     ).prompt_async(style=CLI_DEFAULT_STYLE)
                 ]
             except CancelledError:
-                ctx.exit()
+                return
 
             try:
                 for plugin in loaded_builtin_plugins:
@@ -375,6 +375,7 @@ async def create(
     click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
     click.secho("  nb run --reload", fg="green")
+    ctx.exit()
 
 
 @click.command(cls=ClickAliasedCommand, help=_("Generate entry file of your bot."))

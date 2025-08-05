@@ -111,7 +111,7 @@ async def install(
             _("Adapter name to install:"), name, await list_adapters()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
         GLOBAL_CONFIG.add_adapter(adapter)
@@ -137,6 +137,8 @@ async def install(
             ).format(adapter=adapter),
             fg="red",
         )
+        assert proc.returncode
+        ctx.exit(proc.returncode)
 
     try:
         GLOBAL_CONFIG.add_dependency(adapter)
@@ -153,17 +155,14 @@ async def install(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def update(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         adapter = await find_exact_package(
             _("Adapter name to update:"), name, await list_adapters()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     proc = await call_pip_update(adapter.project_link, pip_args)
     await proc.wait()
@@ -185,17 +184,14 @@ async def update(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         adapter = await find_exact_package(
             _("Adapter name to uninstall:"), name, await list_adapters()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
         can_uninstall = GLOBAL_CONFIG.remove_adapter(adapter)
@@ -207,7 +203,7 @@ async def uninstall(
                 adapter=adapter, e=e
             )
         )
-        can_uninstall = False
+        return
 
     if can_uninstall:
         proc = await call_pip_uninstall(adapter.project_link, pip_args)
@@ -237,7 +233,7 @@ async def create(
                 style=CLI_DEFAULT_STYLE
             )
         except CancelledError:
-            ctx.exit()
+            return
     if output_dir is None:
         detected: list[Choice[None]] = [
             Choice(str(x))
@@ -264,7 +260,7 @@ async def create(
                     validator=lambda x: len(x) > 0 and Path(x).is_dir(),
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
     elif not Path(output_dir).is_dir():
         click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
@@ -274,5 +270,6 @@ async def create(
                 error_message=_("Invalid output dir!"),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
     create_adapter(name, output_dir, template=template)
+    ctx.exit()

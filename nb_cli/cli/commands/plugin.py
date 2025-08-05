@@ -111,7 +111,7 @@ async def install(
             _("Plugin name to install:"), name, await list_plugins()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
         GLOBAL_CONFIG.add_plugin(plugin)
@@ -137,6 +137,8 @@ async def install(
             ).format(plugin=plugin),
             fg="red",
         )
+        assert proc.returncode
+        ctx.exit(proc.returncode)
 
     try:
         GLOBAL_CONFIG.add_dependency(plugin)
@@ -163,7 +165,7 @@ async def update(
             _("Plugin name to update:"), name, await list_plugins()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     proc = await call_pip_update(plugin.project_link, pip_args)
     await proc.wait()
@@ -195,7 +197,7 @@ async def uninstall(
             _("Plugin name to uninstall:"), name, await list_plugins()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
         can_uninstall = GLOBAL_CONFIG.remove_plugin(plugin)
@@ -207,7 +209,7 @@ async def uninstall(
                 plugin=plugin, e=e
             )
         )
-        can_uninstall = False
+        return
 
     if can_uninstall:
         proc = await call_pip_uninstall(plugin.project_link, pip_args)
@@ -239,14 +241,14 @@ async def create(
                 style=CLI_DEFAULT_STYLE
             )
         except CancelledError:
-            ctx.exit()
+            return
     if sub_plugin is None:
         try:
             sub_plugin = await ConfirmPrompt(
                 _("Use nested plugin?"), default_choice=False
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
     if output_dir is None:
         detected: list[Choice[None]] = [
@@ -271,7 +273,7 @@ async def create(
                     error_message=_("Invalid output dir!"),
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
     elif not Path(output_dir).is_dir():
         click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
@@ -281,6 +283,7 @@ async def create(
                 error_message=_("Invalid output dir!"),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
     create_plugin(name, output_dir, sub_plugin=sub_plugin, template=template)
+    ctx.exit()

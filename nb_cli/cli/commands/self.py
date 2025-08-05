@@ -71,18 +71,15 @@ async def self(ctx: click.Context):
 )
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def install(name: Optional[str], pip_args: Optional[list[str]]):
     if name is None:
         try:
             name = await InputPrompt(
                 _("Package name you want to install?")
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
     proc = await call_pip_install(name, pip_args, python_path=sys.executable)
     await proc.wait()
@@ -105,18 +102,15 @@ async def update(pip_args: Optional[list[str]]):
 )
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     if name is None:
         try:
             name = await InputPrompt(
                 _("Package name you want to uninstall?")
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
     proc = await call_pip_uninstall(name, pip_args, python_path=sys.executable)
     await proc.wait()
