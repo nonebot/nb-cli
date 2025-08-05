@@ -70,21 +70,37 @@ async def adapter(ctx: click.Context):
 @adapter.command(
     name="list", help=_("List nonebot adapters published on nonebot homepage.")
 )
+@click.option(
+    "--include-unpublished-adapters",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @run_async
-async def list_():
-    adapters = await list_adapters()
+async def list_(include_unpublished_adapters: bool = False):
+    adapters = await list_adapters(include_unpublished=include_unpublished_adapters)
     click.echo(format_package_results(adapters))
 
 
 @adapter.command(help=_("Search for nonebot adapters published on nonebot homepage."))
+@click.option(
+    "--include-unpublished-adapters",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @click.argument("name", nargs=1, default=None)
 @run_async
-async def search(name: Optional[str]):
+async def search(name: Optional[str], include_unpublished_adapters: bool = False):
     if name is None:
         name = await InputPrompt(_("Adapter name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
-    adapters = await list_adapters(name)
+    adapters = await list_adapters(
+        name, include_unpublished=include_unpublished_adapters
+    )
     click.echo(format_package_results(adapters))
 
 
@@ -96,6 +112,13 @@ async def search(name: Optional[str]):
 @click.option(
     "--no-restrict-version", nargs=1, is_flag=True, flag_value=True, default=False
 )
+@click.option(
+    "--include-unpublished-adapters",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -105,10 +128,13 @@ async def install(
     no_restrict_version: bool,
     name: Optional[str],
     pip_args: Optional[list[str]],
+    include_unpublished_adapters: bool = False,
 ):
     try:
         adapter = await find_exact_package(
-            _("Adapter name to install:"), name, await list_adapters()
+            _("Adapter name to install:"),
+            name,
+            await list_adapters(include_unpublished=include_unpublished_adapters),
         )
     except CancelledError:
         return
@@ -153,13 +179,26 @@ async def install(
 @adapter.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot adapter.")
 )
+@click.option(
+    "--include-unpublished-adapters",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def update(name: Optional[str], pip_args: Optional[list[str]]):
+async def update(
+    name: Optional[str],
+    pip_args: Optional[list[str]],
+    include_unpublished_adapters: bool = False,
+):
     try:
         adapter = await find_exact_package(
-            _("Adapter name to update:"), name, await list_adapters()
+            _("Adapter name to update:"),
+            name,
+            await list_adapters(include_unpublished=include_unpublished_adapters),
         )
     except CancelledError:
         return
@@ -188,7 +227,9 @@ async def update(name: Optional[str], pip_args: Optional[list[str]]):
 async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         adapter = await find_exact_package(
-            _("Adapter name to uninstall:"), name, await list_adapters()
+            _("Adapter name to uninstall:"),
+            name,
+            await list_adapters(include_unpublished=True),
         )
     except CancelledError:
         return
