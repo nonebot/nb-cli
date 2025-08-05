@@ -6,6 +6,7 @@ import click
 from noneprompt import Choice, ListPrompt, ConfirmPrompt, CancelledError
 
 from nb_cli import _
+from nb_cli import cache as cache_data
 from nb_cli.handlers.data import CACHE_DIR
 from nb_cli.cli.utils import humanize_data_size
 from nb_cli.handlers import download_module_data
@@ -188,6 +189,7 @@ async def _update_module_data(module_type: Literal["adapter", "plugin", "driver"
 @click.argument("module_type", type=str, nargs=1, default="all")
 @run_async
 async def update(module_type: str):
+    await cache_data.clear()
     if module_type == "all":
         for mod in "adapter", "plugin", "driver":
             await _update_module_data(mod)
@@ -266,6 +268,8 @@ async def clear(unpublished_only: bool = False, noconfirm: bool = False):
         ).prompt_async(style=CLI_DEFAULT_STYLE)
         if not confirm:
             return
+
+    await cache_data.clear()
 
     for f in (
         CACHE_DIR / "adapters_unpublished.json",
