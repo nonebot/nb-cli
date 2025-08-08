@@ -150,7 +150,8 @@ async def upgrade_project_format() -> None:
             info = SimpleInfo(name=adapter.name, module_name=adapter.module_name)
             if adapter.name != a.name:
                 click.secho(
-                    _("WARNING: Inconsistent adapter name info: {old!r} -> {new!r}")
+                    _("WARNING: Inconsistent adapter name info: {old!r} -> {new!r}"),
+                    fg="yellow",
                 )
         else:
             info = a
