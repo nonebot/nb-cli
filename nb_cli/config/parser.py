@@ -1,6 +1,7 @@
 import string
 import logging
 import weakref
+import functools
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
 from typing import Any, Union, Generic, TypeVar, ClassVar, Optional
@@ -23,6 +24,21 @@ CONFIG_FILE_ENCODING = "utf-8"
 VALID_PACKAGE_NAME_CHARS = string.ascii_letters + string.digits + "-_"
 
 _T_config = TypeVar("_T_config", NoneBotConfig, LegacyNoneBotConfig)
+
+
+@functools.lru_cache(maxsize=512)
+def _split_package_dependency(dep: str) -> tuple[str, Optional[str], Optional[str]]:
+    pkg_delims = ("=", ">", "<", "!", "~", ";")
+    sep = min(
+        filter(lambda i: i != -1, (dep.find(ch) for ch in pkg_delims)), default=len(dep)
+    )
+    cons = dep[sep:]
+    ver, env = cons.split(";", maxsplit=1) if ";" in cons else (cons, None)
+    return (
+        dep[:sep].strip(),
+        ver.strip() or None,
+        env.strip() if env is not None else None,
+    )
 
 
 class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
@@ -225,61 +241,65 @@ class ConfigManager:
             return
         data = self._get_data()
         deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+
         for dependency in dependencies:
-            dep = dependency if isinstance(dependency, str) else dependency.project_link
+            dep_str = (
+                dependency if isinstance(dependency, str) else dependency.project_link
+            )
+
             if not any(
-                d == dep
-                or (
-                    d.startswith(dep)
-                    and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
-                )
+                _split_package_dependency(d)[0] == _split_package_dependency(dep_str)[0]
                 for d in deps
             ):
-                deps.append(
-                    dep
-                    if isinstance(dependency, str)
-                    else f"{dep}>={dependency.version}"
-                )
+                if isinstance(dependency, str):
+                    deps.append(dep_str)
+                else:
+                    deps.append(f"{dep_str}>={dependency.version}")
+
         self._write_data(data)
 
     def update_dependency(self, *dependencies: PackageInfo) -> None:
         data = self._get_data()
         deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+
         for dependency in dependencies:
-            dep = dependency.project_link
-            filtered = [
+            dep_str = dependency.project_link
+            matches = [
                 (i, d)
                 for i, d in enumerate(deps)
-                if d == dep
-                or (
-                    d.startswith(dep)
-                    and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
-                )
+                if _split_package_dependency(d)[0]
+                == _split_package_dependency(dep_str)[0]
             ]
-            for seq, (i, d) in enumerate(filtered):
-                if seq == 0:
-                    deps[i] = f"{dep}>={dependency.version}"
-                else:
-                    deps.remove(d)
-            if not filtered:
-                deps.append(f"{dep}>={dependency.version}")
+
+            if matches:
+                idx, _ = matches[0]
+                deps[idx] = f"{dep_str}>={dependency.version}"
+
+                for i, _ in sorted(matches[1:], reverse=True):
+                    del deps[i]
+            else:
+                deps.append(f"{dep_str}>={dependency.version}")
+
         self._write_data(data)
 
     def remove_dependency(self, *dependencies: Union[str, PackageInfo]) -> None:
         data = self._get_data()
         deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+
         for dependency in dependencies:
-            dep = dependency if isinstance(dependency, str) else dependency.project_link
-            for d in [
-                d
-                for d in deps
-                if d == dep
-                or (
-                    d.startswith(dep)
-                    and d.removeprefix(dep)[0] not in VALID_PACKAGE_NAME_CHARS
-                )
-            ]:
-                deps.remove(d)
+            dep_str = (
+                dependency if isinstance(dependency, str) else dependency.project_link
+            )
+            indices_to_remove = [
+                i
+                for i, d in enumerate(deps)
+                if _split_package_dependency(d)[0]
+                == _split_package_dependency(dep_str)[0]
+            ]
+
+            for i in sorted(indices_to_remove, reverse=True):
+                del deps[i]
+
         self._write_data(data)
 
     def add_adapter(self, *adapters: PackageInfo) -> None:
