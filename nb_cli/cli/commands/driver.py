@@ -68,21 +68,39 @@ async def driver(ctx: click.Context):
 @driver.command(
     name="list", help=_("List nonebot drivers published on nonebot homepage.")
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished drivers."),
+)
 @run_async
-async def list_():
-    drivers = await list_drivers()
+async def list_(include_unpublished: bool = False):
+    drivers = await list_drivers(include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished drivers may be included."), fg="yellow")
     click.echo(format_package_results(drivers))
 
 
 @driver.command(help=_("Search for nonebot drivers published on nonebot homepage."))
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished drivers."),
+)
 @click.argument("name", nargs=1, default=None)
 @run_async
-async def search(name: Optional[str]):
+async def search(name: Optional[str], include_unpublished: bool = False):
     if name is None:
         name = await InputPrompt(_("Driver name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
-    drivers = await list_drivers(name)
+    drivers = await list_drivers(name, include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished drivers may be included."), fg="yellow")
     click.echo(format_package_results(drivers))
 
 
@@ -91,16 +109,38 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot driver to current project."),
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished drivers."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def install(name: Optional[str], pip_args: Optional[list[str]]):
+async def install(
+    name: Optional[str],
+    pip_args: Optional[list[str]],
+    include_unpublished: bool = False,
+):
     try:
         driver = await find_exact_package(
-            _("Driver name to install:"), name, await list_drivers()
+            _("Driver name to install:"),
+            name,
+            await list_drivers(include_unpublished=include_unpublished),
         )
     except CancelledError:
         return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished drivers may be installed. "
+                "These drivers may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     if driver.project_link:
         proc = await call_pip_install(driver.project_link, pip_args)
@@ -119,16 +159,38 @@ async def install(name: Optional[str], pip_args: Optional[list[str]]):
 @driver.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot driver.")
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished drivers."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def update(name: Optional[str], pip_args: Optional[list[str]]):
+async def update(
+    name: Optional[str],
+    pip_args: Optional[list[str]],
+    include_unpublished: bool = False,
+):
     try:
         driver = await find_exact_package(
-            _("Driver name to update:"), name, await list_drivers()
+            _("Driver name to update:"),
+            name,
+            await list_drivers(include_unpublished=include_unpublished),
         )
     except CancelledError:
         return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished drivers may be installed. "
+                "These drivers may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     if driver.project_link:
         proc = await call_pip_update(driver.project_link, pip_args)
@@ -155,7 +217,11 @@ async def update(name: Optional[str], pip_args: Optional[list[str]]):
 async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
-            _("Driver name to uninstall:"), name, await list_drivers()
+            _("Driver name to uninstall:"),
+            name,
+            await list_drivers(
+                include_unpublished=True  # unpublished modules are always removable
+            ),
         )
     except CancelledError:
         return

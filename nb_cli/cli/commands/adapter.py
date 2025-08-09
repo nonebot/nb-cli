@@ -71,21 +71,23 @@ async def adapter(ctx: click.Context):
     name="list", help=_("List nonebot adapters published on nonebot homepage.")
 )
 @click.option(
-    "--include-unpublished-adapters",
+    "--include-unpublished",
     is_flag=True,
     default=False,
     flag_value=True,
     help=_("Whether to include unpublished adapters."),
 )
 @run_async
-async def list_(include_unpublished_adapters: bool = False):
-    adapters = await list_adapters(include_unpublished=include_unpublished_adapters)
+async def list_(include_unpublished: bool = False):
+    adapters = await list_adapters(include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished adapters may be included."), fg="yellow")
     click.echo(format_package_results(adapters))
 
 
 @adapter.command(help=_("Search for nonebot adapters published on nonebot homepage."))
 @click.option(
-    "--include-unpublished-adapters",
+    "--include-unpublished",
     is_flag=True,
     default=False,
     flag_value=True,
@@ -93,14 +95,14 @@ async def list_(include_unpublished_adapters: bool = False):
 )
 @click.argument("name", nargs=1, default=None)
 @run_async
-async def search(name: Optional[str], include_unpublished_adapters: bool = False):
+async def search(name: Optional[str], include_unpublished: bool = False):
     if name is None:
         name = await InputPrompt(_("Adapter name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
-    adapters = await list_adapters(
-        name, include_unpublished=include_unpublished_adapters
-    )
+    adapters = await list_adapters(name, include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished adapters may be included."), fg="yellow")
     click.echo(format_package_results(adapters))
 
 
@@ -113,7 +115,7 @@ async def search(name: Optional[str], include_unpublished_adapters: bool = False
     "--no-restrict-version", nargs=1, is_flag=True, flag_value=True, default=False
 )
 @click.option(
-    "--include-unpublished-adapters",
+    "--include-unpublished",
     is_flag=True,
     default=False,
     flag_value=True,
@@ -128,16 +130,25 @@ async def install(
     no_restrict_version: bool,
     name: Optional[str],
     pip_args: Optional[list[str]],
-    include_unpublished_adapters: bool = False,
+    include_unpublished: bool = False,
 ):
     try:
         adapter = await find_exact_package(
             _("Adapter name to install:"),
             name,
-            await list_adapters(include_unpublished=include_unpublished_adapters),
+            await list_adapters(include_unpublished=include_unpublished),
         )
     except CancelledError:
         return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished adapters may be installed. "
+                "These adapters may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     try:
         GLOBAL_CONFIG.add_adapter(adapter)
@@ -180,7 +191,7 @@ async def install(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot adapter.")
 )
 @click.option(
-    "--include-unpublished-adapters",
+    "--include-unpublished",
     is_flag=True,
     default=False,
     flag_value=True,
@@ -192,16 +203,25 @@ async def install(
 async def update(
     name: Optional[str],
     pip_args: Optional[list[str]],
-    include_unpublished_adapters: bool = False,
+    include_unpublished: bool = False,
 ):
     try:
         adapter = await find_exact_package(
             _("Adapter name to update:"),
             name,
-            await list_adapters(include_unpublished=include_unpublished_adapters),
+            await list_adapters(include_unpublished=include_unpublished),
         )
     except CancelledError:
         return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished adapters may be installed. "
+                "These adapters may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     proc = await call_pip_update(adapter.project_link, pip_args)
     await proc.wait()
@@ -229,7 +249,9 @@ async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
         adapter = await find_exact_package(
             _("Adapter name to uninstall:"),
             name,
-            await list_adapters(include_unpublished=True),
+            await list_adapters(
+                include_unpublished=True  # unpublished modules are always removable
+            ),
         )
     except CancelledError:
         return

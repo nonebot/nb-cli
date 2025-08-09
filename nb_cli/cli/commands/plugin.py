@@ -70,21 +70,39 @@ async def plugin(ctx: click.Context):
 @plugin.command(
     name="list", help=_("List nonebot plugins published on nonebot homepage.")
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished plugins."),
+)
 @run_async
-async def list_():
-    plugins = await list_plugins()
+async def list_(include_unpublished: bool = False):
+    plugins = await list_plugins(include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished plugins may be included."), fg="yellow")
     click.echo(format_package_results(plugins))
 
 
 @plugin.command(help=_("Search for nonebot plugins published on nonebot homepage."))
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished plugins."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @run_async
-async def search(name: Optional[str]):
+async def search(name: Optional[str], include_unpublished: bool = False):
     if name is None:
         name = await InputPrompt(_("Plugin name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
-    plugins = await list_plugins(name)
+    plugins = await list_plugins(name, include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished plugins may be included."), fg="yellow")
     click.echo(format_package_results(plugins))
 
 
@@ -96,6 +114,13 @@ async def search(name: Optional[str]):
 @click.option(
     "--no-restrict-version", nargs=1, is_flag=True, flag_value=True, default=False
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished plugins."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
@@ -105,13 +130,25 @@ async def install(
     no_restrict_version: bool,
     name: Optional[str],
     pip_args: Optional[list[str]],
+    include_unpublished: bool = False,
 ):
     try:
         plugin = await find_exact_package(
-            _("Plugin name to install:"), name, await list_plugins()
+            _("Plugin name to install:"),
+            name,
+            await list_plugins(include_unpublished=include_unpublished),
         )
     except CancelledError:
         return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished plugins may be installed. "
+                "These plugins may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     try:
         GLOBAL_CONFIG.add_plugin(plugin)
@@ -153,19 +190,38 @@ async def install(
 @plugin.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot plugin.")
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished plugins."),
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
+    name: Optional[str],
+    pip_args: Optional[list[str]],
+    include_unpublished: bool = False,
 ):
     try:
         plugin = await find_exact_package(
-            _("Plugin name to update:"), name, await list_plugins()
+            _("Plugin name to update:"),
+            name,
+            await list_plugins(include_unpublished=include_unpublished),
         )
     except CancelledError:
         return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished plugins may be installed. "
+                "These plugins may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     proc = await call_pip_update(plugin.project_link, pip_args)
     await proc.wait()
@@ -187,14 +243,15 @@ async def update(
 )
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         plugin = await find_exact_package(
-            _("Plugin name to uninstall:"), name, await list_plugins()
+            _("Plugin name to uninstall:"),
+            name,
+            await list_plugins(
+                include_unpublished=True  # unpublished modules are always removable
+            ),
         )
     except CancelledError:
         return
