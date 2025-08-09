@@ -169,7 +169,7 @@ async def install(
         click.secho(
             _(
                 "Errors occurred in installing plugin {plugin.name}\n"
-                "    *** Try `nb plugin install` command with `--no-restrict-version` "
+                "*** Try `nb plugin install` command with `--no-restrict-version` "
                 "option to resolve under loose version constraints may work."
             ).format(plugin=plugin),
             fg="red",
@@ -224,7 +224,14 @@ async def update(
         )
 
     proc = await call_pip_update(plugin.project_link, pip_args)
-    await proc.wait()
+    if await proc.wait() != 0:
+        click.secho(
+            _("Errors occurred in updating plugin {plugin.name}. Aborted.").format(
+                plugin=plugin
+            ),
+            fg="red",
+        )
+        return
 
     try:
         GLOBAL_CONFIG.update_dependency(plugin)

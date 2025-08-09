@@ -144,7 +144,14 @@ async def install(
 
     if driver.project_link:
         proc = await call_pip_install(driver.project_link, pip_args)
-        await proc.wait()
+        if await proc.wait() != 0:
+            click.secho(
+                _(
+                    "Errors occurred in installing driver {driver.name}. Aborted."
+                ).format(driver=driver),
+                fg="red",
+            )
+            return
 
     try:
         GLOBAL_CONFIG.add_dependency(driver)
@@ -194,7 +201,14 @@ async def update(
 
     if driver.project_link:
         proc = await call_pip_update(driver.project_link, pip_args)
-        await proc.wait()
+        if await proc.wait() != 0:
+            click.secho(
+                _("Errors occurred in updating driver {driver.name}. Aborted.").format(
+                    driver=driver
+                ),
+                fg="red",
+            )
+            return
 
     try:
         GLOBAL_CONFIG.update_dependency(driver)

@@ -169,7 +169,7 @@ async def install(
         click.secho(
             _(
                 "Errors occurred in installing adapter {adapter.name}\n"
-                "    *** Try `nb adapter install` command with `--no-restrict-version` "
+                "*** Try `nb adapter install` command with `--no-restrict-version` "
                 "option to resolve under loose version constraints may work."
             ).format(adapter=adapter),
             fg="red",
@@ -224,7 +224,14 @@ async def update(
         )
 
     proc = await call_pip_update(adapter.project_link, pip_args)
-    await proc.wait()
+    if await proc.wait() != 0:
+        click.secho(
+            _("Errors occurred in updating adapter {adapter.name}. Aborted.").format(
+                adapter=adapter
+            ),
+            fg="red",
+        )
+        return
 
     try:
         GLOBAL_CONFIG.update_dependency(adapter)

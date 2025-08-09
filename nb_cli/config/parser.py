@@ -455,7 +455,7 @@ class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
             click.secho(
                 _(
                     "WARNING: Legacy configuration format detected.\n"
-                    "    *** Use `nb upgrade-format` to upgrade to the new format."
+                    "*** Use `nb upgrade-format` to upgrade to the new format."
                 ),
                 fg="yellow",
             )

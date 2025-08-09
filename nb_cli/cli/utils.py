@@ -53,6 +53,9 @@ async def find_exact_package(
         click.echo(format_package_results(packages))
     else:
         click.echo(_("Package {name} not found.").format(name=name))
+        click.echo(
+            _("*** You may check with `--include-unpublished` option if supported.")
+        )
 
     raise RuntimeError("No or multiple packages found.")
 
