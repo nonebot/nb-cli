@@ -33,7 +33,6 @@ class PackageInfo(SimpleInfo):
 class Adapter(PackageInfo):
     __module_name__ = "adapters"
 
-    name: str
     desc: str
     author: str
     homepage: str
@@ -44,7 +43,6 @@ class Adapter(PackageInfo):
 class Plugin(PackageInfo):
     __module_name__ = "plugins"
 
-    name: str
     desc: str
     author: str
     homepage: str
@@ -56,7 +54,6 @@ class Plugin(PackageInfo):
 class Driver(PackageInfo):
     __module_name__ = "drivers"
 
-    name: str
     desc: str
     author: str
     homepage: str
