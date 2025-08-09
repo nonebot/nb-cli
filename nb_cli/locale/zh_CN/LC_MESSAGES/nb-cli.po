@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-21 18:50+0000\n"
+"POT-Creation-Date: 2025-08-09 14:02+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -35,13 +35,13 @@ msgid "Auto detect virtual environment."
 msgstr "自动检测虚拟环境."
 
 #: nb_cli/cli/__init__.py:108 nb_cli/cli/commands/adapter.py:45
-#: nb_cli/cli/commands/cache.py:41 nb_cli/cli/commands/driver.py:43
+#: nb_cli/cli/commands/cache.py:42 nb_cli/cli/commands/driver.py:43
 #: nb_cli/cli/commands/plugin.py:45 nb_cli/cli/commands/self.py:42
 msgid "Run subcommand {sub_cmd.name!r}"
 msgstr "运行子命令 {sub_cmd.name!r}"
 
 #: nb_cli/cli/__init__.py:112 nb_cli/cli/commands/adapter.py:52
-#: nb_cli/cli/commands/cache.py:48 nb_cli/cli/commands/driver.py:50
+#: nb_cli/cli/commands/cache.py:49 nb_cli/cli/commands/driver.py:50
 #: nb_cli/cli/commands/plugin.py:52 nb_cli/cli/commands/self.py:49
 msgid "Exit NB CLI."
 msgstr "退出 NB CLI."
@@ -51,7 +51,7 @@ msgid "Welcome to NoneBot CLI!"
 msgstr "欢迎使用 NoneBot CLI!"
 
 #: nb_cli/cli/__init__.py:123 nb_cli/cli/commands/adapter.py:58
-#: nb_cli/cli/commands/cache.py:54 nb_cli/cli/commands/driver.py:56
+#: nb_cli/cli/commands/cache.py:55 nb_cli/cli/commands/driver.py:56
 #: nb_cli/cli/commands/plugin.py:58 nb_cli/cli/commands/self.py:55
 msgid "What do you want to do?"
 msgstr "你想要进行什么操作?"
@@ -64,11 +64,15 @@ msgstr "运行脚本 {script_name!r}"
 msgid "Package {name} not found."
 msgstr "包 {name} 未找到."
 
+#: nb_cli/cli/utils.py:57
+msgid "*** You may check with `--include-unpublished` option if supported."
+msgstr "*** 可以对支持的命令使用 `--include-unpublished` 选项来确认."
+
 #: nb_cli/cli/commands/adapter.py:29
 msgid "Manage bot adapters."
 msgstr "管理 bot 适配器."
 
-#: nb_cli/cli/commands/adapter.py:50 nb_cli/cli/commands/cache.py:46
+#: nb_cli/cli/commands/adapter.py:50 nb_cli/cli/commands/cache.py:47
 #: nb_cli/cli/commands/driver.py:48 nb_cli/cli/commands/plugin.py:50
 #: nb_cli/cli/commands/self.py:47
 msgid "Back to top level."
@@ -78,120 +82,139 @@ msgstr "返回上一级."
 msgid "List nonebot adapters published on nonebot homepage."
 msgstr "列出 NoneBot 官网上发布的适配器."
 
-#: nb_cli/cli/commands/adapter.py:79
+#: nb_cli/cli/commands/adapter.py:78 nb_cli/cli/commands/adapter.py:94
+#: nb_cli/cli/commands/adapter.py:122 nb_cli/cli/commands/adapter.py:198
+msgid "Whether to include unpublished adapters."
+msgstr "是否要包含已下架的适配器."
+
+#: nb_cli/cli/commands/adapter.py:84 nb_cli/cli/commands/adapter.py:105
+msgid "WARNING: Unpublished adapters may be included."
+msgstr "警告: 结果中可能含有已下架的适配器."
+
+#: nb_cli/cli/commands/adapter.py:88
 msgid "Search for nonebot adapters published on nonebot homepage."
 msgstr "搜索 NoneBot 官网上发布的适配器."
 
-#: nb_cli/cli/commands/adapter.py:84
+#: nb_cli/cli/commands/adapter.py:100
 msgid "Adapter name to search:"
 msgstr "想要搜索的适配器名称:"
 
-#: nb_cli/cli/commands/adapter.py:94
+#: nb_cli/cli/commands/adapter.py:112
 msgid "Install nonebot adapter to current project."
 msgstr "安装适配器到当前项目."
 
-#: nb_cli/cli/commands/adapter.py:111
+#: nb_cli/cli/commands/adapter.py:137
 msgid "Adapter name to install:"
 msgstr "想要安装的适配器名称:"
 
-#: nb_cli/cli/commands/adapter.py:120
+#: nb_cli/cli/commands/adapter.py:146 nb_cli/cli/commands/adapter.py:219
+msgid ""
+"WARNING: Unpublished adapters may be installed. These adapters may be "
+"unmaintained or unusable."
+msgstr "警告: 有可能安装已下架的适配器. 其可能缺少维护或不可用."
+
+#: nb_cli/cli/commands/adapter.py:157
 msgid "Failed to add adapter {adapter.name} to config: {e}"
 msgstr "添加适配器 {adapter.name} 到配置文件失败: {e}"
 
-#: nb_cli/cli/commands/adapter.py:133
+#: nb_cli/cli/commands/adapter.py:170
 msgid ""
 "Errors occurred in installing adapter {adapter.name}\n"
-"    *** Try `nb adapter install` command with `--no-restrict-version` "
-"option to resolve under loose version constraints may work."
+"*** Try `nb adapter install` command with `--no-restrict-version` option "
+"to resolve under loose version constraints may work."
 msgstr ""
 "安装适配器 {adapter.name} 时发生错误\n"
-"    *** 尝试使用 `--no-restrict-version` 选项执行 `nb adapter install` "
+"*** 尝试使用 `--no-restrict-version` 选项执行 `nb adapter install` "
 "命令在宽松的版本约束下解析依赖可能可以解决此问题."
 
-#: nb_cli/cli/commands/adapter.py:145
+#: nb_cli/cli/commands/adapter.py:184
 msgid "Failed to add adapter {adapter.name} to dependencies: {e}"
 msgstr "添加适配器 {adapter.name} 到依赖项失败: {e}"
 
-#: nb_cli/cli/commands/adapter.py:152
+#: nb_cli/cli/commands/adapter.py:191
 msgid "Update nonebot adapter."
 msgstr "更新适配器."
 
-#: nb_cli/cli/commands/adapter.py:163
+#: nb_cli/cli/commands/adapter.py:210
 msgid "Adapter name to update:"
 msgstr "想要更新的适配器名称:"
 
-#: nb_cli/cli/commands/adapter.py:175
+#: nb_cli/cli/commands/adapter.py:229
+msgid "Errors occurred in updating adapter {adapter.name}. Aborted."
+msgstr "更新适配器 {adapter.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/adapter.py:240
 msgid "Failed to update adapter {adapter.name} to dependencies: {e}"
 msgstr "更新适配器 {adapter.name} 的依赖项失败: {e}"
 
-#: nb_cli/cli/commands/adapter.py:184
+#: nb_cli/cli/commands/adapter.py:249
 msgid "Uninstall nonebot adapter from current project."
 msgstr "移除当前项目中的适配器."
 
-#: nb_cli/cli/commands/adapter.py:195
+#: nb_cli/cli/commands/adapter.py:257
 msgid "Adapter name to uninstall:"
 msgstr "想要移除的适配器名称:"
 
-#: nb_cli/cli/commands/adapter.py:206
+#: nb_cli/cli/commands/adapter.py:272
 msgid "Failed to remove adapter {adapter.name} from config: {e}"
 msgstr "从配置文件移除适配器 {adapter.name} 失败: {e}"
 
-#: nb_cli/cli/commands/adapter.py:217
+#: nb_cli/cli/commands/adapter.py:283
 msgid "Create a new nonebot adapter."
 msgstr "新建适配器"
 
-#: nb_cli/cli/commands/adapter.py:225
+#: nb_cli/cli/commands/adapter.py:291
 msgid "The adapter template to use."
 msgstr "使用的适配器模板."
 
-#: nb_cli/cli/commands/adapter.py:236
+#: nb_cli/cli/commands/adapter.py:302
 msgid "Adapter name:"
 msgstr "适配器名称:"
 
-#: nb_cli/cli/commands/adapter.py:257
+#: nb_cli/cli/commands/adapter.py:323
 msgid "Where to store the adapter?"
 msgstr "请输入适配器存储的位置:"
 
-#: nb_cli/cli/commands/adapter.py:258 nb_cli/cli/commands/adapter.py:261
-#: nb_cli/cli/commands/plugin.py:264 nb_cli/cli/commands/plugin.py:267
+#: nb_cli/cli/commands/adapter.py:324 nb_cli/cli/commands/adapter.py:327
+#: nb_cli/cli/commands/plugin.py:330 nb_cli/cli/commands/plugin.py:333
 msgid "Other"
 msgstr "其他"
 
-#: nb_cli/cli/commands/adapter.py:263 nb_cli/cli/commands/adapter.py:272
-#: nb_cli/cli/commands/plugin.py:269 nb_cli/cli/commands/plugin.py:279
+#: nb_cli/cli/commands/adapter.py:329 nb_cli/cli/commands/adapter.py:338
+#: nb_cli/cli/commands/plugin.py:335 nb_cli/cli/commands/plugin.py:345
 msgid "Output Dir:"
 msgstr "输出目录:"
 
-#: nb_cli/cli/commands/adapter.py:269 nb_cli/cli/commands/plugin.py:276
+#: nb_cli/cli/commands/adapter.py:335 nb_cli/cli/commands/plugin.py:342
 msgid "Output dir is not a directory!"
 msgstr "输出目录不是一个文件夹!"
 
-#: nb_cli/cli/commands/adapter.py:274 nb_cli/cli/commands/plugin.py:271
-#: nb_cli/cli/commands/plugin.py:281
+#: nb_cli/cli/commands/adapter.py:340 nb_cli/cli/commands/plugin.py:337
+#: nb_cli/cli/commands/plugin.py:347
 msgid "Invalid output dir!"
 msgstr "无效的输出目录!"
 
-#: nb_cli/cli/commands/cache.py:25
+#: nb_cli/cli/commands/cache.py:26
 msgid "Manage CLI data caches."
 msgstr "管理 CLI 数据缓存."
 
-#: nb_cli/cli/commands/cache.py:77
+#: nb_cli/cli/commands/cache.py:78
 msgid "Show current usage of caches."
 msgstr "展示当前缓存使用情况."
 
-#: nb_cli/cli/commands/cache.py:83
+#: nb_cli/cli/commands/cache.py:84
 msgid "Show sizes under 1000-based SI units."
 msgstr "使用 1000 进制的 SI 单位 (KB/MB/GB/...) 显示大小."
 
-#: nb_cli/cli/commands/cache.py:88
+#: nb_cli/cli/commands/cache.py:89
 msgid "Cache location: {cache_dir}"
 msgstr "缓存位置: {cache_dir}"
 
-#: nb_cli/cli/commands/cache.py:126
+#: nb_cli/cli/commands/cache.py:127
 msgid "Module Type     Current         Unpublished     Total"
 msgstr "模块类型        当前            已下架          总计"
 
-#: nb_cli/cli/commands/cache.py:128
+#: nb_cli/cli/commands/cache.py:129
 msgid ""
 "Adapter         {adapter_current:<15} {adapter_unpublished:<15} "
 "{adapter_total:<15}"
@@ -199,7 +222,7 @@ msgstr ""
 "适配器          {adapter_current:<15} {adapter_unpublished:<15} "
 "{adapter_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:138
+#: nb_cli/cli/commands/cache.py:139
 msgid ""
 "Driver          {driver_current:<15} {driver_unpublished:<15} "
 "{driver_total:<15}"
@@ -207,7 +230,7 @@ msgstr ""
 "驱动器          {driver_current:<15} {driver_unpublished:<15} "
 "{driver_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:148
+#: nb_cli/cli/commands/cache.py:149
 msgid ""
 "Plugin          {plugin_current:<15} {plugin_unpublished:<15} "
 "{plugin_total:<15}"
@@ -215,7 +238,7 @@ msgstr ""
 "插件            {plugin_current:<15} {plugin_unpublished:<15} "
 "{plugin_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:158
+#: nb_cli/cli/commands/cache.py:159
 msgid ""
 "(Total)         {total_current:<15} {total_unpublished:<15} "
 "{total_total:<15}"
@@ -223,59 +246,59 @@ msgstr ""
 "(总计)          {total_current:<15} {total_unpublished:<15} "
 "{total_total:<15}"
 
-#: nb_cli/cli/commands/cache.py:174
+#: nb_cli/cli/commands/cache.py:175
 msgid "ERROR: Failed to update data cache for module {module_type}."
 msgstr "错误: {module_type} 模块类型数据缓存更新失败."
 
-#: nb_cli/cli/commands/cache.py:181
+#: nb_cli/cli/commands/cache.py:182
 msgid "Successfully updated data cache for module {module_type}."
 msgstr "成功更新 {module_type} 模块类型的数据缓存."
 
-#: nb_cli/cli/commands/cache.py:187
+#: nb_cli/cli/commands/cache.py:188
 msgid "Update local cache."
 msgstr "更新本地缓存."
 
-#: nb_cli/cli/commands/cache.py:198
+#: nb_cli/cli/commands/cache.py:200
 msgid "ERROR: Invalid module type: {module_type}"
 msgstr "错误: 无效的模块类型: {module_type}"
 
-#: nb_cli/cli/commands/cache.py:207
+#: nb_cli/cli/commands/cache.py:209
 msgid "Update local cache for adapters."
 msgstr "更新适配器信息本地缓存."
 
-#: nb_cli/cli/commands/cache.py:214
+#: nb_cli/cli/commands/cache.py:216
 msgid "Update local cache for plugins."
 msgstr "更新插件信息本地缓存."
 
-#: nb_cli/cli/commands/cache.py:221
+#: nb_cli/cli/commands/cache.py:223
 msgid "Update local cache for drivers."
 msgstr "更新驱动器信息本地缓存."
 
-#: nb_cli/cli/commands/cache.py:229
+#: nb_cli/cli/commands/cache.py:231
 msgid "Clear local caches of unpublished modules."
 msgstr "清除已下架模块的本地缓存."
 
-#: nb_cli/cli/commands/cache.py:237 nb_cli/cli/commands/cache.py:259
+#: nb_cli/cli/commands/cache.py:239 nb_cli/cli/commands/cache.py:261
 msgid "Clear caches without confirm."
 msgstr "不再次确认，直接清除缓存."
 
-#: nb_cli/cli/commands/cache.py:245
+#: nb_cli/cli/commands/cache.py:247
 msgid "Clear local caches."
 msgstr "清除本地缓存."
 
-#: nb_cli/cli/commands/cache.py:251
+#: nb_cli/cli/commands/cache.py:253
 msgid "Only clear caches for unpublished module types."
 msgstr "仅清除已下架模块缓存."
 
-#: nb_cli/cli/commands/cache.py:265
+#: nb_cli/cli/commands/cache.py:267
 msgid "Are you sure to clear these caches?"
 msgstr "你确定要清除这些缓存吗?"
 
-#: nb_cli/cli/commands/cache.py:279
+#: nb_cli/cli/commands/cache.py:283
 msgid "Successfully cleared unpublished caches."
 msgstr "成功清除已下架模块缓存."
 
-#: nb_cli/cli/commands/cache.py:290
+#: nb_cli/cli/commands/cache.py:294
 msgid "Successfully cleared all caches."
 msgstr "成功清除所有缓存."
 
@@ -287,47 +310,70 @@ msgstr "管理 bot 驱动器."
 msgid "List nonebot drivers published on nonebot homepage."
 msgstr "列出 NoneBot 官网上发布的驱动器."
 
-#: nb_cli/cli/commands/driver.py:77
+#: nb_cli/cli/commands/driver.py:76 nb_cli/cli/commands/driver.py:92
+#: nb_cli/cli/commands/driver.py:117 nb_cli/cli/commands/driver.py:174
+msgid "Whether to include unpublished drivers."
+msgstr "是否要包含已下架的驱动器."
+
+#: nb_cli/cli/commands/driver.py:82 nb_cli/cli/commands/driver.py:103
+msgid "WARNING: Unpublished drivers may be included."
+msgstr "警告: 结果中可能含有已下架的驱动器."
+
+#: nb_cli/cli/commands/driver.py:86
 msgid "Search for nonebot drivers published on nonebot homepage."
 msgstr "搜索 NoneBot 官网上发布的驱动器."
 
-#: nb_cli/cli/commands/driver.py:82
+#: nb_cli/cli/commands/driver.py:98
 msgid "Driver name to search:"
 msgstr "想要搜索的驱动器名称:"
 
-#: nb_cli/cli/commands/driver.py:92
+#: nb_cli/cli/commands/driver.py:110
 msgid "Install nonebot driver to current project."
 msgstr "安装驱动器到当前项目."
 
-#: nb_cli/cli/commands/driver.py:103
+#: nb_cli/cli/commands/driver.py:129
 msgid "Driver name to install:"
 msgstr "想要安装的驱动器名称:"
 
-#: nb_cli/cli/commands/driver.py:116
+#: nb_cli/cli/commands/driver.py:138 nb_cli/cli/commands/driver.py:195
+msgid ""
+"WARNING: Unpublished drivers may be installed. These drivers may be "
+"unmaintained or unusable."
+msgstr "警告: 有可能安装已下架的驱动器. 其可能缺少维护或不可用."
+
+#: nb_cli/cli/commands/driver.py:149
+msgid "Errors occurred in installing driver {driver.name}. Aborted."
+msgstr "安装驱动器 {driver.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/driver.py:160
 msgid "Failed to add driver {driver.name} to dependencies: {e}"
 msgstr "添加适配器 {adapter.name} 到依赖项失败: {e}"
 
-#: nb_cli/cli/commands/driver.py:123
+#: nb_cli/cli/commands/driver.py:167
 msgid "Update nonebot driver."
 msgstr "更新驱动器."
 
-#: nb_cli/cli/commands/driver.py:134
+#: nb_cli/cli/commands/driver.py:186
 msgid "Driver name to update:"
 msgstr "想要更新的驱动器名称:"
 
-#: nb_cli/cli/commands/driver.py:147
+#: nb_cli/cli/commands/driver.py:206
+msgid "Errors occurred in updating driver {driver.name}. Aborted."
+msgstr "更新驱动器 {driver.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/driver.py:217
 msgid "Failed to update driver {driver.name} to dependencies: {e}"
 msgstr "更新驱动器 {adapter.name} 的依赖项失败: {e}"
 
-#: nb_cli/cli/commands/driver.py:156
+#: nb_cli/cli/commands/driver.py:226
 msgid "Uninstall nonebot driver from current project."
 msgstr "移除当前项目中的驱动器."
 
-#: nb_cli/cli/commands/driver.py:167
+#: nb_cli/cli/commands/driver.py:234
 msgid "Driver name to uninstall:"
 msgstr "想要移除的驱动器名称:"
 
-#: nb_cli/cli/commands/driver.py:177
+#: nb_cli/cli/commands/driver.py:248
 msgid "Failed to remove driver {driver.name} from dependencies: {e}"
 msgstr "从依赖项中移除驱动器 {adapter.name} 失败: {e}"
 
@@ -339,81 +385,100 @@ msgstr "管理 bot 插件."
 msgid "List nonebot plugins published on nonebot homepage."
 msgstr "列出 NoneBot 官网上发布的插件."
 
-#: nb_cli/cli/commands/plugin.py:79
+#: nb_cli/cli/commands/plugin.py:78 nb_cli/cli/commands/plugin.py:94
+#: nb_cli/cli/commands/plugin.py:122 nb_cli/cli/commands/plugin.py:198
+msgid "Whether to include unpublished plugins."
+msgstr "是否要包含已下架的插件."
+
+#: nb_cli/cli/commands/plugin.py:84 nb_cli/cli/commands/plugin.py:105
+msgid "WARNING: Unpublished plugins may be included."
+msgstr "警告: 结果中可能含有已下架的插件."
+
+#: nb_cli/cli/commands/plugin.py:88
 msgid "Search for nonebot plugins published on nonebot homepage."
 msgstr "搜索 NoneBot 官网上发布的插件."
 
-#: nb_cli/cli/commands/plugin.py:84
+#: nb_cli/cli/commands/plugin.py:100
 msgid "Plugin name to search:"
 msgstr "想要搜索的插件名称:"
 
-#: nb_cli/cli/commands/plugin.py:94
+#: nb_cli/cli/commands/plugin.py:112
 msgid "Install nonebot plugin to current project."
 msgstr "安装插件到当前项目."
 
-#: nb_cli/cli/commands/plugin.py:111
+#: nb_cli/cli/commands/plugin.py:137
 msgid "Plugin name to install:"
 msgstr "想要安装的插件名称:"
 
-#: nb_cli/cli/commands/plugin.py:120
+#: nb_cli/cli/commands/plugin.py:146 nb_cli/cli/commands/plugin.py:219
+msgid ""
+"WARNING: Unpublished plugins may be installed. These plugins may be "
+"unmaintained or unusable."
+msgstr "警告: 有可能安装已下架的插件. 其可能缺少维护或不可用."
+
+#: nb_cli/cli/commands/plugin.py:157
 msgid "Failed to add plugin {plugin.name} to config: {e}"
 msgstr "添加插件 {plugin.name} 到配置文件失败: {e}"
 
-#: nb_cli/cli/commands/plugin.py:133
+#: nb_cli/cli/commands/plugin.py:170
 msgid ""
 "Errors occurred in installing plugin {plugin.name}\n"
-"    *** Try `nb plugin install` command with `--no-restrict-version` "
-"option to resolve under loose version constraints may work."
+"*** Try `nb plugin install` command with `--no-restrict-version` option "
+"to resolve under loose version constraints may work."
 msgstr ""
 "安装插件 {adapter.name} 时发生错误\n"
-"    *** 尝试使用 `--no-restrict-version` 选项执行 `nb plugin install` "
+"*** 尝试使用 `--no-restrict-version` 选项执行 `nb plugin install` "
 "命令在宽松的版本约束下解析依赖可能可以解决此问题."
 
-#: nb_cli/cli/commands/plugin.py:145
+#: nb_cli/cli/commands/plugin.py:184
 msgid "Failed to add plugin {plugin.name} to dependencies: {e}"
 msgstr "添加插件 {plugin.name} 到依赖项失败: {e}"
 
-#: nb_cli/cli/commands/plugin.py:152
+#: nb_cli/cli/commands/plugin.py:191
 msgid "Update nonebot plugin."
 msgstr "更新插件."
 
-#: nb_cli/cli/commands/plugin.py:163
+#: nb_cli/cli/commands/plugin.py:210
 msgid "Plugin name to update:"
 msgstr "想要更新的插件名称:"
 
-#: nb_cli/cli/commands/plugin.py:175
+#: nb_cli/cli/commands/plugin.py:229
+msgid "Errors occurred in updating plugin {plugin.name}. Aborted."
+msgstr "更新插件 {plugin.name} 时发生错误. 已中止."
+
+#: nb_cli/cli/commands/plugin.py:240
 msgid "Failed to update plugin {plugin.name} to dependencies: {e}"
 msgstr "更新插件 {plugin.name} 的依赖项失败: {e}"
 
-#: nb_cli/cli/commands/plugin.py:184
+#: nb_cli/cli/commands/plugin.py:249
 msgid "Uninstall nonebot plugin from current project."
 msgstr "移除当前项目中的插件."
 
-#: nb_cli/cli/commands/plugin.py:195
+#: nb_cli/cli/commands/plugin.py:257
 msgid "Plugin name to uninstall:"
 msgstr "想要移除的插件名称:"
 
-#: nb_cli/cli/commands/plugin.py:206
+#: nb_cli/cli/commands/plugin.py:272
 msgid "Failed to remove plugin {plugin.name} from config: {e}"
 msgstr "从配置文件中移除插件 {plugin.name} 失败: {e}"
 
-#: nb_cli/cli/commands/plugin.py:217
+#: nb_cli/cli/commands/plugin.py:283
 msgid "Create a new nonebot plugin."
 msgstr "创建一个新的插件."
 
-#: nb_cli/cli/commands/plugin.py:226
+#: nb_cli/cli/commands/plugin.py:292
 msgid "The plugin template to use."
 msgstr "使用的插件模板."
 
-#: nb_cli/cli/commands/plugin.py:238
+#: nb_cli/cli/commands/plugin.py:304
 msgid "Plugin name:"
 msgstr "插件名称:"
 
-#: nb_cli/cli/commands/plugin.py:246
+#: nb_cli/cli/commands/plugin.py:312
 msgid "Use nested plugin?"
 msgstr "使用嵌套插件?"
 
-#: nb_cli/cli/commands/plugin.py:263 nb_cli/cli/commands/project.py:202
+#: nb_cli/cli/commands/plugin.py:329 nb_cli/cli/commands/project.py:207
 msgid "Where to store the plugin?"
 msgstr "请输入插件存储位置:"
 
@@ -425,193 +490,210 @@ msgstr "bootstrap (初学者或用户)"
 msgid "simple (for plugin developer)"
 msgstr "simple (插件开发者)"
 
-#: nb_cli/cli/commands/project.py:79
+#: nb_cli/cli/commands/project.py:84
 msgid "Loading adapters..."
 msgstr "正在加载适配器..."
 
-#: nb_cli/cli/commands/project.py:81
+#: nb_cli/cli/commands/project.py:86
 msgid "Loading drivers..."
 msgstr "正在加载驱动器..."
 
-#: nb_cli/cli/commands/project.py:86
+#: nb_cli/cli/commands/project.py:91
 msgid "Project Name:"
 msgstr "项目名称:"
 
-#: nb_cli/cli/commands/project.py:88
+#: nb_cli/cli/commands/project.py:93
 msgid "Invalid project name!"
 msgstr "无效的项目名称!"
 
-#: nb_cli/cli/commands/project.py:96
+#: nb_cli/cli/commands/project.py:101
 msgid "Which adapter(s) would you like to use?"
 msgstr "要使用哪些适配器?"
 
-#: nb_cli/cli/commands/project.py:106
+#: nb_cli/cli/commands/project.py:111
 msgid "You haven't chosen any adapter! Please confirm."
 msgstr "你没有选择任何适配器! 请确认."
 
-#: nb_cli/cli/commands/project.py:120
+#: nb_cli/cli/commands/project.py:125
 msgid "Which driver(s) would you like to use?"
 msgstr "要使用哪些驱动器?"
 
-#: nb_cli/cli/commands/project.py:128
+#: nb_cli/cli/commands/project.py:133
 msgid "Chosen drivers is not valid!"
 msgstr "选择的驱动器不合法!"
 
-#: nb_cli/cli/commands/project.py:142
+#: nb_cli/cli/commands/project.py:147
 msgid "User global (default, suitable for single instance in single user)"
 msgstr "用户全局 (默认, 适用于单用户下单实例)"
 
-#: nb_cli/cli/commands/project.py:143
+#: nb_cli/cli/commands/project.py:148
 msgid "Current project (suitable for multiple/portable instances)"
 msgstr "当前项目 (适用于多实例/便携实例)"
 
-#: nb_cli/cli/commands/project.py:144
+#: nb_cli/cli/commands/project.py:149
 msgid ""
 "User global (isolate by project name, suitable for multiple instances in "
 "single user)"
 msgstr "用户全局 (按项目名称隔离, 适用于单用户下多实例)"
 
-#: nb_cli/cli/commands/project.py:148
+#: nb_cli/cli/commands/project.py:153
 msgid "Custom storage location (for advanced users)"
 msgstr "自定义存储位置 (高级用户)"
 
-#: nb_cli/cli/commands/project.py:153
+#: nb_cli/cli/commands/project.py:158
 msgid "Which strategy of local storage would you like to use?"
 msgstr "要使用什么本地存储策略?"
 
-#: nb_cli/cli/commands/project.py:176
+#: nb_cli/cli/commands/project.py:181
 msgid "Cache directory to use:"
 msgstr "要使用的缓存目录:"
 
-#: nb_cli/cli/commands/project.py:181
+#: nb_cli/cli/commands/project.py:186
 msgid "Data directory to use:"
 msgstr "要使用的数据目录:"
 
-#: nb_cli/cli/commands/project.py:186
+#: nb_cli/cli/commands/project.py:191
 msgid "Config directory to use:"
 msgstr "要使用的配置目录:"
 
-#: nb_cli/cli/commands/project.py:198
+#: nb_cli/cli/commands/project.py:203
 msgid "1) In a \"{dir_name}\" folder"
 msgstr "1) 在 \"{dir_name}\" 文件夹中"
 
-#: nb_cli/cli/commands/project.py:199
+#: nb_cli/cli/commands/project.py:204
 msgid "2) In a \"src\" folder"
 msgstr "2) 在 \"src\" 文件夹中"
 
+#: nb_cli/cli/commands/project.py:214
+#, fuzzy
+msgid "Which developer tool(s) would you like to use?"
+msgstr "要使用哪些开发工具?"
+
+#: nb_cli/cli/commands/project.py:216 nb_cli/cli/commands/project.py:217
+msgid " (Recommended)"
+msgstr " (推荐)"
+
 #: nb_cli/cli/commands/project.py:219
+msgid " (Advanced user)"
+msgstr " (高级用户)"
+
+#: nb_cli/cli/commands/project.py:223
+msgid "Cannot choose 'Pylance/Pyright' and 'BasedPyright' at the same time."
+msgstr "不能同时选择 'Pylance/Pyright' 和 'BasedPyright'."
+
+#: nb_cli/cli/commands/project.py:241
 msgid "Create a NoneBot project."
 msgstr "创建一个 NoneBot 项目."
 
-#: nb_cli/cli/commands/project.py:227
+#: nb_cli/cli/commands/project.py:249
 msgid "The project template to use."
 msgstr "使用的项目模板."
 
-#: nb_cli/cli/commands/project.py:232
+#: nb_cli/cli/commands/project.py:254
 msgid "The python interpreter virtualenv is installed into."
 msgstr "虚拟环境使用的 Python 解释器."
 
-#: nb_cli/cli/commands/project.py:249
+#: nb_cli/cli/commands/project.py:271
 msgid "Select a template to use:"
 msgstr "选择一个要使用的模板:"
 
-#: nb_cli/cli/commands/project.py:271
+#: nb_cli/cli/commands/project.py:293
 msgid "Install dependencies now?"
 msgstr "立即安装依赖?"
 
-#: nb_cli/cli/commands/project.py:284
+#: nb_cli/cli/commands/project.py:306
 msgid "Create virtual environment?"
 msgstr "创建虚拟环境?"
 
-#: nb_cli/cli/commands/project.py:291
+#: nb_cli/cli/commands/project.py:313
 msgid "Creating virtual environment in {venv_dir} ..."
 msgstr "在 {venv_dir} 中创建虚拟环境..."
 
-#: nb_cli/cli/commands/project.py:317
+#: nb_cli/cli/commands/project.py:339
 msgid "Which builtin plugin(s) would you like to use?"
 msgstr "要使用哪些内置插件?"
 
-#: nb_cli/cli/commands/project.py:329
+#: nb_cli/cli/commands/project.py:351
 msgid "Failed to add builtin plugins {builtin_plugins} to config: {e}"
 msgstr "添加内置插件 {builtin_plugins} 到配置文件失败: {e}"
 
-#: nb_cli/cli/commands/project.py:337
+#: nb_cli/cli/commands/project.py:359
 msgid ""
 "Failed to install dependencies! You should install the dependencies "
 "manually."
 msgstr "安装依赖失败! 请手动安装依赖."
 
-#: nb_cli/cli/commands/project.py:344
+#: nb_cli/cli/commands/project.py:366
 msgid "Done!"
 msgstr "完成!"
 
-#: nb_cli/cli/commands/project.py:346
+#: nb_cli/cli/commands/project.py:368
 msgid ""
 "Add following packages to your project using dependency manager like "
 "poetry or pdm:"
 msgstr "使用 poetry 或 pdm 等依赖管理工具添加以下包:"
 
-#: nb_cli/cli/commands/project.py:353
+#: nb_cli/cli/commands/project.py:375
 msgid "Run the following command to start your bot:"
 msgstr "运行以下命令来启动你的机器人:"
 
-#: nb_cli/cli/commands/project.py:358
+#: nb_cli/cli/commands/project.py:381
 msgid "Generate entry file of your bot."
 msgstr "生成机器人的入口文件."
 
-#: nb_cli/cli/commands/project.py:364
+#: nb_cli/cli/commands/project.py:387
 msgid "The file script saved to."
 msgstr "脚本文件保存路径."
 
-#: nb_cli/cli/commands/project.py:373
+#: nb_cli/cli/commands/project.py:396
 msgid "Run the bot in current folder."
 msgstr "在当前文件夹中运行机器人."
 
-#: nb_cli/cli/commands/project.py:380
+#: nb_cli/cli/commands/project.py:403
 msgid "Exist entry file of your bot."
 msgstr "存在的机器人入口文件."
 
-#: nb_cli/cli/commands/project.py:387
+#: nb_cli/cli/commands/project.py:410
 msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
-#: nb_cli/cli/commands/project.py:393
+#: nb_cli/cli/commands/project.py:416
 msgid "Paths to watch for changes."
 msgstr "要监视变化的路径."
 
-#: nb_cli/cli/commands/project.py:399
+#: nb_cli/cli/commands/project.py:422
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:405
+#: nb_cli/cli/commands/project.py:428
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
-#: nb_cli/cli/commands/project.py:412
+#: nb_cli/cli/commands/project.py:435
 msgid "Delay time for reloading in seconds."
 msgstr "重新加载的延迟时间(秒)."
 
-#: nb_cli/cli/commands/project.py:445
+#: nb_cli/cli/commands/project.py:468
 msgid "Upgrade the project format of your bot."
 msgstr "升级机器人的项目格式."
 
-#: nb_cli/cli/commands/project.py:450
+#: nb_cli/cli/commands/project.py:473
 msgid "Are you sure to upgrade the project format?"
 msgstr "你确定要升级项目格式吗?"
 
-#: nb_cli/cli/commands/project.py:453
+#: nb_cli/cli/commands/project.py:476
 msgid "Successfully upgraded project format."
 msgstr "成功升级项目格式."
 
-#: nb_cli/cli/commands/project.py:457
+#: nb_cli/cli/commands/project.py:480
 msgid "Downgrade the project format of your bot."
 msgstr "降级机器人的项目格式."
 
-#: nb_cli/cli/commands/project.py:462
+#: nb_cli/cli/commands/project.py:485
 msgid "Are you sure to downgrade the project format?"
 msgstr "你确定要降级项目格式吗?"
 
-#: nb_cli/cli/commands/project.py:465
+#: nb_cli/cli/commands/project.py:488
 msgid "Successfully downgraded project format."
 msgstr "成功降级项目格式."
 
@@ -623,45 +705,45 @@ msgstr "管理 NB CLI."
 msgid "Install package to cli venv."
 msgstr "在 cli 虚拟环境中安装包."
 
-#: nb_cli/cli/commands/self.py:82
+#: nb_cli/cli/commands/self.py:79
 msgid "Package name you want to install?"
 msgstr "要安装的包名?"
 
-#: nb_cli/cli/commands/self.py:92
+#: nb_cli/cli/commands/self.py:89
 msgid "Update cli self."
 msgstr "更新 cli."
 
-#: nb_cli/cli/commands/self.py:104
+#: nb_cli/cli/commands/self.py:101
 msgid "Uninstall package from cli venv."
 msgstr "从 cli 虚拟环境中卸载包."
 
-#: nb_cli/cli/commands/self.py:116
+#: nb_cli/cli/commands/self.py:110
 msgid "Package name you want to uninstall?"
 msgstr "要卸载的包名?"
 
-#: nb_cli/cli/commands/self.py:128
+#: nb_cli/cli/commands/self.py:122
 msgid "List installed packages in cli venv."
 msgstr "列出 cli 虚拟环境中已安装的包."
 
-#: nb_cli/config/parser.py:123
+#: nb_cli/config/parser.py:139
 msgid "Invalid project config format."
 msgstr "无效的项目配置格式."
 
-#: nb_cli/config/parser.py:132
+#: nb_cli/config/parser.py:148
 msgid "Cannot find project root directory! {config_file} file not exists."
 msgstr "无法找到项目根目录! {config_file} 文件不存在."
 
-#: nb_cli/config/parser.py:174
+#: nb_cli/config/parser.py:190
 msgid "Using python: {python_path}"
 msgstr "使用 Python: {python_path}"
 
-#: nb_cli/config/parser.py:436
+#: nb_cli/config/parser.py:456
 msgid ""
 "WARNING: Legacy configuration format detected.\n"
-"    *** Use `nb upgrade-format` to upgrade to the new format."
+"*** Use `nb upgrade-format` to upgrade to the new format."
 msgstr ""
 "警告: 检测到旧的项目格式.\n"
-"    *** 使用 `nb upgrade-format` 升级至新格式."
+"*** 使用 `nb upgrade-format` 升级至新格式."
 
 #: nb_cli/handlers/meta.py:86
 msgid "Cannot find a valid Python interpreter."
@@ -704,7 +786,7 @@ msgstr "当前格式已为新格式."
 msgid "WARNING: Inconsistent adapter name info: {old!r} -> {new!r}"
 msgstr "警告: 适配器名称信息不一致: {old!r} -> {new!r}"
 
-#: nb_cli/handlers/project.py:188
+#: nb_cli/handlers/project.py:189
 msgid "Current format is already the old format."
 msgstr "当前格式已为旧格式."
 
@@ -732,27 +814,27 @@ msgstr "停止重载监视"
 msgid "WARNING: Cache directory is unavailable."
 msgstr "警告: 缓存目录不可用."
 
-#: nb_cli/handlers/store.py:108 nb_cli/handlers/store.py:199
+#: nb_cli/handlers/store.py:124 nb_cli/handlers/store.py:215
 msgid "Invalid module type: {module_type}"
 msgstr "无效的模块类型: {module_type}"
 
-#: nb_cli/handlers/store.py:143
+#: nb_cli/handlers/store.py:159
 msgid "WARNING: Failed to cache data for module {module_type}."
 msgstr "警告: {module_type} 模块类型数据缓存失败."
 
-#: nb_cli/handlers/store.py:152
+#: nb_cli/handlers/store.py:168
 msgid "WARNING: Failed to update unpublished data for module {module_type}."
 msgstr "警告: {module_type} 模块类型下架数据更新失败."
 
-#: nb_cli/handlers/store.py:163
+#: nb_cli/handlers/store.py:179
 msgid "Failed to get {module_type} list."
 msgstr "获取 {module_type} 列表失败."
 
-#: nb_cli/handlers/store.py:214
+#: nb_cli/handlers/store.py:230
 msgid "Invalid local cache of module type: {module_type}"
 msgstr "无效的模块类型缓存: {module_type}"
 
-#: nb_cli/handlers/store.py:249
+#: nb_cli/handlers/store.py:265
 msgid ""
 "WARNING: Failed to download latest data of module {module_type}. Expired "
 "cache is used."
