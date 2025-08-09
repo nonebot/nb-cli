@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "i18n"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:daec2db208d476e4a60d8eae8d95630f1cbf7aa281d9d66e2bed86e6c8297070"
+content_hash = "sha256:1426c9d0cfc100a927e7660bc32826138712f9e37f4f998bda39cfbe0061b614"
 
 [[metadata.targets]]
 requires_python = "~=3.9"
@@ -871,18 +871,17 @@ files = [
 
 [[package]]
 name = "rich"
-version = "13.8.0"
-requires_python = ">=3.7.0"
+version = "14.1.0"
+requires_python = ">=3.8.0"
 summary = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 groups = ["default"]
 dependencies = [
     "markdown-it-py>=2.2.0",
     "pygments<3.0.0,>=2.13.0",
-    "typing-extensions<5.0,>=4.0.0; python_version < \"3.9\"",
 ]
 files = [
-    {file = "rich-13.8.0-py3-none-any.whl", hash = "sha256:2e85306a063b9492dffc86278197a60cbece75bcb766022f3436f567cae11bdc"},
-    {file = "rich-13.8.0.tar.gz", hash = "sha256:a5ac1f1cd448ade0d59cc3356f7db7a7ccda2c8cbae9c7a90c28ff463d3e91f4"},
+    {file = "rich-14.1.0-py3-none-any.whl", hash = "sha256:536f5f1785986d6dbdea3c75205c473f970777b4a0d6c6dd1b696aa05a3fa04f"},
+    {file = "rich-14.1.0.tar.gz", hash = "sha256:e497a48b844b0320d45007cdebfeaeed8db2a4f4bcf49f15e455cfc4af11eaa8"},
 ]
 
 [[package]]
