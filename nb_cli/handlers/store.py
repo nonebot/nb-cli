@@ -1,15 +1,12 @@
 import json
-import shutil
 import typing
-from statistics import median_high
 from datetime import datetime, timedelta
 from asyncio import create_task, as_completed
-from typing import TYPE_CHECKING, Union, Literal, TypeVar, Optional, overload
+from typing import TYPE_CHECKING, Union, Literal, TypeVar, overload
 
 import anyio
 import click
 import httpx
-from wcwidth import wcswidth
 
 from nb_cli import _, cache
 from nb_cli.handlers.data import CACHE_DIR
@@ -269,67 +266,3 @@ async def load_module_data(
             fg="yellow",
         )
         return res
-
-
-def split_text_by_wcswidth(text: str, width: int):
-    _width = width
-    while wcswidth(text[:_width]) > width:
-        _width = _width - 1
-    return text[:_width], text[_width:]
-
-
-def format_package_results(
-    hits: list[T],
-    name_column_width: Optional[int] = None,
-    terminal_width: Optional[int] = None,
-) -> str:
-    if not hits:
-        return ""
-
-    if name_column_width is None:
-        name_column_width = median_high(
-            wcswidth(f"{hit.name} ({hit.project_link})") for hit in hits
-        )
-    if terminal_width is None:
-        terminal_width = shutil.get_terminal_size()[0]
-
-    desc_width = terminal_width - name_column_width - 8
-
-    lines: list[str] = []
-    for hit in hits:
-        is_official = "👍" if hit.is_official else "  "
-        valid = "  "
-        if isinstance(hit, Plugin):
-            valid = "✅" if hit.valid else "❌"
-        name = hit.name.replace("\n", "")
-        link = f"({hit.project_link})"
-        desc = hit.desc.replace("\n", "")
-        # wrap and indent summary to fit terminal
-        is_first_line = True
-        while (
-            wcswidth(f"{name} {link}") > name_column_width
-            or wcswidth(desc) > desc_width
-        ):
-            name_column, name = split_text_by_wcswidth(name, name_column_width)
-            if name_column == "":
-                name_column, link = split_text_by_wcswidth(link, name_column_width)
-            desc_column, desc = split_text_by_wcswidth(desc, desc_width)
-            lines.append(
-                name_column
-                + " " * (name_column_width - wcswidth(name_column))
-                + (f" {valid} {is_official} " if is_first_line else " " * 7)
-                + desc_column
-                + " " * (desc_width - wcswidth(desc_column))
-            )
-            is_first_line = False
-
-        name_column = f"{name} {link}".strip()
-        lines.append(
-            name_column
-            + " " * (name_column_width - wcswidth(name_column))
-            + (f" {valid} {is_official} " if is_first_line else " " * 7)
-            + desc
-            + " " * (desc_width - wcswidth(desc))
-        )
-
-    return "\n".join(lines)

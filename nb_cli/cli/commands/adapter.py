@@ -6,7 +6,7 @@ from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
-from nb_cli.cli.utils import find_exact_package
+from nb_cli.cli.utils import find_exact_package, format_package_results
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
@@ -21,7 +21,6 @@ from nb_cli.handlers import (
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,
-    format_package_results,
 )
 
 
