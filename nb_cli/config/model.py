@@ -49,6 +49,7 @@ class Plugin(PackageInfo):
     tags: list[Tag]
     is_official: Optional[bool] = None
     valid: Optional[bool] = None
+    skip_test: bool = False
 
 
 class Driver(PackageInfo):
