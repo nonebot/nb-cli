@@ -5,3 +5,5 @@ from .plugin import plugin as plugin
 from .project import create as create
 from .adapter import adapter as adapter
 from .project import generate as generate
+from .project import upgrade_format as upgrade_format
+from .project import downgrade_format as downgrade_format

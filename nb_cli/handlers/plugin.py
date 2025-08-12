@@ -10,8 +10,8 @@ from nb_cli.compat import model_dump
 
 from . import templates
 from .process import create_process
-from .store import load_module_data
 from .meta import requires_nonebot, get_default_python
+from .store import load_module_data, load_unpublished_modules
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
@@ -49,8 +49,12 @@ def create_plugin(
     )
 
 
-async def list_plugins(query: Optional[str] = None) -> list[Plugin]:
+async def list_plugins(
+    query: Optional[str] = None, include_unpublished: bool = False
+) -> list[Plugin]:
     plugins = await load_module_data("plugin")
+    if include_unpublished:
+        plugins = plugins + await load_unpublished_modules(Plugin)
     if query is None:
         return plugins
 

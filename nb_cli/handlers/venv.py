@@ -9,7 +9,7 @@ from .meta import requires_python, get_default_python
 
 
 def detect_virtualenv(cwd: Optional[Path] = None) -> Optional[str]:
-    return ConfigManager._detact_virtual_env(cwd)
+    return ConfigManager._detect_virtual_env(cwd)
 
 
 @requires_python
