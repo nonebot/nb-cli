@@ -7,7 +7,14 @@ from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt, Cancelled
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
-from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
+from nb_cli.cli import (
+    CLI_DEFAULT_STYLE,
+    ClickAliasedGroup,
+    back_,
+    exit_,
+    run_sync,
+    run_async,
+)
 from nb_cli.handlers import (
     list_plugins,
     create_plugin,
@@ -39,16 +46,25 @@ async def plugin(ctx: click.Context):
                     sub_cmd,
                 )
             )
+    if ctx.parent and ctx.parent.params.get("can_back_to_parent", False):
+        _exit_choice = Choice(_("Back to top level."), back_)
+    else:
+        _exit_choice = Choice(_("Exit NB CLI."), exit_)
+    choices.append(_exit_choice)
 
-    try:
-        result = await ListPrompt(
-            _("What do you want to do?"), choices=choices
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
-    except CancelledError:
-        ctx.exit()
+    while True:
+        try:
+            result = await ListPrompt(
+                _("What do you want to do?"), choices=choices
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            result = _exit_choice
 
-    sub_cmd = result.data
-    await run_sync(ctx.invoke)(sub_cmd)
+        sub_cmd = result.data
+        if sub_cmd == back_:
+            return
+        ctx.params["can_back_to_parent"] = True
+        await run_sync(ctx.invoke)(sub_cmd)
 
 
 @plugin.command(
@@ -77,22 +93,28 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot plugin to current project."),
 )
+@click.option(
+    "--no-restrict-version", nargs=1, is_flag=True, flag_value=True, default=False
+)
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
+    ctx: click.Context,
+    no_restrict_version: bool,
+    name: Optional[str],
+    pip_args: Optional[list[str]],
 ):
     try:
         plugin = await find_exact_package(
             _("Plugin name to install:"), name, await list_plugins()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
-        GLOBAL_CONFIG.add_plugin(plugin.module_name)
+        GLOBAL_CONFIG.add_plugin(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to config: {e}").format(
@@ -100,8 +122,32 @@ async def install(
             )
         )
 
-    proc = await call_pip_install(plugin.project_link, pip_args)
-    await proc.wait()
+    pkg = (
+        plugin.project_link
+        if no_restrict_version
+        else f"{plugin.project_link}>={plugin.version}"
+    )
+    proc = await call_pip_install(pkg, pip_args)
+    if await proc.wait() != 0:
+        click.secho(
+            _(
+                "Errors occurred in installing plugin {plugin.name}\n"
+                "    *** Try `nb plugin install` command with `--no-restrict-version` "
+                "option to resolve under loose version constraints may work."
+            ).format(plugin=plugin),
+            fg="red",
+        )
+        assert proc.returncode
+        ctx.exit(proc.returncode)
+
+    try:
+        GLOBAL_CONFIG.add_dependency(plugin)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to add plugin {plugin.name} to dependencies: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
 
 @plugin.command(
@@ -119,10 +165,19 @@ async def update(
             _("Plugin name to update:"), name, await list_plugins()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     proc = await call_pip_update(plugin.project_link, pip_args)
     await proc.wait()
+
+    try:
+        GLOBAL_CONFIG.update_dependency(plugin)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to update plugin {plugin.name} to dependencies: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
 
 @plugin.command(
@@ -142,19 +197,23 @@ async def uninstall(
             _("Plugin name to uninstall:"), name, await list_plugins()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
-        GLOBAL_CONFIG.remove_plugin(plugin.module_name)
+        can_uninstall = GLOBAL_CONFIG.remove_plugin(plugin)
+        if can_uninstall:
+            GLOBAL_CONFIG.remove_dependency(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(
                 plugin=plugin, e=e
             )
         )
+        return
 
-    proc = await call_pip_uninstall(plugin.project_link, pip_args)
-    await proc.wait()
+    if can_uninstall:
+        proc = await call_pip_uninstall(plugin.project_link, pip_args)
+        await proc.wait()
 
 
 @plugin.command(aliases=["new"], help=_("Create a new nonebot plugin."))
@@ -182,14 +241,14 @@ async def create(
                 style=CLI_DEFAULT_STYLE
             )
         except CancelledError:
-            ctx.exit()
+            return
     if sub_plugin is None:
         try:
             sub_plugin = await ConfirmPrompt(
                 _("Use nested plugin?"), default_choice=False
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
     if output_dir is None:
         detected: list[Choice[None]] = [
@@ -214,7 +273,7 @@ async def create(
                     error_message=_("Invalid output dir!"),
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
     elif not Path(output_dir).is_dir():
         click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
@@ -224,6 +283,7 @@ async def create(
                 error_message=_("Invalid output dir!"),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
     create_plugin(name, output_dir, sub_plugin=sub_plugin, template=template)
+    ctx.exit()

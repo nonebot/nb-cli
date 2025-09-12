@@ -4,8 +4,16 @@ import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
+from nb_cli.config import GLOBAL_CONFIG
 from nb_cli.cli.utils import find_exact_package
-from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
+from nb_cli.cli import (
+    CLI_DEFAULT_STYLE,
+    ClickAliasedGroup,
+    back_,
+    exit_,
+    run_sync,
+    run_async,
+)
 from nb_cli.handlers import (
     list_drivers,
     call_pip_update,
@@ -36,16 +44,25 @@ async def driver(ctx: click.Context):
                     sub_cmd,
                 )
             )
+    if ctx.parent and ctx.parent.params.get("can_back_to_parent", False):
+        _exit_choice = Choice(_("Back to top level."), back_)
+    else:
+        _exit_choice = Choice(_("Exit NB CLI."), exit_)
+    choices.append(_exit_choice)
 
-    try:
-        result = await ListPrompt(
-            _("What do you want to do?"), choices=choices
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
-    except CancelledError:
-        ctx.exit()
+    while True:
+        try:
+            result = await ListPrompt(
+                _("What do you want to do?"), choices=choices
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            result = _exit_choice
 
-    sub_cmd = result.data
-    await run_sync(ctx.invoke)(sub_cmd)
+        sub_cmd = result.data
+        if sub_cmd == back_:
+            return
+        ctx.params["can_back_to_parent"] = True
+        await run_sync(ctx.invoke)(sub_cmd)
 
 
 @driver.command(
@@ -76,21 +93,27 @@ async def search(name: Optional[str]):
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def install(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
             _("Driver name to install:"), name, await list_drivers()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     if driver.project_link:
         proc = await call_pip_install(driver.project_link, pip_args)
         await proc.wait()
+
+    try:
+        GLOBAL_CONFIG.add_dependency(driver)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to add driver {driver.name} to dependencies: {e}").format(
+                driver=driver, e=e
+            )
+        )
 
 
 @driver.command(
@@ -98,21 +121,27 @@ async def install(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def update(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
             _("Driver name to update:"), name, await list_drivers()
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     if driver.project_link:
         proc = await call_pip_update(driver.project_link, pip_args)
         await proc.wait()
+
+    try:
+        GLOBAL_CONFIG.update_dependency(driver)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to update driver {driver.name} to dependencies: {e}").format(
+                driver=driver, e=e
+            )
+        )
 
 
 @driver.command(
@@ -122,17 +151,24 @@ async def update(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         driver = await find_exact_package(
             _("Driver name to uninstall:"), name, await list_drivers()
         )
     except CancelledError:
-        ctx.exit()
+        return
+
+    try:
+        GLOBAL_CONFIG.remove_dependency(driver)
+        GLOBAL_CONFIG.add_dependency("nonebot2")  # hold a nonebot2 package
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to remove driver {driver.name} from dependencies: {e}").format(
+                driver=driver, e=e
+            )
+        )
 
     if package := driver.project_link:
         if package.startswith("nonebot2[") and package.endswith("]"):

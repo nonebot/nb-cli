@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+{%- set extensions = ['"tamasfe.even-better-toml"', '"ms-python.python"'] -%}
+{% if "pyright" in cookiecutter.nonebot.devtools -%}
+{% set _ = extensions.append('"ms-python.vscode-pylance"') %}
+{%- endif -%}
+{% if "mypy" in cookiecutter.nonebot.devtools -%}
+{% set _ = extensions.append('"ms-python.mypy-type-checker"') %}
+{%- endif -%}
+{% if "basedpyright" in cookiecutter.nonebot.devtools -%}
+{% set _ = extensions.append('"detachhead.basedpyright"') %}
+{%- endif -%}
+{% if "ruff" in cookiecutter.nonebot.devtools -%}
+{% set _ = extensions.append('"charliermarsh.ruff"') %}
+{%- endif %}
+    {{ extensions|join(",\n")|indent(4) }}
+  ]
+}
