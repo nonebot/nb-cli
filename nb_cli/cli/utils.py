@@ -1,9 +1,9 @@
 import shutil
 from statistics import median_high
 from functools import wraps, partial
-from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import Any, Literal, TypeVar, Callable, Optional
+from collections.abc import Iterable, Coroutine
+from typing import Any, Union, Literal, TypeVar, Callable, Optional, Protocol
 
 import click
 import anyio.to_thread
@@ -18,6 +18,7 @@ from nb_cli.config import Driver, Plugin, Adapter
 T = TypeVar("T", Adapter, Plugin, Driver)
 P = ParamSpec("P")
 R = TypeVar("R")
+CT = TypeVar("CT", bound=str)
 
 CLI_DEFAULT_STYLE = Style.from_dict(
     {
@@ -31,6 +32,26 @@ CLI_DEFAULT_STYLE = Style.from_dict(
         "answer": "bold",
     }
 )
+
+
+class _ValueFilterFunction(Protocol):
+    def __call__(self, x: Union[Adapter, Plugin, Driver], *, value: str) -> bool: ...
+
+
+ADVANCED_SEARCH_FILTERS_SIMPLE: dict[
+    str, Callable[[Union[Adapter, Plugin, Driver]], bool]
+] = {
+    "#official": lambda x: x.is_official is True,
+    "#passing": lambda x: (
+        not isinstance(x, Plugin) or x.valid is True or x.skip_test is True
+    ),
+}
+ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
+    "#author:": lambda x, *, value: not value
+    or any(v in x.author for v in value.split(",")),
+    "#tags:": lambda x, *, value: not value
+    or any(v in (t.label for t in x.tags) for v in value.split(",")),
+}
 
 
 async def find_exact_package(
@@ -197,3 +218,83 @@ def format_package_results(
         )
 
     return "\n".join(lines)
+
+
+def auto_fgcolor(
+    bg: str, gamma: float = 2.2, dark: CT = "#000000", light: CT = "#FFFFFF"
+) -> CT:
+    """Automatically choose black or white foreground color based on background color
+    for optimal contrast.
+
+    Args:
+        bg (str): hex color string of the background color, in the format of "#RRGGBB".
+        gamma (float): the gamma value to correct the luminance.
+        dark (str): the dark color on brighter background, "#000000" by default.
+        light (str): the light color on darker background, "#FFFFFF" by default.
+
+    Returns:
+        Either the `dark` color or the `bright` color.
+    """
+    # if 0.2126 × R**γ + 0.7152 × G**γ + 0.0722 × B**γ > 0.5**γ, choose black;
+    #   else choose white.
+    # See also: https://graphicdesign.stackexchange.com/questions/62368/automatically-select-a-foreground-color-based-on-a-background-color
+    if len(bg) != 7:
+        raise ValueError("Expected hex color string.")
+    r_g, g_g, b_g = (
+        float((int(x, base=16) / 255) ** gamma)
+        for x in (bg.removeprefix("#")[i : i + 2] for i in (0, 2, 4))
+    )
+    luminance = 0.2126 * r_g + 0.7152 * g_g + 0.0722 * b_g
+    return dark if luminance > (0.5**gamma) else light
+
+
+def advanced_search_filter(input_: Union[str, list[str]], module: T) -> bool:
+    if isinstance(input_, str):
+        input_ = input_.split()
+
+    def keyword_filter(m: T) -> bool:
+        search_src = (
+            m.project_link.lower(),
+            m.module_name.lower(),
+            m.name.lower(),
+            m.desc.lower(),
+        )
+        return not query_words or any(
+            any(w.lower() in s for w in query_words) for s in search_src
+        )
+
+    filters: list[Callable[[T], bool]] = [keyword_filter]
+    query_words: set[str] = set()
+
+    for word in input_:
+        if word[0] not in "#!":
+            query_words.add(word)
+            continue
+        for stag, filter_ in ADVANCED_SEARCH_FILTERS_SIMPLE.items():
+            if word == stag:
+                filters.append(filter_)
+                continue
+        for atag, filter_ in ADVANCED_SEARCH_FILTERS_ARGS.items():
+            if word.startswith(atag):
+                filters.append(partial(filter_, value=word.removeprefix(atag)))
+                continue
+
+    return all(f(module) for f in filters)
+
+
+def advanced_search(input_: Union[str, list[str]], source: Iterable[T]) -> list[T]:
+    return [m for m in source if advanced_search_filter(input_, m)]
+
+
+def cut_text(text: str, max_width: int, max_lines: int = 1) -> str:
+    result: list[str] = []
+    for __ in range(max_lines - 1):
+        split, text = split_text_by_wcswidth(text, max_width)
+        result.append(split)
+    split, rest = split_text_by_wcswidth(text, max_width)
+    if rest:
+        split, _ = split_text_by_wcswidth(text, max_width - 3)
+        result.append(split + "...")
+    else:
+        result.append(split)
+    return "\n".join(result)
