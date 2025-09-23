@@ -28,7 +28,7 @@ T_module = TypeVar("T_module", Adapter, Driver, Plugin)
 
 def _create_tag(*tags: Tag) -> str:
     return " ".join(
-        f"[auto on {tag.color}]{markup.escape(tag.label)}[/]" for tag in tags
+        f"[auto on {tag.color}]{markup.escape(tag.label.strip())}[/]" for tag in tags
     )
 
 
@@ -67,7 +67,9 @@ class Card(Static, Generic[T_module]):
 
     def render(self):
         desc = (
-            cut_text(self.data.desc, max(self.size.width, 45), 2) if self.data else ""
+            cut_text(self.data.desc.strip(), max(self.size.width, 40), 2)
+            if self.data
+            else ""
         )
         content = ("[$text]{desc}[/]\n" "{tags}\n" "[gray]{author}[/]").format(
             desc=(_("Initializing...") if self.data is None else markup.escape(desc)),
@@ -81,7 +83,7 @@ class Card(Static, Generic[T_module]):
             ),
         )
         if self.data:
-            self.border_title = self.data.name
+            self.border_title = self.data.name.strip()
             self.border_subtitle = _create_status_bar(self.data)
 
         return content
