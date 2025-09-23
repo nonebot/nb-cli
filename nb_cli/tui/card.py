@@ -59,7 +59,7 @@ def _create_valid_state(data: Union[Adapter, Driver, Plugin]) -> str:
 class CardPopup(ModalScreen, Generic[T_module]):
     BINDINGS: ClassVar = [
         ("esc,q,ctrl+c", "app.pop_screen"),
-        ("ctrl+z", "toggle_dark", "Toggle dark mode"),
+        ("ctrl+z", "toggle_dark", _("Toggle dark mode")),
     ]
     CSS = """
     CardPopup {

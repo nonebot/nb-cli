@@ -23,7 +23,7 @@ class Gallery(App, Generic[T_module]):
     BINDINGS: ClassVar = [
         ("escape,q,ctrl+c", "quit", _("Quit")),
         ("/", "toggle_search", _("Search")),
-        ("ctrl+z", "toggle_dark", "Toggle dark mode"),
+        ("ctrl+z", "toggle_dark", _("Toggle dark mode")),
     ]
 
     CSS = """
