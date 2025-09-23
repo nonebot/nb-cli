@@ -64,6 +64,17 @@ async def driver(ctx: click.Context):
         await run_sync(ctx.invoke)(sub_cmd)
 
 
+@driver.command(help=_("Open nonebot driver store."))
+@run_async
+async def store():
+    from nb_cli.tui import Gallery
+
+    driver_store = Gallery()
+    driver_store.datasource = await list_drivers()
+    driver_store.title = _("NB-CLI - NoneBot Driver Store")
+    await driver_store.run_async()
+
+
 @driver.command(
     name="list", help=_("List nonebot drivers published on nonebot homepage.")
 )

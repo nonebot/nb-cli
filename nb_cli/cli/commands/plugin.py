@@ -66,6 +66,17 @@ async def plugin(ctx: click.Context):
         await run_sync(ctx.invoke)(sub_cmd)
 
 
+@plugin.command(help=_("Open nonebot plugin store."))
+@run_async
+async def store():
+    from nb_cli.tui import Gallery
+
+    plugin_store = Gallery()
+    plugin_store.datasource = await list_plugins()
+    plugin_store.title = _("NB-CLI - NoneBot Plugin Store")
+    await plugin_store.run_async()
+
+
 @plugin.command(
     name="list", help=_("List nonebot plugins published on nonebot homepage.")
 )

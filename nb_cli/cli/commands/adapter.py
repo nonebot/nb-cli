@@ -66,6 +66,17 @@ async def adapter(ctx: click.Context):
         await run_sync(ctx.invoke)(sub_cmd)
 
 
+@adapter.command(help=_("Open nonebot adapter store."))
+@run_async
+async def store():
+    from nb_cli.tui import Gallery
+
+    adapter_store = Gallery()
+    adapter_store.datasource = await list_adapters()
+    adapter_store.title = _("NB-CLI - NoneBot Adapter Store")
+    await adapter_store.run_async()
+
+
 @adapter.command(
     name="list", help=_("List nonebot adapters published on nonebot homepage.")
 )
