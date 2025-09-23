@@ -1,5 +1,7 @@
-from typing import Generic, TypeVar, ClassVar
+from functools import partial
+from typing import Generic, TypeVar, ClassVar, Optional
 
+from textual.timer import Timer
 from textual.reactive import var
 from textual.widget import Widget
 from textual.app import App, ComposeResult
@@ -13,6 +15,8 @@ from nb_cli.config.model import Driver, Plugin, Adapter
 
 T_widget = TypeVar("T_widget", bound=Widget)
 T_module = TypeVar("T_module", Adapter, Driver, Plugin)
+
+SEARCH_DEBOUNCE_DELAY: float = 0.3
 
 
 class Gallery(App, Generic[T_module]):
@@ -31,12 +35,19 @@ class Gallery(App, Generic[T_module]):
     #modules {
         align: center middle;
     }
+
+    #query-filter {
+        height: 2;
+        border: none;
+        border-top: solid #ea5252;
+    }
     """
 
+    datasource: var[list[T_module]] = var(list, init=False)
     cards: var[list[Card[T_module]]] = var(list)
     query_open: var[bool] = var(False)
     query_filter: var[str] = var("", always_update=True)
-    datasource: var[list[T_module]] = var(list, init=False)
+    query_debounce: Optional[Timer] = None
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -44,7 +55,7 @@ class Gallery(App, Generic[T_module]):
         with Vertical():
             with VerticalScroll():
                 yield ItemGrid(id="modules", min_column_width=49)
-            yield Input(id="query-filter")
+            yield Input(id="query-filter", placeholder=_("Search..."))
 
     async def on_mount(self):
         input_ = self.query_one("#query-filter", Input)
@@ -67,8 +78,16 @@ class Gallery(App, Generic[T_module]):
     def on_input_submitted(self, event: Input.Submitted):
         event.input.display = False
 
+    def _update_query_filter(self, input_: str):
+        self.query_filter = input_
+        self.query_debounce = None
+
     def on_input_changed(self, event: Input.Changed):
-        self.query_filter = event.value
+        if self.query_debounce is not None:
+            self.query_debounce.stop()
+        self.query_debounce = self.set_timer(
+            SEARCH_DEBOUNCE_DELAY, partial(self._update_query_filter, event.value)
+        )
 
     def watch_query_open(self, _: bool, new_st: bool):
         input_ = self.query_one("#query-filter", Input)
