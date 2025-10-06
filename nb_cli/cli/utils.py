@@ -41,16 +41,19 @@ class _ValueFilterFunction(Protocol):
 ADVANCED_SEARCH_FILTERS_SIMPLE: dict[
     str, Callable[[Union[Adapter, Plugin, Driver]], bool]
 ] = {
-    "#official": lambda x: x.is_official is True,
-    "#passing": lambda x: (
+    "official": lambda x: x.is_official is True,
+    "passing": lambda x: (
         not isinstance(x, Plugin) or x.valid is True or x.skip_test is True
     ),
 }
 ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
-    "#author:": lambda x, *, value: not value
-    or any(v in x.author for v in value.split(",")),
-    "#tags:": lambda x, *, value: not value
-    or any(v in (t.label for t in x.tags) for v in value.split(",")),
+    "author:": lambda x, *, value: not value.strip()
+    or any(v.lower() in x.author.lower() for v in value.strip().split(",")),
+    "tag:": lambda x, *, value: not value.strip()
+    or any(
+        (v.lower() in (t.label.lower() for t in x.tags))
+        for v in value.strip().split(",")
+    ),
 }
 
 
@@ -248,8 +251,14 @@ def auto_fgcolor(
     return dark if luminance > (0.5**gamma) else light
 
 
-def advanced_search_filter(input_: Union[str, list[str]], module: T) -> bool:
+def _advanced_search_filter(input_: Union[str, list[str]]) -> Callable[[T], bool]:
     if isinstance(input_, str):
+        if ";" in input_[:1024]:
+            return lambda module: any(
+                _advanced_search_filter(_strip)(module)
+                for sep in input_.split(";")
+                if (_strip := sep.strip())
+            )
         input_ = input_.split()
 
     def keyword_filter(m: T) -> bool:
@@ -259,31 +268,50 @@ def advanced_search_filter(input_: Union[str, list[str]], module: T) -> bool:
             m.name.lower(),
             m.desc.lower(),
         )
-        return not query_words or any(
-            any(w.lower() in s for w in query_words) for s in search_src
+        return (
+            not query_words
+            or any(any(w.lower() in s for w in query_words) for s in search_src)
+        ) and (
+            not nquery_words
+            or all(all(w.lower() not in s for w in nquery_words) for s in search_src)
         )
 
-    filters: list[Callable[[T], bool]] = [keyword_filter]
+    filters: list[Callable[[T], bool]] = []
+    nfilters: list[Callable[[T], bool]] = []
     query_words: set[str] = set()
+    nquery_words: set[str] = set()
 
     for word in input_:
-        if word[0] not in "#!":
-            query_words.add(word)
+        if word and word[0] not in "#!":
+            if word[0] != "-":
+                query_words.add(word)
+            elif word[1:]:
+                nquery_words.add(word[1:])
             continue
+        _filt = filters if word[0] == "#" else nfilters
         for stag, filter_ in ADVANCED_SEARCH_FILTERS_SIMPLE.items():
-            if word == stag:
-                filters.append(filter_)
+            if word[1:] == stag:
+                _filt.append(filter_)
                 continue
         for atag, filter_ in ADVANCED_SEARCH_FILTERS_ARGS.items():
-            if word.startswith(atag):
-                filters.append(partial(filter_, value=word.removeprefix(atag)))
+            if word[1:].startswith(atag):
+                _filt.append(partial(filter_, value=word[1:].removeprefix(atag)))
                 continue
 
-    return all(f(module) for f in filters)
+    return lambda module: (
+        all(f(module) for f in filters)
+        and not any(f(module) for f in nfilters)
+        and keyword_filter(module)
+    )
+
+
+def advanced_search_filter(input_: Union[str, list[str]], module: T) -> bool:
+    return _advanced_search_filter(input_)(module)
 
 
 def advanced_search(input_: Union[str, list[str]], source: Iterable[T]) -> list[T]:
-    return [m for m in source if advanced_search_filter(input_, m)]
+    filt = _advanced_search_filter(input_)
+    return [m for m in source if filt(m)]
 
 
 def cut_text(text: str, max_width: int, max_lines: int = 1) -> str:
