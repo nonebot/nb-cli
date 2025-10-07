@@ -421,10 +421,9 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
         plugin_data = ctx.setdefault(
             "@local" if isinstance(plugin, str) else plugin.project_link, []
         )
-        if plugin not in plugin_data:
-            plugin_data.append(
-                plugin if isinstance(plugin, str) else plugin.module_name
-            )
+        name = plugin if isinstance(plugin, str) else plugin.module_name
+        if name not in plugin_data:
+            plugin_data.append(name)
 
     @staticmethod
     def remove_plugin(
