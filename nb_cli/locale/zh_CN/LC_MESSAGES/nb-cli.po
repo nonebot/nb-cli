@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-07 16:38+0000\n"
+"POT-Creation-Date: 2025-10-07 17:05+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -967,32 +967,36 @@ msgstr "成功安装 \"{name}\"."
 msgid "Initializing..."
 msgstr "初始化中..."
 
-#: nb_cli/tui/console.py:20
+#: nb_cli/tui/console.py:22
 msgid "Close"
 msgstr "关闭"
 
-#: nb_cli/tui/console.py:21
+#: nb_cli/tui/console.py:23
 msgid "Clear output"
 msgstr "清空输出"
 
-#: nb_cli/tui/console.py:22
+#: nb_cli/tui/console.py:24
 msgid "Cancel process"
 msgstr "取消进程"
 
-#: nb_cli/tui/console.py:23
+#: nb_cli/tui/console.py:25
 msgid "Terminate process"
 msgstr "终止进程"
 
-#: nb_cli/tui/console.py:25
+#: nb_cli/tui/console.py:26
+msgid "Copy content"
+msgstr "复制内容"
+
+#: nb_cli/tui/console.py:28
 msgid "Console output"
 msgstr "控制台输出"
 
-#: nb_cli/tui/console.py:61
+#: nb_cli/tui/console.py:64
 #, python-brace-format
 msgid "Process exited (code: {code}). Press ESC / q / Ctrl+C to close."
 msgstr "进程已退出 (状态码: {code}). 按 ESC / q / Ctrl+C 关闭."
 
-#: nb_cli/tui/console.py:73
+#: nb_cli/tui/console.py:76
 msgid "Cannot leave current console until the process is done or terminated."
 msgstr "进程结束或终止前无法离开当前控制台."
 

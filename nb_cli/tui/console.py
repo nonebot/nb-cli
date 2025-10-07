@@ -3,6 +3,8 @@ import signal
 from typing import Final, Optional
 from asyncio.subprocess import Process
 
+import rich
+import rich.text
 from textual.reactive import var
 from textual.app import ComposeResult
 from textual.screen import ModalScreen
@@ -21,6 +23,7 @@ class LogConsole(ModalScreen):
         ("ctrl+l", "clear_output", _("Clear output")),
         ("ctrl+c", "cancel_proc", _("Cancel process")),
         ("ctrl+k", "terminate_proc", _("Terminate process")),
+        ("ctrl+n", "copy", _("Copy content")),
     ]
     SUB_TITLE = _("Console output")
 
@@ -88,6 +91,13 @@ class LogConsole(ModalScreen):
     async def action_clear_output(self):
         log = self.query_one(Log)
         log.clear()
+
+    async def action_copy(self):
+        log = self.query_one(Log)
+        # works on terminals that supports OSC 52.
+        self.app.copy_to_clipboard(
+            "\n".join(rich.text.Text.from_ansi(line).plain for line in log.lines)
+        )
 
     def check_action(
         self, action: str, parameters: tuple[object, ...]
