@@ -10,6 +10,7 @@ from textual.containers import ItemGrid, Vertical, VerticalScroll
 
 from nb_cli import _
 from nb_cli.tui.card import Card
+from nb_cli.tui.console import LogConsole
 from nb_cli.cli.utils import advanced_search_filter
 from nb_cli.config.model import Driver, Plugin, Adapter
 
@@ -24,7 +25,9 @@ class Gallery(App, Generic[T_module]):
         ("escape,q,ctrl+c", "quit", _("Quit")),
         ("/", "toggle_search", _("Search")),
         ("ctrl+z", "toggle_dark", _("Toggle dark mode")),
+        ("ctrl+n", "app.push_screen('console')", _("Open console")),
     ]
+    SCREENS: ClassVar = {"console": LogConsole}
 
     CSS = """
     Footer, VerticalScroll, Input {

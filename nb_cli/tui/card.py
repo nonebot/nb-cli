@@ -1,14 +1,20 @@
-from typing import Union, Generic, TypeVar, ClassVar, Optional
+import os
+import asyncio
+from typing import Final, Union, Generic, TypeVar, Optional
 
+import textual
 from textual import markup
-from textual.widgets import Static
 from textual.app import ComposeResult
 from textual.reactive import reactive
 from textual.screen import ModalScreen
+from textual.widgets import Button, Static
 from textual.containers import Grid, Vertical, Horizontal, VerticalScroll
 
 from nb_cli import _
 from nb_cli.cli.utils import cut_text
+from nb_cli.config import GLOBAL_CONFIG
+from nb_cli.tui.console import LogConsole
+from nb_cli.handlers.pip import call_pip_install
 from nb_cli.config.model import Tag, Driver, Plugin, Adapter
 
 CARD_WIDTH = 49
@@ -57,7 +63,7 @@ def _create_valid_state(data: Union[Adapter, Driver, Plugin]) -> str:
 
 
 class CardPopup(ModalScreen, Generic[T_module]):
-    BINDINGS: ClassVar = [
+    BINDINGS: Final = [
         ("esc,q,ctrl+c", "app.pop_screen"),
         ("ctrl+z", "toggle_dark", _("Toggle dark mode")),
     ]
@@ -109,6 +115,15 @@ class CardPopup(ModalScreen, Generic[T_module]):
         grid-size: 1 2;
     }
 
+    #gap {
+        width: 1fr;
+    }
+
+    #top > Vertical {
+        padding: 1 2;
+        align: right middle;
+    }
+
     #content {
         #content-desc {
             height: 1fr;
@@ -141,6 +156,9 @@ class CardPopup(ModalScreen, Generic[T_module]):
                         if self.data
                         else ""
                     )
+                yield Static(id="gap")
+                with Vertical():
+                    yield Button(_("Install"), id="install-module")
             with Vertical(id="content"):
                 yield Static(
                     markup.escape(self.data.desc.strip()) if self.data else "",
@@ -187,6 +205,30 @@ class CardPopup(ModalScreen, Generic[T_module]):
         c = self.query_one("#card-content", Grid)
         c.remove_class("-dark", "-light", update=False)
         c.add_class(style)
+
+    @textual.on(Button.Pressed, "#install-module")
+    async def handle_install_module(self):
+        if self.data is None:
+            return
+        await self.app.push_screen("console")
+        con = self.app.get_screen("console", LogConsole)
+        proc = await call_pip_install(
+            self.data.as_dependency(),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+            env=os.environ.copy() | {"FORCE_COLOR": "1"},
+        )
+        await con.attach_process(proc)
+        if proc.returncode == 0:
+            GLOBAL_CONFIG.add_dependency(self.data)
+            if isinstance(self.data, Adapter):
+                GLOBAL_CONFIG.add_adapter(self.data)
+            elif isinstance(self.data, Plugin):
+                GLOBAL_CONFIG.add_plugin(self.data)
+            await self.app.pop_screen()
+            self.notify(
+                _('Successfully installed "{name}".').format(name=self.data.name)
+            )
 
 
 class Card(Static, Generic[T_module]):
