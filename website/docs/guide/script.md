@@ -1,10 +1,10 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 description: 项目脚本配置
 
 options:
   menu:
-    weight: 60
+    weight: 70
     category: guide
 ---
 
