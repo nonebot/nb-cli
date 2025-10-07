@@ -160,12 +160,9 @@ async def install(
             fg="yellow",
         )
 
-    pkg = (
-        plugin.project_link
-        if no_restrict_version
-        else f"{plugin.project_link}>={plugin.version}"
+    proc = await call_pip_install(
+        plugin.as_dependency(not no_restrict_version), pip_args
     )
-    proc = await call_pip_install(pkg, pip_args)
     if await proc.wait() != 0:
         click.secho(
             _(

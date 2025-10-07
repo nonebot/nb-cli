@@ -29,6 +29,11 @@ class PackageInfo(SimpleInfo):
     def time_serializer(self, dt: datetime):
         return dt.isoformat()
 
+    def as_dependency(self, versioned: bool = True) -> str:
+        return (
+            f"{self.project_link}>={self.version}" if versioned else self.project_link
+        )
+
 
 class Adapter(PackageInfo):
     __module_name__ = "adapters"

@@ -160,12 +160,9 @@ async def install(
             fg="yellow",
         )
 
-    pkg = (
-        adapter.project_link
-        if no_restrict_version
-        else f"{adapter.project_link}>={adapter.version}"
+    proc = await call_pip_install(
+        adapter.as_dependency(not no_restrict_version), pip_args
     )
-    proc = await call_pip_install(pkg, pip_args)
     if await proc.wait() != 0:
         click.secho(
             _(
