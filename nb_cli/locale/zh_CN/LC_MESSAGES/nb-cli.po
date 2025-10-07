@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-07 16:23+0000\n"
+"POT-Creation-Date: 2025-10-07 16:38+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -987,10 +987,10 @@ msgstr "终止进程"
 msgid "Console output"
 msgstr "控制台输出"
 
-#: nb_cli/tui/console.py:60
+#: nb_cli/tui/console.py:61
 #, python-brace-format
-msgid "Process exited (code: {code}). Press ESC / q to close."
-msgstr "进程已退出 (状态码: {code}). 按 ESC / q 关闭."
+msgid "Process exited (code: {code}). Press ESC / q / Ctrl+C to close."
+msgstr "进程已退出 (状态码: {code}). 按 ESC / q / Ctrl+C 关闭."
 
 #: nb_cli/tui/console.py:73
 msgid "Cannot leave current console until the process is done or terminated."

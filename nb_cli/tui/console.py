@@ -57,9 +57,9 @@ class LogConsole(ModalScreen):
         if code := await proc.wait():
             log.write_line(
                 "\n"
-                + _("Process exited (code: {code}). Press ESC / q to close.").format(
-                    code=code
-                )
+                + _(
+                    "Process exited (code: {code}). Press ESC / q / Ctrl+C to close."
+                ).format(code=code)
             )
         self.attached = False
         del self._attached_proc
