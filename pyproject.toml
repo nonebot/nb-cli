@@ -5,7 +5,7 @@ description = "CLI for nonebot2"
 authors = [{ name = "yanyongyu", email = "yyy@nonebot.dev" }]
 license = { text = "MIT" }
 readme = "README.md"
-keywords = ["bot", "qq", "nonebot", "bot", "qq", "nonebot"]
+keywords = ["bot", "qq", "nonebot"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Framework :: Robot Framework",
