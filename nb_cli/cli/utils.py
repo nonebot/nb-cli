@@ -9,8 +9,8 @@ import click
 import anyio.to_thread
 import anyio.from_thread
 from wcwidth import wcswidth
-from noneprompt import InputPrompt
 from prompt_toolkit.styles import Style
+from noneprompt import Choice, ListPrompt
 
 from nb_cli import _
 from nb_cli.config import Driver, Plugin, Adapter
@@ -61,7 +61,21 @@ async def find_exact_package(
     question: str, name: Optional[str], packages: list[T]
 ) -> T:
     if name is None:
-        name = await InputPrompt(question).prompt_async(style=CLI_DEFAULT_STYLE)
+        return (
+            await ListPrompt(
+                question,
+                [
+                    Choice(
+                        "{name} ({desc})".format(
+                            name=p.name, desc=p.desc.replace("\n", " ")
+                        ),
+                        p,
+                    )
+                    for p in packages
+                ],
+                custom_filter=lambda input_, p: advanced_search_filter(input_, p.data),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        ).data
 
     if exact_packages := [
         p for p in packages if name in {p.name, p.module_name, p.project_link}
