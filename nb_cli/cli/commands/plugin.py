@@ -160,15 +160,6 @@ async def install(
             fg="yellow",
         )
 
-    try:
-        GLOBAL_CONFIG.add_plugin(plugin)
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to add plugin {plugin.name} to config: {e}").format(
-                plugin=plugin, e=e
-            )
-        )
-
     pkg = (
         plugin.project_link
         if no_restrict_version
@@ -186,6 +177,15 @@ async def install(
         )
         assert proc.returncode
         ctx.exit(proc.returncode)
+
+    try:
+        GLOBAL_CONFIG.add_plugin(plugin)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to add plugin {plugin.name} to config: {e}").format(
+                plugin=plugin, e=e
+            )
+        )
 
     try:
         GLOBAL_CONFIG.add_dependency(plugin)
