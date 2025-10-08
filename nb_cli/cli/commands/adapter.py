@@ -6,15 +6,21 @@ from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
-from nb_cli.cli.utils import find_exact_package
-from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedGroup, run_sync, run_async
+from nb_cli.cli.utils import find_exact_package, format_package_results
+from nb_cli.cli import (
+    CLI_DEFAULT_STYLE,
+    ClickAliasedGroup,
+    back_,
+    exit_,
+    run_sync,
+    run_async,
+)
 from nb_cli.handlers import (
     list_adapters,
     create_adapter,
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,
-    format_package_results,
 )
 
 
@@ -39,36 +45,74 @@ async def adapter(ctx: click.Context):
                     sub_cmd,
                 )
             )
+    if ctx.parent and ctx.parent.params.get("can_back_to_parent", False):
+        _exit_choice = Choice(_("Back to top level."), back_)
+    else:
+        _exit_choice = Choice(_("Exit NB CLI."), exit_)
+    choices.append(_exit_choice)
 
-    try:
-        result = await ListPrompt(
-            _("What do you want to do?"), choices=choices
-        ).prompt_async(style=CLI_DEFAULT_STYLE)
-    except CancelledError:
-        ctx.exit()
+    while True:
+        try:
+            result = await ListPrompt(
+                _("What do you want to do?"), choices=choices
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        except CancelledError:
+            result = _exit_choice
 
-    sub_cmd = result.data
-    await run_sync(ctx.invoke)(sub_cmd)
+        sub_cmd = result.data
+        if sub_cmd == back_:
+            return
+        ctx.params["can_back_to_parent"] = True
+        await run_sync(ctx.invoke)(sub_cmd)
+
+
+@adapter.command(help=_("Open nonebot adapter store."))
+@run_async
+async def store():
+    from nb_cli.tui import Gallery
+
+    adapter_store = Gallery()
+    adapter_store.datasource = await list_adapters()
+    adapter_store.title = _("NB-CLI - NoneBot Adapter Store")
+    await adapter_store.run_async()
 
 
 @adapter.command(
     name="list", help=_("List nonebot adapters published on nonebot homepage.")
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @run_async
-async def list_():
-    adapters = await list_adapters()
+async def list_(include_unpublished: bool = False):
+    adapters = await list_adapters(include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished adapters may be included."), fg="yellow")
     click.echo(format_package_results(adapters))
 
 
 @adapter.command(help=_("Search for nonebot adapters published on nonebot homepage."))
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @click.argument("name", nargs=1, default=None)
 @run_async
-async def search(name: Optional[str]):
+async def search(name: Optional[str], include_unpublished: bool = False):
     if name is None:
         name = await InputPrompt(_("Adapter name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
         )
-    adapters = await list_adapters(name)
+    adapters = await list_adapters(name, include_unpublished=include_unpublished)
+    if include_unpublished:
+        click.secho(_("WARNING: Unpublished adapters may be included."), fg="yellow")
     click.echo(format_package_results(adapters))
 
 
@@ -77,19 +121,59 @@ async def search(name: Optional[str]):
     context_settings={"ignore_unknown_options": True},
     help=_("Install nonebot adapter to current project."),
 )
+@click.option(
+    "--no-restrict-version", nargs=1, is_flag=True, flag_value=True, default=False
+)
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @click.pass_context
 @run_async
 async def install(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
+    ctx: click.Context,
+    no_restrict_version: bool,
+    name: Optional[str],
+    pip_args: Optional[list[str]],
+    include_unpublished: bool = False,
 ):
     try:
         adapter = await find_exact_package(
-            _("Adapter name to install:"), name, await list_adapters()
+            _("Adapter name to install:"),
+            name,
+            await list_adapters(include_unpublished=include_unpublished),
         )
     except CancelledError:
-        ctx.exit()
+        return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished adapters may be installed. "
+                "These adapters may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
+
+    proc = await call_pip_install(
+        adapter.as_dependency(not no_restrict_version), pip_args
+    )
+    if await proc.wait() != 0:
+        click.secho(
+            _(
+                "Errors occurred in installing adapter {adapter.name}\n"
+                "*** Try `nb adapter install` command with `--no-restrict-version` "
+                "option to resolve under loose version constraints may work."
+            ).format(adapter=adapter),
+            fg="red",
+        )
+        assert proc.returncode
+        ctx.exit(proc.returncode)
 
     try:
         GLOBAL_CONFIG.add_adapter(adapter)
@@ -100,29 +184,70 @@ async def install(
             )
         )
 
-    proc = await call_pip_install(adapter.project_link, pip_args)
-    await proc.wait()
+    try:
+        GLOBAL_CONFIG.add_dependency(adapter)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to add adapter {adapter.name} to dependencies: {e}").format(
+                adapter=adapter, e=e
+            )
+        )
 
 
 @adapter.command(
     context_settings={"ignore_unknown_options": True}, help=_("Update nonebot adapter.")
 )
+@click.option(
+    "--include-unpublished",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to include unpublished adapters."),
+)
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
 async def update(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
+    name: Optional[str],
+    pip_args: Optional[list[str]],
+    include_unpublished: bool = False,
 ):
     try:
         adapter = await find_exact_package(
-            _("Adapter name to update:"), name, await list_adapters()
+            _("Adapter name to update:"),
+            name,
+            await list_adapters(include_unpublished=include_unpublished),
         )
     except CancelledError:
-        ctx.exit()
+        return
+
+    if include_unpublished:
+        click.secho(
+            _(
+                "WARNING: Unpublished adapters may be installed. "
+                "These adapters may be unmaintained or unusable."
+            ),
+            fg="yellow",
+        )
 
     proc = await call_pip_update(adapter.project_link, pip_args)
-    await proc.wait()
+    if await proc.wait() != 0:
+        click.secho(
+            _("Errors occurred in updating adapter {adapter.name}. Aborted.").format(
+                adapter=adapter
+            ),
+            fg="red",
+        )
+        return
+
+    try:
+        GLOBAL_CONFIG.update_dependency(adapter)
+    except RuntimeError as e:
+        click.echo(
+            _("Failed to update adapter {adapter.name} to dependencies: {e}").format(
+                adapter=adapter, e=e
+            )
+        )
 
 
 @adapter.command(
@@ -132,29 +257,34 @@ async def update(
 )
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
-@click.pass_context
 @run_async
-async def uninstall(
-    ctx: click.Context, name: Optional[str], pip_args: Optional[list[str]]
-):
+async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
     try:
         adapter = await find_exact_package(
-            _("Adapter name to uninstall:"), name, await list_adapters()
+            _("Adapter name to uninstall:"),
+            name,
+            await list_adapters(
+                include_unpublished=True  # unpublished modules are always removable
+            ),
         )
     except CancelledError:
-        ctx.exit()
+        return
 
     try:
-        GLOBAL_CONFIG.remove_adapter(adapter)
+        can_uninstall = GLOBAL_CONFIG.remove_adapter(adapter)
+        if can_uninstall:
+            GLOBAL_CONFIG.remove_dependency(adapter)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove adapter {adapter.name} from config: {e}").format(
                 adapter=adapter, e=e
             )
         )
+        return
 
-    proc = await call_pip_uninstall(adapter.project_link, pip_args)
-    await proc.wait()
+    if can_uninstall:
+        proc = await call_pip_uninstall(adapter.project_link, pip_args)
+        await proc.wait()
 
 
 @adapter.command(aliases=["new"], help=_("Create a new nonebot adapter."))
@@ -180,7 +310,7 @@ async def create(
                 style=CLI_DEFAULT_STYLE
             )
         except CancelledError:
-            ctx.exit()
+            return
     if output_dir is None:
         detected: list[Choice[None]] = [
             Choice(str(x))
@@ -207,7 +337,7 @@ async def create(
                     validator=lambda x: len(x) > 0 and Path(x).is_dir(),
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
     elif not Path(output_dir).is_dir():
         click.secho(_("Output dir is not a directory!"), fg="yellow")
         try:
@@ -217,5 +347,6 @@ async def create(
                 error_message=_("Invalid output dir!"),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
     create_adapter(name, output_dir, template=template)
+    ctx.exit()

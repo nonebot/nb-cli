@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Mapping
 from typing import IO, Any, Union, Optional
 
 from .process import create_process
@@ -13,6 +14,7 @@ async def call_pip(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     if pip_args is None:
         pip_args = []
@@ -27,6 +29,7 @@ async def call_pip(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        env=env,
     )
 
 
@@ -39,6 +42,7 @@ async def call_pip_install(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     if isinstance(package, str):
         package = [package]
@@ -51,6 +55,7 @@ async def call_pip_install(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        env=env,
     )
 
 
@@ -63,6 +68,7 @@ async def call_pip_update(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     if isinstance(package, str):
         package = [package]
@@ -75,6 +81,7 @@ async def call_pip_update(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        env=env,
     )
 
 
@@ -87,6 +94,7 @@ async def call_pip_uninstall(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     if isinstance(package, str):
         package = [package]
@@ -99,6 +107,7 @@ async def call_pip_uninstall(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        env=env,
     )
 
 
@@ -110,6 +119,7 @@ async def call_pip_list(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     if pip_args is None:
         pip_args = []
@@ -120,4 +130,5 @@ async def call_pip_list(
         stdin=stdin,
         stdout=stdout,
         stderr=stderr,
+        env=env,
     )

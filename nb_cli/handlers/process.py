@@ -5,8 +5,8 @@ import subprocess
 from pathlib import Path
 from functools import wraps
 from contextlib import nullcontext
-from collections.abc import Coroutine
 from typing_extensions import ParamSpec
+from collections.abc import Mapping, Coroutine
 from typing import IO, Any, Union, Callable, Optional
 
 from nb_cli.consts import WINDOWS
@@ -61,6 +61,7 @@ async def create_process(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     return await asyncio.create_subprocess_exec(
         *args,
@@ -69,6 +70,7 @@ async def create_process(
         stdout=stdout,
         stderr=stderr,
         creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if WINDOWS else 0,
+        env=env,
     )
 
 
@@ -79,6 +81,7 @@ async def create_process_shell(
     stdin: Optional[Union[IO[Any], int]] = None,
     stdout: Optional[Union[IO[Any], int]] = None,
     stderr: Optional[Union[IO[Any], int]] = None,
+    env: Optional[Mapping[str, str]] = None,
 ) -> asyncio.subprocess.Process:
     return await asyncio.create_subprocess_shell(
         command,
@@ -87,6 +90,7 @@ async def create_process_shell(
         stdout=stdout,
         stderr=stderr,
         creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if WINDOWS else 0,
+        env=env,
     )
 
 

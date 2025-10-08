@@ -4,18 +4,43 @@ version = "0.1.0"
 description = "{{ cookiecutter.computed.project_desc }}"
 readme = "README.md"
 requires-python = ">=3.9, <4.0"
+{% set dependencies = [] -%}
+{% for driver in cookiecutter.nonebot.drivers.values() -%}
+{% if driver.project_link == "" -%}
+{% set driver_str = '"nonebot2>=%s"'|format(driver.version) -%}
+{%- else -%}
+{% set driver_str = '"%s>=%s"'|format(driver.project_link, driver.version) -%}
+{%- endif -%}
+{% if driver.project_link != "" or cookiecutter.nonebot.drivers|length == 1 -%}
+{% set _ = dependencies.append(driver_str) -%}
+{%- endif -%}
+{%- endfor -%}
+{% for adapter in cookiecutter.nonebot.adapters.values() -%}
+{% set adapter_str = '"%s>=%s"'|format(adapter[0].project_link, adapter[0].version) -%}
+{% set _ = dependencies.append(adapter_str) -%}
+{%- endfor -%}
+dependencies = [
+    {{ dependencies|join(",\n")|indent(4) }}
+]
 
 [tool.nonebot]
-{% set adapters = [] -%}
-{% for adapter in cookiecutter.nonebot.adapters.values() -%}
+plugin_dirs = []
+builtin_plugins = []
+
+[tool.nonebot.adapters]
+{% for package, adapters in cookiecutter.nonebot.adapters.items() -%}
+{% set adapters_ = [] -%}
+{% for adapter in adapters -%}
 {% set name = adapter.name -%}
 {% set module_name = adapter.module_name -%}
 {% set adapter_str = '{ name = "%s", module_name = "%s" }'|format(name, module_name) -%}
-{% set _ = adapters.append(adapter_str) -%}
+{% set _ = adapters_.append(adapter_str) -%}
 {%- endfor -%}
-adapters = [
-    {{ adapters|join(",\n")|indent(4) }}
+{{ package }} = [
+    {{ adapters_|join(",\n")|indent(4) }}
 ]
-plugins = []
-plugin_dirs = []
-builtin_plugins = []
+{% endfor -%}
+"@local" = []
+
+[tool.nonebot.plugins]
+"@local" = []

@@ -1,12 +1,24 @@
 import asyncio
 from pathlib import Path
-from typing import IO, Any, Union, Optional
+from collections.abc import Iterable
+from typing import IO, Any, Union, TypeVar, Optional
 
+import click
 from cookiecutter.main import cookiecutter
 
-from nb_cli.config import SimpleInfo
+from nb_cli import _
+from nb_cli.config import (
+    GLOBAL_CONFIG,
+    SimpleInfo,
+    PackageInfo,
+    NoneBotConfig,
+    LegacyNoneBotConfig,
+)
 
 from . import templates
+from .driver import list_drivers
+from .plugin import list_plugins
+from .adapter import list_adapters
 from .process import create_process
 from .meta import (
     get_project_root,
@@ -17,6 +29,8 @@ from .meta import (
 )
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
+
+T_info = TypeVar("T_info", bound=PackageInfo)
 
 
 def list_project_templates() -> list[str]:
@@ -48,7 +62,7 @@ async def generate_run_script(
     if adapters is None or builtin_plugins is None:
         bot_config = get_nonebot_config()
         if adapters is None:
-            adapters = bot_config.adapters
+            adapters = bot_config.get_adapters()
         if builtin_plugins is None:
             builtin_plugins = bot_config.builtin_plugins
 
@@ -73,7 +87,7 @@ async def run_project(
     if adapters is None or builtin_plugins is None:
         bot_config = get_nonebot_config()
         if adapters is None:
-            adapters = bot_config.adapters
+            adapters = bot_config.get_adapters()
         if builtin_plugins is None:
             builtin_plugins = bot_config.builtin_plugins
 
@@ -101,3 +115,85 @@ async def run_project(
         stdout=stdout,
         stderr=stderr,
     )
+
+
+def _index_by_module_name(data: Iterable[T_info]) -> dict[str, T_info]:
+    res: dict[str, T_info] = {}
+
+    for d in data:
+        res[d.module_name] = d
+
+    return res
+
+
+@requires_project_root
+async def upgrade_project_format() -> None:
+    bot_config = get_nonebot_config()
+    if isinstance(bot_config, NoneBotConfig):
+        click.echo(_("Current format is already the new format."))
+        return
+
+    all_adapters = _index_by_module_name(await list_adapters())
+    all_plugins = _index_by_module_name(await list_plugins())
+    nonebot_pkg = next(iter(await list_drivers("~none"))).model_copy()
+    nonebot_pkg.project_link = "nonebot2"
+
+    new_adapters: dict[str, list[SimpleInfo]] = {"@local": []}
+    new_plugins: dict[str, list[str]] = {"@local": []}
+
+    packages: list[PackageInfo] = []
+
+    for a in bot_config.adapters:
+        if a.module_name in all_adapters:
+            adapter = all_adapters[a.module_name]
+            packages.append(adapter)
+            info = SimpleInfo(name=adapter.name, module_name=adapter.module_name)
+            if adapter.name != a.name:
+                click.secho(
+                    _("WARNING: Inconsistent adapter name info: {old!r} -> {new!r}"),
+                    fg="yellow",
+                )
+        else:
+            info = a
+        new_adapters.setdefault(
+            (
+                all_adapters[a.module_name].project_link
+                if a.module_name in all_adapters
+                else "@local"
+            ),
+            [],
+        ).append(info)
+
+    for p in bot_config.plugins:
+        if p in all_plugins:
+            packages.append(all_plugins[p])
+        new_plugins.setdefault(
+            (all_plugins[p].project_link if p in all_plugins else "@local"), []
+        ).append(p)
+
+    new_config = NoneBotConfig(
+        adapters=new_adapters,
+        plugins=new_plugins,
+        plugin_dirs=bot_config.plugin_dirs,
+        builtin_plugins=bot_config.builtin_plugins,
+    )
+
+    GLOBAL_CONFIG.update_nonebot_config(new_config)
+    GLOBAL_CONFIG.update_dependency(nonebot_pkg, *packages)
+
+
+@requires_project_root
+async def downgrade_project_format() -> None:
+    bot_config = get_nonebot_config()
+    if isinstance(bot_config, LegacyNoneBotConfig):
+        click.echo(_("Current format is already the old format."))
+        return
+
+    old_config = LegacyNoneBotConfig(
+        adapters=bot_config.get_adapters(),
+        plugins=bot_config.get_plugins(),
+        plugin_dirs=bot_config.plugin_dirs,
+        builtin_plugins=bot_config.builtin_plugins,
+    )
+
+    GLOBAL_CONFIG.update_nonebot_config(old_config)

@@ -2,11 +2,15 @@ from typing import Optional
 
 from nb_cli.compat import model_dump
 
-from .store import Driver, load_module_data
+from .store import Driver, load_module_data, load_unpublished_modules
 
 
-async def list_drivers(query: Optional[str] = None) -> list[Driver]:
+async def list_drivers(
+    query: Optional[str] = None, include_unpublished: bool = False
+) -> list[Driver]:
     drivers = await load_module_data("driver")
+    if include_unpublished:
+        drivers = drivers + await load_unpublished_modules(Driver)
     if query is None:
         return drivers
 

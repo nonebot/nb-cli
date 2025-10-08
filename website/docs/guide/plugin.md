@@ -1,10 +1,10 @@
 ---
-sidebar_position: 7
+sidebar_position: 8
 description: CLI 插件配置
 
 options:
   menu:
-    weight: 70
+    weight: 80
     category: guide
 ---
 

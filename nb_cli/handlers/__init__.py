@@ -38,7 +38,7 @@ from .data import CONFIG_DIR as CONFIG_DIR
 
 # package
 from .store import load_module_data as load_module_data
-from .store import format_package_results as format_package_results
+from .store import download_module_data as download_module_data
 
 # isort: split
 
@@ -97,10 +97,13 @@ from .script import list_scripts as list_scripts
 
 # isort: split
 
-# project
 from .reloader import Reloader as Reloader
 from .reloader import FileFilter as FileFilter
+
+# project
 from .project import run_project as run_project
 from .project import create_project as create_project
 from .project import generate_run_script as generate_run_script
 from .project import list_project_templates as list_project_templates
+from .project import upgrade_project_format as upgrade_project_format
+from .project import downgrade_project_format as downgrade_project_format

@@ -1,6 +1,7 @@
 import re
 import sys
 import json
+import shlex
 from pathlib import Path
 from logging import Logger
 from functools import partial
@@ -8,6 +9,7 @@ from typing import Any, Optional
 from dataclasses import field, dataclass
 
 import click
+import nonestorage
 from noneprompt import (
     Choice,
     ListPrompt,
@@ -38,6 +40,8 @@ from nb_cli.handlers import (
     generate_run_script,
     list_builtin_plugins,
     list_project_templates,
+    upgrade_project_format,
+    downgrade_project_format,
 )
 
 VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
@@ -69,6 +73,11 @@ def project_name_validator(name: str) -> bool:
         bool(re.match(VALID_PROJECT_NAME, name))
         and name not in BLACKLISTED_PROJECT_NAME
     )
+
+
+def project_devtools_validator(devtools: tuple[Choice[str], ...]) -> bool:
+    expanded = {ch.data for ch in devtools}
+    return bool({"pyright", "basedpyright"} - expanded)
 
 
 async def prompt_common_context(context: ProjectContext) -> ProjectContext:
@@ -104,10 +113,13 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )
 
-    context.variables["adapters"] = json.dumps(
-        {a.data.project_link: model_dump(a.data) for a in adapters}
+    _adapters = {}
+    for a in adapters:
+        _adapters.setdefault(a.data.project_link, []).append(model_dump(a.data))
+    context.variables["adapters"] = json.dumps(_adapters)
+    context.packages.extend(
+        [f"{a.data.project_link}>={a.data.version}" for a in adapters]
     )
-    context.packages.extend([a.data.project_link for a in adapters])
 
     drivers = await CheckboxPrompt(
         _("Which driver(s) would you like to use?"),
@@ -124,8 +136,61 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         {d.data.project_link: model_dump(d.data) for d in drivers}
     )
     context.packages.extend(
-        [d.data.project_link for d in drivers if d.data.project_link]
+        [
+            f"{d.data.project_link}>={d.data.version}"
+            for d in drivers
+            if d.data.project_link
+        ]
     )
+
+    localstore_mode_text = [
+        _("User global (default, suitable for single instance in single user)"),
+        _("Current project (suitable for multiple/portable instances)"),
+        _(
+            "User global (isolate by project name, suitable for multiple instances in"
+            " single user)"
+        ),
+        _("Custom storage location (for advanced users)"),
+    ]
+
+    context.variables["environment"] = {}
+    localstore_mode = await ListPrompt(
+        _("Which strategy of local storage would you like to use?"),
+        choices=[
+            Choice(localstore_mode_text[0], "global"),
+            Choice(localstore_mode_text[1], "project"),
+            Choice(localstore_mode_text[2], "global_isolated"),
+            Choice(localstore_mode_text[3], "custom"),
+        ],
+    ).prompt_async(style=CLI_DEFAULT_STYLE)
+    if localstore_mode.data == "project":
+        context.variables["environment"]["LOCALSTORE_USE_CWD"] = "true"
+    elif localstore_mode.data == "global_isolated":
+        context.variables["environment"]["LOCALSTORE_CACHE_DIR"] = shlex.quote(
+            str(nonestorage.user_cache_dir(f"nonebot2-{project_name}"))
+        )
+        context.variables["environment"]["LOCALSTORE_DATA_DIR"] = shlex.quote(
+            str(nonestorage.user_data_dir(f"nonebot2-{project_name}"))
+        )
+        context.variables["environment"]["LOCALSTORE_CONFIG_DIR"] = shlex.quote(
+            str(nonestorage.user_config_dir(f"nonebot2-{project_name}"))
+        )
+    elif localstore_mode.data == "custom":
+        context.variables["environment"]["LOCALSTORE_CACHE_DIR"] = shlex.quote(
+            await InputPrompt(
+                _("Cache directory to use:"),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        )
+        context.variables["environment"]["LOCALSTORE_DATA_DIR"] = shlex.quote(
+            await InputPrompt(
+                _("Data directory to use:"),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        )
+        context.variables["environment"]["LOCALSTORE_CONFIG_DIR"] = shlex.quote(
+            await InputPrompt(
+                _("Config directory to use:"),
+            ).prompt_async(style=CLI_DEFAULT_STYLE)
+        )
 
     return context
 
@@ -143,6 +208,23 @@ async def prompt_simple_context(context: ProjectContext) -> ProjectContext:
             style=CLI_DEFAULT_STYLE
         )
     ).data
+    context.variables["devtools"] = [
+        ch.data
+        for ch in await CheckboxPrompt(
+            _("Which developer tool(s) would you like to use?"),
+            [
+                Choice("Pylance/Pyright" + _(" (Recommended)"), "pyright"),
+                Choice("Ruff" + _(" (Recommended)"), "ruff"),
+                Choice("MyPy", "mypy"),
+                Choice("BasedPyright" + _(" (Advanced user)"), "basedpyright"),
+            ],
+            [0, 1],
+            validator=project_devtools_validator,
+            error_message=_(
+                "Cannot choose 'Pylance/Pyright' and 'BasedPyright' at the same time."
+            ),
+        ).prompt_async(style=CLI_DEFAULT_STYLE)
+    ]
 
     return context
 
@@ -191,7 +273,7 @@ async def create(
                 ).prompt_async(style=CLI_DEFAULT_STYLE)
             ).data
         except CancelledError:
-            ctx.exit()
+            return
 
     context = ProjectContext()
     try:
@@ -202,7 +284,7 @@ async def create(
         click.secho(repr(e), fg="red")
         ctx.exit(1)
     except CancelledError:
-        ctx.exit()
+        return
 
     create_project(template, {"nonebot": context.variables}, output_dir)
 
@@ -211,7 +293,7 @@ async def create(
             _("Install dependencies now?"), default_choice=True
         ).prompt_async(style=CLI_DEFAULT_STYLE)
     except CancelledError:
-        ctx.exit()
+        return
 
     use_venv = False
     project_dir_name = context.variables["project_name"].replace(" ", "-")
@@ -224,7 +306,7 @@ async def create(
                 _("Create virtual environment?"), default_choice=True
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
-            ctx.exit()
+            return
 
         if use_venv:
             click.secho(
@@ -240,7 +322,7 @@ async def create(
         config_manager = ConfigManager(working_dir=project_dir, use_venv=use_venv)
 
         proc = await call_pip_install(
-            ["nonebot2", *context.packages],
+            ["nonebot2", *set(context.packages)],
             pip_args,
             python_path=config_manager.python_path,
         )
@@ -259,7 +341,7 @@ async def create(
                     ).prompt_async(style=CLI_DEFAULT_STYLE)
                 ]
             except CancelledError:
-                ctx.exit()
+                return
 
             try:
                 for plugin in loaded_builtin_plugins:
@@ -289,10 +371,11 @@ async def create(
         ),
         fg="green",
     )
-    click.secho(f"  {' '.join(context.packages)}", fg="green")
+    click.secho(f"  {' '.join(set(context.packages))}", fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
     click.secho("  nb run --reload", fg="green")
+    ctx.exit()
 
 
 @click.command(cls=ClickAliasedCommand, help=_("Generate entry file of your bot."))
@@ -379,3 +462,27 @@ async def run(
     else:
         proc = await run_project(exist_bot=Path(file))
         await proc.wait()
+
+
+@click.command(
+    cls=ClickAliasedCommand, help=_("Upgrade the project format of your bot.")
+)
+@run_async
+async def upgrade_format():
+    if await ConfirmPrompt(
+        _("Are you sure to upgrade the project format?"), True
+    ).prompt_async(style=CLI_DEFAULT_STYLE):
+        await upgrade_project_format()
+        click.echo(_("Successfully upgraded project format."))
+
+
+@click.command(
+    cls=ClickAliasedCommand, help=_("Downgrade the project format of your bot.")
+)
+@run_async
+async def downgrade_format():
+    if await ConfirmPrompt(
+        _("Are you sure to downgrade the project format?"), True
+    ).prompt_async(style=CLI_DEFAULT_STYLE):
+        await downgrade_project_format()
+        click.echo(_("Successfully downgraded project format."))

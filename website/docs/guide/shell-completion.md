@@ -1,10 +1,10 @@
 ---
-sidebar_position: 8
+sidebar_position: 9
 description: Shell 自动补全
 
 options:
   menu:
-    weight: 80
+    weight: 90
     category: guide
 ---
 
