@@ -49,13 +49,15 @@ async def dump_unpublished_modules(module_class: type[T], newer: list[T]) -> Non
     module_name: str = module_class.__module_name__
 
     if (path_current := CACHE_DIR / f"{module_name}.json").is_file():
-        async with await anyio.open_file(path_current) as fcurrent:
+        async with await anyio.open_file(path_current, encoding="utf-8") as fcurrent:
             current = type_validate_json(list[module_class], await fcurrent.read())
     else:
         current: list[T] = []
 
     if (path_historical := CACHE_DIR / f"{module_name}_unpublished.json").is_file():
-        async with await anyio.open_file(path_historical) as fhistorical:
+        async with await anyio.open_file(
+            path_historical, encoding="utf-8"
+        ) as fhistorical:
             historical = type_validate_json(
                 list[module_class], await fhistorical.read()
             )
