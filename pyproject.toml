@@ -1,6 +1,6 @@
 [project]
 name = "nb-cli"
-version = "1.4.2"
+version = "1.5.0"
 description = "CLI for nonebot2"
 authors = [{ name = "yanyongyu", email = "yyy@nonebot.dev" }]
 license = { text = "MIT" }
