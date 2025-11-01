@@ -370,8 +370,8 @@ class ConfigManager:
 class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
     @staticmethod
     def test_format(cfg: dict[str, Any]) -> bool:
-        return isinstance(cfg.setdefault("adapters", {}), dict) and isinstance(
-            cfg.setdefault("plugins", {}), dict
+        return isinstance(cfg.get("adapters", {}), dict) and isinstance(
+            cfg.get("plugins", {}), dict
         )
 
     def get_nonebot_config(self) -> NoneBotConfig:
@@ -447,8 +447,8 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
 class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
     @staticmethod
     def test_format(cfg: dict[str, Any]) -> bool:
-        result = isinstance(cfg.setdefault("adapters", []), list) and isinstance(
-            cfg.setdefault("plugins", []), list
+        result = isinstance(cfg.get("adapters", []), list) and isinstance(
+            cfg.get("plugins", []), list
         )
         if result:
             click.secho(
