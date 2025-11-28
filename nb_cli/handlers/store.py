@@ -2,7 +2,7 @@ import json
 import typing
 from datetime import datetime, timedelta
 from asyncio import create_task, as_completed
-from typing import TYPE_CHECKING, Union, Literal, TypeVar, overload
+from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 import anyio
 import click
@@ -104,14 +104,14 @@ if TYPE_CHECKING:
 
     async def download_module_data(
         module_type: Literal["adapter", "plugin", "driver"],
-    ) -> Union[list[Adapter], list[Plugin], list[Driver]]: ...
+    ) -> list[Adapter] | list[Plugin] | list[Driver]: ...
 
 else:
 
     @cache(ttl=None)
     async def download_module_data(
         module_type: Literal["adapter", "plugin", "driver"],
-    ) -> Union[list[Adapter], list[Plugin], list[Driver]]:
+    ) -> list[Adapter] | list[Plugin] | list[Driver]:
         if module_type == "adapter":
             module_class = Adapter
         elif module_type == "plugin":
@@ -202,7 +202,7 @@ def load_local_module_data(
     module_type: Literal["adapter", "plugin", "driver"],
     *,
     allow_expired: bool = False,
-) -> Union[list[Adapter], list[Plugin], list[Driver]]:
+) -> list[Adapter] | list[Plugin] | list[Driver]:
     if module_type == "adapter":
         module_class = Adapter
     elif module_type == "plugin":
@@ -221,7 +221,7 @@ def load_local_module_data(
             datafile.stat().st_mtime
         ) < timedelta(hours=12):
             return typing.cast(
-                Union[list[Adapter], list[Plugin], list[Driver]],
+                list[Adapter] | list[Plugin] | list[Driver],
                 type_validate_json(list[module_class], datafile.read_text("utf-8")),
             )
     except Exception as exc:
@@ -248,7 +248,7 @@ async def load_module_data(module_type: Literal["driver"]) -> list[Driver]: ...
 
 async def load_module_data(
     module_type: Literal["adapter", "plugin", "driver"],
-) -> Union[list[Adapter], list[Plugin], list[Driver]]:
+) -> list[Adapter] | list[Plugin] | list[Driver]:
     try:
         return load_local_module_data(module_type)
     except ModuleLoadFailed:  # local cache file is missing or broken

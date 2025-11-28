@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from cookiecutter.main import cookiecutter
 
@@ -14,7 +13,7 @@ TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "adapter"
 def create_adapter(
     adapter_name: str,
     output_dir: str = ".",
-    template: Optional[str] = None,
+    template: str | None = None,
 ):
     cookiecutter(
         str(TEMPLATE_ROOT.resolve()) if template is None else template,
@@ -25,7 +24,7 @@ def create_adapter(
 
 
 async def list_adapters(
-    query: Optional[str] = None, include_unpublished: bool = False
+    query: str | None = None, include_unpublished: bool = False
 ) -> list[Adapter]:
     adapters = await load_module_data("adapter")
     if include_unpublished:

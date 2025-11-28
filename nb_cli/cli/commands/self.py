@@ -1,5 +1,5 @@
 import sys
-from typing import Optional, cast
+from typing import cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
@@ -72,7 +72,7 @@ async def self(ctx: click.Context):
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def install(name: Optional[str], pip_args: Optional[list[str]]):
+async def install(name: str | None, pip_args: list[str] | None):
     if name is None:
         try:
             name = await InputPrompt(
@@ -90,7 +90,7 @@ async def install(name: Optional[str], pip_args: Optional[list[str]]):
 )
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def update(pip_args: Optional[list[str]]):
+async def update(pip_args: list[str] | None):
     proc = await call_pip_update("nb-cli", pip_args, python_path=sys.executable)
     await proc.wait()
 
@@ -103,7 +103,7 @@ async def update(pip_args: Optional[list[str]]):
 @click.argument("name", nargs=1, required=False, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
+async def uninstall(name: str | None, pip_args: list[str] | None):
     if name is None:
         try:
             name = await InputPrompt(
@@ -123,7 +123,7 @@ async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
 )
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def list_(pip_args: Optional[list[str]]):
+async def list_(pip_args: list[str] | None):
     proc = await call_pip_list(pip_args, python_path=sys.executable)
     await proc.wait()
 
