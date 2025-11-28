@@ -15,7 +15,7 @@ classifiers = [
   "Programming Language :: Python :: 3",
 ]
 
-requires-python = ">=3.9, <4.0"
+requires-python = ">=3.10, <4.0"
 dependencies = [
   "click ~=8.1",
   "httpx ~=0.18",
@@ -76,7 +76,7 @@ reportPrivateImportUsage = false
 reportShadowedImports = false
 executionEnvironments = [
   { root = "./website", pythonVersion = "3.10" },
-  { root = "./", pythonVersion = "3.9" },
+  { root = "./", pythonVersion = "3.10" },
 ]
 defineConstant = { PYDANTIC_V2 = true }
 
@@ -99,7 +99,7 @@ extend_skip = ["nb_cli/template/"]
 extend-exclude = ["nb_cli/template/"]
 
 line-length = 88
-target-version = "py39"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = [
