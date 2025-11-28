@@ -2,8 +2,8 @@ import shutil
 from statistics import median_high
 from functools import wraps, partial
 from typing_extensions import ParamSpec
-from collections.abc import Iterable, Coroutine
-from typing import Any, Union, Literal, TypeVar, Callable, Optional, Protocol
+from typing import Any, Literal, TypeVar, Protocol
+from collections.abc import Callable, Iterable, Coroutine
 
 import click
 import anyio.to_thread
@@ -35,11 +35,11 @@ CLI_DEFAULT_STYLE = Style.from_dict(
 
 
 class _ValueFilterFunction(Protocol):
-    def __call__(self, x: Union[Adapter, Plugin, Driver], *, value: str) -> bool: ...
+    def __call__(self, x: Adapter | Plugin | Driver, *, value: str) -> bool: ...
 
 
 ADVANCED_SEARCH_FILTERS_SIMPLE: dict[
-    str, Callable[[Union[Adapter, Plugin, Driver]], bool]
+    str, Callable[[Adapter | Plugin | Driver], bool]
 ] = {
     "official": lambda x: x.is_official is True,
     "passing": lambda x: (
@@ -57,9 +57,7 @@ ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
 }
 
 
-async def find_exact_package(
-    question: str, name: Optional[str], packages: list[T]
-) -> T:
+async def find_exact_package(question: str, name: str | None, packages: list[T]) -> T:
     if name is None:
         return (
             await ListPrompt(
@@ -182,8 +180,8 @@ def split_text_by_wcswidth(text: str, width: int):
 
 def format_package_results(
     hits: list[T],
-    name_column_width: Optional[int] = None,
-    terminal_width: Optional[int] = None,
+    name_column_width: int | None = None,
+    terminal_width: int | None = None,
 ) -> str:
     if not hits:
         return ""
@@ -265,7 +263,7 @@ def auto_fgcolor(
     return dark if luminance > (0.5**gamma) else light
 
 
-def _advanced_search_filter(input_: Union[str, list[str]]) -> Callable[[T], bool]:
+def _advanced_search_filter(input_: str | list[str]) -> Callable[[T], bool]:
     if isinstance(input_, str):
         if ";" in input_[:1024]:
             return lambda module: any(
@@ -319,11 +317,11 @@ def _advanced_search_filter(input_: Union[str, list[str]]) -> Callable[[T], bool
     )
 
 
-def advanced_search_filter(input_: Union[str, list[str]], module: T) -> bool:
+def advanced_search_filter(input_: str | list[str], module: T) -> bool:
     return _advanced_search_filter(input_)(module)
 
 
-def advanced_search(input_: Union[str, list[str]], source: Iterable[T]) -> list[T]:
+def advanced_search(input_: str | list[str], source: Iterable[T]) -> list[T]:
     filt = _advanced_search_filter(input_)
     return [m for m in source if filt(m)]
 

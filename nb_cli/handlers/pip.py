@@ -1,6 +1,6 @@
 import asyncio
+from typing import IO, Any
 from collections.abc import Mapping
-from typing import IO, Any, Union, Optional
 
 from .process import create_process
 from .meta import requires_pip, get_default_python
@@ -8,13 +8,13 @@ from .meta import requires_pip, get_default_python
 
 @requires_pip
 async def call_pip(
-    pip_args: Optional[list[str]] = None,
+    pip_args: list[str] | None = None,
     *,
-    python_path: Optional[str] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    python_path: str | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     if pip_args is None:
         pip_args = []
@@ -35,14 +35,14 @@ async def call_pip(
 
 @requires_pip
 async def call_pip_install(
-    package: Union[str, list[str]],
-    pip_args: Optional[list[str]] = None,
+    package: str | list[str],
+    pip_args: list[str] | None = None,
     *,
-    python_path: Optional[str] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    python_path: str | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     if isinstance(package, str):
         package = [package]
@@ -61,14 +61,14 @@ async def call_pip_install(
 
 @requires_pip
 async def call_pip_update(
-    package: Union[str, list[str]],
-    pip_args: Optional[list[str]] = None,
+    package: str | list[str],
+    pip_args: list[str] | None = None,
     *,
-    python_path: Optional[str] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    python_path: str | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     if isinstance(package, str):
         package = [package]
@@ -87,14 +87,14 @@ async def call_pip_update(
 
 @requires_pip
 async def call_pip_uninstall(
-    package: Union[str, list[str]],
-    pip_args: Optional[list[str]] = None,
+    package: str | list[str],
+    pip_args: list[str] | None = None,
     *,
-    python_path: Optional[str] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    python_path: str | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     if isinstance(package, str):
         package = [package]
@@ -113,13 +113,13 @@ async def call_pip_uninstall(
 
 @requires_pip
 async def call_pip_list(
-    pip_args: Optional[list[str]] = None,
+    pip_args: list[str] | None = None,
     *,
-    python_path: Optional[str] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    python_path: str | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     if pip_args is None:
         pip_args = []

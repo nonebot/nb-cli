@@ -2,9 +2,9 @@ import json
 import asyncio
 from pathlib import Path
 from functools import wraps
-from collections.abc import Coroutine
 from typing_extensions import ParamSpec
-from typing import TYPE_CHECKING, Any, Union, TypeVar, Callable, Optional, cast
+from collections.abc import Callable, Coroutine
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from nb_cli import _, cache
 from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
@@ -37,11 +37,11 @@ def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
 
 
-def get_nonebot_config() -> Union[NoneBotConfig, LegacyNoneBotConfig]:
+def get_nonebot_config() -> NoneBotConfig | LegacyNoneBotConfig:
     return GLOBAL_CONFIG.get_nonebot_config()
 
 
-def get_project_root(cwd: Optional[Path] = None) -> Path:
+def get_project_root(cwd: Path | None = None) -> Path:
     config = ConfigManager(working_dir=cwd) if cwd is not None else GLOBAL_CONFIG
     return config.project_root
 
@@ -51,7 +51,7 @@ def requires_project_root(
 ) -> Callable[P, Coroutine[Any, Any, R]]:
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        get_project_root(cast(Optional[Path], kwargs.get("cwd")))
+        get_project_root(cast(Path | None, kwargs.get("cwd")))
         return await func(*args, **kwargs)
 
     return wrapper
@@ -89,7 +89,7 @@ else:
         )
 
 
-async def get_default_python(cwd: Optional[Path] = None) -> str:
+async def get_default_python(cwd: Path | None = None) -> str:
     config = ConfigManager(working_dir=cwd) if cwd is not None else GLOBAL_CONFIG
     if config.python_path is not None:
         return config.python_path
@@ -100,14 +100,14 @@ async def get_default_python(cwd: Optional[Path] = None) -> str:
 if TYPE_CHECKING:
 
     async def get_python_version(
-        python_path: Optional[str] = None, cwd: Optional[Path] = None
+        python_path: str | None = None, cwd: Path | None = None
     ) -> dict[str, int]: ...
 
 else:
 
     @cache(ttl=None)
     async def get_python_version(
-        python_path: Optional[str] = None, cwd: Optional[Path] = None
+        python_path: str | None = None, cwd: Path | None = None
     ) -> dict[str, int]:
         if python_path is None:
             python_path = await get_default_python(cwd)
@@ -145,8 +145,8 @@ def requires_python(
     @wraps(func)
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         version = await get_python_version(
-            cast(Optional[str], kwargs.get("python_path")),
-            cast(Optional[Path], kwargs.get("cwd")),
+            cast(str | None, kwargs.get("python_path")),
+            cast(Path | None, kwargs.get("cwd")),
         )
         if (version["major"], version["minor"]) >= REQUIRES_PYTHON:
             return await func(*args, **kwargs)
@@ -163,14 +163,14 @@ def requires_python(
 if TYPE_CHECKING:
 
     async def get_nonebot_version(
-        python_path: Optional[str] = None, cwd: Optional[Path] = None
+        python_path: str | None = None, cwd: Path | None = None
     ) -> str: ...
 
 else:
 
     @cache(ttl=None)
     async def get_nonebot_version(
-        python_path: Optional[str] = None, cwd: Optional[Path] = None
+        python_path: str | None = None, cwd: Path | None = None
     ) -> str:
         if python_path is None:
             python_path = await get_default_python(cwd)
@@ -209,8 +209,8 @@ def requires_nonebot(
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         if await get_nonebot_version(
-            cast(Optional[str], kwargs.get("python_path")),
-            cast(Optional[Path], kwargs.get("cwd")),
+            cast(str | None, kwargs.get("python_path")),
+            cast(Path | None, kwargs.get("cwd")),
         ):
             return await func(*args, **kwargs)
 
@@ -222,14 +222,14 @@ def requires_nonebot(
 if TYPE_CHECKING:
 
     async def get_pip_version(
-        python_path: Optional[str] = None, cwd: Optional[Path] = None
+        python_path: str | None = None, cwd: Path | None = None
     ) -> str: ...
 
 else:
 
     @cache(ttl=None)
     async def get_pip_version(
-        python_path: Optional[str] = None, cwd: Optional[Path] = None
+        python_path: str | None = None, cwd: Path | None = None
     ) -> str:
         if python_path is None:
             python_path = await get_default_python(cwd)
@@ -268,8 +268,8 @@ def requires_pip(
     @requires_python
     async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         if await get_pip_version(
-            cast(Optional[str], kwargs.get("python_path")),
-            cast(Optional[Path], kwargs.get("cwd")),
+            cast(str | None, kwargs.get("python_path")),
+            cast(Path | None, kwargs.get("cwd")),
         ):
             return await func(*args, **kwargs)
 

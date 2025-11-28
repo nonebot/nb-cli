@@ -2,10 +2,10 @@ import re
 import sys
 import json
 import shlex
+from typing import Any
 from pathlib import Path
 from logging import Logger
 from functools import partial
-from typing import Any, Optional
 from dataclasses import field, dataclass
 
 import click
@@ -51,8 +51,7 @@ TEMPLATE_DESCRIPTION = {
     "simple": _("simple (for plugin developer)"),
 }
 
-if sys.version_info >= (3, 10):
-    BLACKLISTED_PROJECT_NAME.update(sys.stdlib_module_names)
+BLACKLISTED_PROJECT_NAME.update(sys.stdlib_module_names)
 
 
 @dataclass
@@ -258,10 +257,10 @@ TEMPLATE_PROMPTS = {
 @run_async
 async def create(
     ctx: click.Context,
-    output_dir: Optional[str],
-    template: Optional[str],
-    python_interpreter: Optional[str],
-    pip_args: Optional[list[str]],
+    output_dir: str | None,
+    template: str | None,
+    python_interpreter: str | None,
+    pip_args: list[str] | None,
 ):
     if not template:
         templates = list_project_templates()
@@ -438,9 +437,9 @@ async def generate(file: str):
 async def run(
     file: str,
     reload: bool,
-    reload_dirs: Optional[list[str]],
-    reload_includes: Optional[list[str]],
-    reload_excludes: Optional[list[str]],
+    reload_dirs: list[str] | None,
+    reload_includes: list[str] | None,
+    reload_excludes: list[str] | None,
     reload_delay: float,
 ):
     if reload:

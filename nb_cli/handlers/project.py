@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
+from typing import IO, Any, TypeVar
 from collections.abc import Iterable
-from typing import IO, Any, Union, TypeVar, Optional
 
 import click
 from cookiecutter.main import cookiecutter
@@ -39,8 +39,8 @@ def list_project_templates() -> list[str]:
 
 def create_project(
     project_template: str,
-    context: Optional[dict[str, Any]] = None,
-    output_dir: Optional[str] = None,
+    context: dict[str, Any] | None = None,
+    output_dir: str | None = None,
     no_input: bool = True,
 ) -> None:
     path = TEMPLATE_ROOT / project_template
@@ -55,8 +55,8 @@ def create_project(
 
 
 async def generate_run_script(
-    adapters: Optional[list[SimpleInfo]] = None,
-    builtin_plugins: Optional[list[str]] = None,
+    adapters: list[SimpleInfo] | None = None,
+    builtin_plugins: list[str] | None = None,
 ) -> str:
     # only read global config when no data provided
     if adapters is None or builtin_plugins is None:
@@ -73,15 +73,15 @@ async def generate_run_script(
 @requires_project_root
 @requires_nonebot
 async def run_project(
-    adapters: Optional[list[SimpleInfo]] = None,
-    builtin_plugins: Optional[list[str]] = None,
+    adapters: list[SimpleInfo] | None = None,
+    builtin_plugins: list[str] | None = None,
     exist_bot: Path = Path("bot.py"),
     *,
-    python_path: Optional[str] = None,
-    cwd: Optional[Path] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
+    python_path: str | None = None,
+    cwd: Path | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
 ) -> asyncio.subprocess.Process:
     # only read global config when no data provided
     if adapters is None or builtin_plugins is None:

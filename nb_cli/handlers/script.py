@@ -1,7 +1,7 @@
 import json
 import asyncio
 from pathlib import Path
-from typing import IO, Any, Union, Optional
+from typing import IO, Any
 
 from nb_cli.config import SimpleInfo
 
@@ -20,7 +20,7 @@ from .meta import (
 @requires_project_root
 @requires_python
 async def list_scripts(
-    *, python_path: Optional[str] = None, cwd: Optional[Path] = None
+    *, python_path: str | None = None, cwd: Path | None = None
 ) -> list[str]:
     if python_path is None:
         python_path = await get_default_python(cwd)
@@ -42,15 +42,15 @@ async def list_scripts(
 @requires_nonebot
 async def run_script(
     script_name: str,
-    script_args: Optional[list[str]] = None,
-    adapters: Optional[list[SimpleInfo]] = None,
-    builtin_plugins: Optional[list[str]] = None,
+    script_args: list[str] | None = None,
+    adapters: list[SimpleInfo] | None = None,
+    builtin_plugins: list[str] | None = None,
     *,
-    python_path: Optional[str] = None,
-    cwd: Optional[Path] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
+    python_path: str | None = None,
+    cwd: Path | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
 ) -> asyncio.subprocess.Process:
     if script_args is None:
         script_args = []

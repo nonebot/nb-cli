@@ -1,5 +1,5 @@
+from typing import cast
 from pathlib import Path
-from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, ConfirmPrompt, CancelledError
@@ -33,14 +33,12 @@ def back_():
 
 
 def _set_global_working_dir(
-    ctx: click.Context, param: click.Option, value: Optional[Path]
+    ctx: click.Context, param: click.Option, value: Path | None
 ):
     ConfigManager._global_working_dir = value
 
 
-def _set_global_python_path(
-    ctx: click.Context, param: click.Option, value: Optional[str]
-):
+def _set_global_python_path(ctx: click.Context, param: click.Option, value: str | None):
     ConfigManager._global_python_path = value
 
 

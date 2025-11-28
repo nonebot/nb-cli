@@ -1,6 +1,6 @@
 import os
 import asyncio
-from typing import Final, Union, Generic, TypeVar, Optional
+from typing import Final, Generic, TypeVar
 
 import textual
 from textual import markup
@@ -20,12 +20,12 @@ from nb_cli.config.model import Tag, Driver, Plugin, Adapter
 CARD_WIDTH = 49
 CARD_HEIGHT = 6
 
-_test_valid_style_mapping: dict[Optional[bool], str] = {
+_test_valid_style_mapping: dict[bool | None, str] = {
     None: "blue",
     True: "green",
     False: "red",
 }
-_test_valid_state_names: dict[Optional[bool], str] = {
+_test_valid_state_names: dict[bool | None, str] = {
     None: _("Unknown state"),
     True: _("Plugin test passed"),
     False: _("Plugin test failed"),
@@ -41,7 +41,7 @@ def _create_tag(*tags: Tag) -> str:
     )
 
 
-def _create_status_bar(data: Union[Adapter, Driver, Plugin]) -> str:
+def _create_status_bar(data: Adapter | Driver | Plugin) -> str:
     buf: list[str] = []
     if data.is_official:
         buf.append("[green]✦[/]")
@@ -51,7 +51,7 @@ def _create_status_bar(data: Union[Adapter, Driver, Plugin]) -> str:
     return " ".join(buf)
 
 
-def _create_valid_state(data: Union[Adapter, Driver, Plugin]) -> str:
+def _create_valid_state(data: Adapter | Driver | Plugin) -> str:
     if not isinstance(data, Plugin):
         return ""
     if data.skip_test:
@@ -134,7 +134,7 @@ class CardPopup(ModalScreen, Generic[T_module]):
         }
     }
     """
-    data: reactive[Optional[T_module]] = reactive(None, init=False, recompose=True)
+    data: reactive[T_module | None] = reactive(None, init=False, recompose=True)
 
     def compose(self) -> ComposeResult:
         with Grid(id="card-content", classes="-dark"):
@@ -252,7 +252,7 @@ class Card(Static, Generic[T_module]):
         border: round #ea5252;
     }
     """
-    data: reactive[Optional[T_module]] = reactive(None, init=False)
+    data: reactive[T_module | None] = reactive(None, init=False)
 
     def render(self):
         desc = (

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import virtualenv
 
@@ -8,16 +7,16 @@ from nb_cli.config import ConfigManager
 from .meta import requires_python, get_default_python
 
 
-def detect_virtualenv(cwd: Optional[Path] = None) -> Optional[str]:
+def detect_virtualenv(cwd: Path | None = None) -> str | None:
     return ConfigManager._detect_virtual_env(cwd)
 
 
 @requires_python
 async def create_virtualenv(
     venv_dir: Path,
-    prompt: Optional[str] = None,
+    prompt: str | None = None,
     *,
-    python_path: Optional[str] = None,
+    python_path: str | None = None,
 ):
     if python_path is None:
         python_path = await get_default_python()

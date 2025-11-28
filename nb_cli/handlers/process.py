@@ -4,10 +4,10 @@ import asyncio
 import subprocess
 from pathlib import Path
 from functools import wraps
+from typing import IO, Any, Union
 from contextlib import nullcontext
 from typing_extensions import ParamSpec
-from collections.abc import Mapping, Coroutine
-from typing import IO, Any, Union, Callable, Optional
+from collections.abc import Mapping, Callable, Coroutine
 
 from nb_cli.consts import WINDOWS
 
@@ -57,11 +57,11 @@ def ensure_process_terminated(
 @ensure_process_terminated
 async def create_process(
     *args: Union[str, bytes, "os.PathLike[str]", "os.PathLike[bytes]"],
-    cwd: Optional[Path] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    cwd: Path | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     return await asyncio.create_subprocess_exec(
         *args,
@@ -76,12 +76,12 @@ async def create_process(
 
 @ensure_process_terminated
 async def create_process_shell(
-    command: Union[str, bytes],
-    cwd: Optional[Path] = None,
-    stdin: Optional[Union[IO[Any], int]] = None,
-    stdout: Optional[Union[IO[Any], int]] = None,
-    stderr: Optional[Union[IO[Any], int]] = None,
-    env: Optional[Mapping[str, str]] = None,
+    command: str | bytes,
+    cwd: Path | None = None,
+    stdin: IO[Any] | int | None = None,
+    stdout: IO[Any] | int | None = None,
+    stderr: IO[Any] | int | None = None,
+    env: Mapping[str, str] | None = None,
 ) -> asyncio.subprocess.Process:
     return await asyncio.create_subprocess_shell(
         command,

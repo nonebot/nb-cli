@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
@@ -103,7 +103,7 @@ async def list_(include_unpublished: bool = False):
 )
 @click.argument("name", nargs=1, default=None)
 @run_async
-async def search(name: Optional[str], include_unpublished: bool = False):
+async def search(name: str | None, include_unpublished: bool = False):
     if name is None:
         name = await InputPrompt(_("Driver name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
@@ -130,8 +130,8 @@ async def search(name: Optional[str], include_unpublished: bool = False):
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def install(
-    name: Optional[str],
-    pip_args: Optional[list[str]],
+    name: str | None,
+    pip_args: list[str] | None,
     include_unpublished: bool = False,
 ):
     try:
@@ -187,8 +187,8 @@ async def install(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(
-    name: Optional[str],
-    pip_args: Optional[list[str]],
+    name: str | None,
+    pip_args: list[str] | None,
     include_unpublished: bool = False,
 ):
     try:
@@ -238,7 +238,7 @@ async def update(
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
+async def uninstall(name: str | None, pip_args: list[str] | None):
     try:
         driver = await find_exact_package(
             _("Driver name to uninstall:"),

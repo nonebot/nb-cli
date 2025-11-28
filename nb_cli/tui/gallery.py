@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Generic, TypeVar, ClassVar, Optional
+from typing import Generic, TypeVar, ClassVar
 
 from textual.timer import Timer
 from textual.reactive import var
@@ -50,7 +50,7 @@ class Gallery(App, Generic[T_module]):
     cards: var[list[Card[T_module]]] = var(list)
     query_open: var[bool] = var(False)
     query_filter: var[str] = var("", always_update=True)
-    query_debounce: Optional[Timer] = None
+    query_debounce: Timer | None = None
 
     def compose(self) -> ComposeResult:
         yield Header()

@@ -1,5 +1,5 @@
+from typing import cast
 from pathlib import Path
-from typing import Optional, cast
 
 import click
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
@@ -105,7 +105,7 @@ async def list_(include_unpublished: bool = False):
 )
 @click.argument("name", nargs=1, default=None)
 @run_async
-async def search(name: Optional[str], include_unpublished: bool = False):
+async def search(name: str | None, include_unpublished: bool = False):
     if name is None:
         name = await InputPrompt(_("Adapter name to search:")).prompt_async(
             style=CLI_DEFAULT_STYLE
@@ -138,8 +138,8 @@ async def search(name: Optional[str], include_unpublished: bool = False):
 async def install(
     ctx: click.Context,
     no_restrict_version: bool,
-    name: Optional[str],
-    pip_args: Optional[list[str]],
+    name: str | None,
+    pip_args: list[str] | None,
     include_unpublished: bool = False,
 ):
     try:
@@ -208,8 +208,8 @@ async def install(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def update(
-    name: Optional[str],
-    pip_args: Optional[list[str]],
+    name: str | None,
+    pip_args: list[str] | None,
     include_unpublished: bool = False,
 ):
     try:
@@ -258,7 +258,7 @@ async def update(
 @click.argument("name", nargs=1, default=None)
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
-async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
+async def uninstall(name: str | None, pip_args: list[str] | None):
     try:
         adapter = await find_exact_package(
             _("Adapter name to uninstall:"),
@@ -300,9 +300,9 @@ async def uninstall(name: Optional[str], pip_args: Optional[list[str]]):
 @run_async
 async def create(
     ctx: click.Context,
-    name: Optional[str],
-    output_dir: Optional[str],
-    template: Optional[str],
+    name: str | None,
+    output_dir: str | None,
+    template: str | None,
 ):
     if name is None:
         try:

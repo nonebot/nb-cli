@@ -2,12 +2,11 @@ import locale
 import gettext
 import contextlib
 from pathlib import Path
-from typing import Optional
 
 from .consts import WINDOWS
 
 
-def _get_win_locale_with_ctypes() -> Optional[str]:
+def _get_win_locale_with_ctypes() -> str | None:
     import ctypes
 
     kernel32 = ctypes.windll.kernel32
@@ -15,7 +14,7 @@ def _get_win_locale_with_ctypes() -> Optional[str]:
     return locale.windows_locale.get(lcid)
 
 
-def _get_win_locale_from_registry() -> Optional[str]:
+def _get_win_locale_from_registry() -> str | None:
     import winreg
 
     with contextlib.suppress(Exception):
@@ -34,12 +33,12 @@ if WINDOWS:
     except ImportError:
         _get_win_locale = _get_win_locale_from_registry
 
-    def get_locale() -> Optional[str]:
+    def get_locale() -> str | None:
         return _get_win_locale()
 
 else:
 
-    def get_locale() -> Optional[str]:
+    def get_locale() -> str | None:
         return locale.getlocale(locale.LC_MESSAGES)[0]
 
 

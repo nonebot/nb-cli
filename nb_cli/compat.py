@@ -3,9 +3,9 @@
 为兼容 Pydantic V1 与 V2 版本，定义了一系列兼容函数与类供使用。
 """
 
+from typing_extensions import Self
 from dataclasses import dataclass, is_dataclass
-from typing import Any, Union, TypeVar, Optional, Annotated
-from typing_extensions import Self, get_args, get_origin, is_typeddict
+from typing import Any, TypeVar, Annotated, get_args, get_origin, is_typeddict
 
 from pydantic import VERSION, BaseModel
 
@@ -31,7 +31,7 @@ __all__ = (
 )
 
 
-def origin_is_annotated(origin: Optional[type[Any]]) -> bool:
+def origin_is_annotated(origin: type[Any] | None) -> bool:
     """判断是否是 Annotated 类型"""
     return origin is Annotated
 
@@ -93,7 +93,7 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
 
         @classmethod
         def construct(
-            cls, name: str, annotation: Any, field_info: Optional[FieldInfo] = None
+            cls, name: str, annotation: Any, field_info: FieldInfo | None = None
         ) -> Self:
             """Construct a ModelField from given infos."""
             return cls._construct(name, annotation, field_info or FieldInfo())
@@ -138,7 +138,7 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
         return kwargs
 
     def model_field_validate(
-        model_field: ModelField, value: Any, config: Optional[ConfigDict] = None
+        model_field: ModelField, value: Any, config: ConfigDict | None = None
     ) -> Any:
         """Validate the value pass to the field."""
         type: Any = Annotated[model_field.annotation, model_field.field_info]
@@ -164,8 +164,8 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
 
     def model_dump(
         model: BaseModel,
-        include: Optional[set[str]] = None,
-        exclude: Optional[set[str]] = None,
+        include: set[str] | None = None,
+        exclude: set[str] | None = None,
         by_alias: bool = False,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
@@ -184,7 +184,7 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
         """Validate data with given type."""
         return TypeAdapter(type_).validate_python(data)
 
-    def type_validate_json(type_: type[T], data: Union[str, bytes]) -> T:
+    def type_validate_json(type_: type[T], data: str | bytes) -> T:
         """Validate JSON with given type."""
         return TypeAdapter(type_).validate_json(data)
 
@@ -244,7 +244,7 @@ else:  # pragma: pydantic-v1
 
         @classmethod
         def construct(
-            cls, name: str, annotation: Any, field_info: Optional[FieldInfo] = None
+            cls, name: str, annotation: Any, field_info: FieldInfo | None = None
         ) -> Self:
             """Construct a ModelField from given infos.
 
@@ -266,7 +266,7 @@ else:  # pragma: pydantic-v1
         return kwargs
 
     def model_field_validate(
-        model_field: ModelField, value: Any, config: Optional[type[ConfigDict]] = None
+        model_field: ModelField, value: Any, config: type[ConfigDict] | None = None
     ) -> Any:
         """Validate the value pass to the field.
 
@@ -302,8 +302,8 @@ else:  # pragma: pydantic-v1
 
     def model_dump(
         model: BaseModel,
-        include: Optional[set[str]] = None,
-        exclude: Optional[set[str]] = None,
+        include: set[str] | None = None,
+        exclude: set[str] | None = None,
         by_alias: bool = False,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
@@ -322,6 +322,6 @@ else:  # pragma: pydantic-v1
         """Validate data with given type."""
         return parse_obj_as(type_, data)
 
-    def type_validate_json(type_: type[T], data: Union[str, bytes]) -> T:
+    def type_validate_json(type_: type[T], data: str | bytes) -> T:
         """Validate JSON with given type."""
         return parse_raw_as(type_, data)

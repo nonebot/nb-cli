@@ -2,9 +2,8 @@ import signal
 import asyncio
 import threading
 from types import FrameType
-from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Callable, Optional
+from collections.abc import Callable, Generator
 
 from nb_cli.consts import WINDOWS
 
@@ -15,7 +14,7 @@ HANDLED_SIGNALS = (
 if WINDOWS:
     HANDLED_SIGNALS += (signal.SIGBREAK,)  # Windows signal 21. Sent by Ctrl+Break.
 
-handlers: list[Callable[[int, Optional[FrameType]], None]] = []
+handlers: list[Callable[[int, FrameType | None], None]] = []
 
 
 class _ShieldContext:
@@ -51,7 +50,7 @@ def install_signal_handler() -> None:
             signal.signal(sig, handle_signal)
 
 
-def handle_signal(signum: int, frame: Optional[FrameType]) -> None:
+def handle_signal(signum: int, frame: FrameType | None) -> None:
     if shield_context.active():
         return
 
@@ -60,12 +59,12 @@ def handle_signal(signum: int, frame: Optional[FrameType]) -> None:
 
 
 def register_signal_handler(
-    handler: Callable[[int, Optional[FrameType]], None],
+    handler: Callable[[int, FrameType | None], None],
 ) -> None:
     handlers.append(handler)
 
 
-def remove_signal_handler(handler: Callable[[int, Optional[FrameType]], None]) -> None:
+def remove_signal_handler(handler: Callable[[int, FrameType | None], None]) -> None:
     handlers.remove(handler)
 
 
