@@ -4,13 +4,19 @@ from pathlib import Path
 
 from cookiecutter.main import cookiecutter
 
-from nb_cli.config import Plugin
 from nb_cli.compat import model_dump
+from nb_cli.exceptions import ProjectInvalidError
+from nb_cli.config import Plugin, NoneBotConfig, LegacyNoneBotConfig
 
 from . import templates
 from .process import create_process
-from .meta import requires_nonebot, get_default_python
 from .store import load_module_data, load_unpublished_modules
+from .meta import (
+    requires_nonebot,
+    get_default_python,
+    get_nonebot_config,
+    requires_project_root,
+)
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 
@@ -67,3 +73,32 @@ async def list_plugins(
             ).values()
         )
     ]
+
+
+@requires_project_root
+async def list_installed_plugins(*, cwd: Path | None = None) -> list[Plugin]:
+    config_data = get_nonebot_config(cwd)
+    plugins = await load_module_data("plugin") + await load_unpublished_modules(Plugin)
+
+    result: list[Plugin] = []
+
+    if isinstance(config_data, NoneBotConfig):
+        plugin_info = config_data.plugins
+        allowed_plugins = {
+            (pkg_name, module_name)
+            for pkg_name, module_names in plugin_info.items()
+            for module_name in module_names
+        }
+        for plugin in plugins:
+            if (plugin.project_link, plugin.module_name) in allowed_plugins:
+                result.append(plugin)
+    elif isinstance(config_data, LegacyNoneBotConfig):
+        plugin_info = config_data.plugins
+        allowed_plugins = set(plugin_info)
+        for plugin in plugins:
+            if plugin.module_name in allowed_plugins:
+                result.append(plugin)
+    else:
+        raise ProjectInvalidError("Invalid config data type")
+
+    return result
