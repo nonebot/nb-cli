@@ -49,7 +49,7 @@ dev = [
   "nonemoji ~=0.1",
   "pre-commit ~=3.1",
 ]
-docs = ["nb-autodoc >=1.0.0a5"]
+docs = ["nb-autodoc >=1.0.3"]
 
 [tool.pdm.scripts]
 autodoc = { shell = "rm -rf ./website/docs/api/* && nb-autodoc nb_cli -s nb_cli.template && cp -r ./build/nb_cli/* ./website/docs/api/" }
