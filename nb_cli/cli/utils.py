@@ -14,6 +14,7 @@ from noneprompt import Choice, ListPrompt
 
 from nb_cli import _
 from nb_cli.config import Driver, Plugin, Adapter
+from nb_cli.exceptions import NoSelectablePackageError
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 P = ParamSpec("P")
@@ -59,6 +60,8 @@ ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
 
 async def find_exact_package(question: str, name: str | None, packages: list[T]) -> T:
     if name is None:
+        if not packages:
+            raise NoSelectablePackageError("No packages available to select.")
         return (
             await ListPrompt(
                 question,

@@ -24,3 +24,7 @@ class ProjectInvalidError(RuntimeError):
 
 class LocalCacheExpired(RuntimeError):
     """Raised when local metadata cache is outdated."""
+
+
+class NoSelectablePackageError(RuntimeError):
+    """Raised when there is no selectable package."""

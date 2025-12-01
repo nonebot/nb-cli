@@ -77,12 +77,14 @@ from .signal import register_signal_handler as register_signal_handler
 from .plugin import list_plugins as list_plugins
 from .plugin import create_plugin as create_plugin
 from .plugin import list_builtin_plugins as list_builtin_plugins
+from .plugin import list_installed_plugins as list_installed_plugins
 
 # isort: split
 
 # adapter
 from .adapter import list_adapters as list_adapters
 from .adapter import create_adapter as create_adapter
+from .adapter import list_installed_adapters as list_installed_adapters
 
 # isort: split
 

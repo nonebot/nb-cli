@@ -6,6 +6,7 @@ from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
+from nb_cli.exceptions import NoSelectablePackageError
 from nb_cli.cli.utils import find_exact_package, format_package_results
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
@@ -21,6 +22,7 @@ from nb_cli.handlers import (
     call_pip_update,
     call_pip_install,
     call_pip_uninstall,
+    list_installed_adapters,
 )
 
 
@@ -81,6 +83,13 @@ async def store():
     name="list", help=_("List nonebot adapters published on nonebot homepage.")
 )
 @click.option(
+    "--installed",
+    is_flag=True,
+    default=False,
+    flag_value=True,
+    help=_("Whether to list installed adapters only in current project."),
+)
+@click.option(
     "--include-unpublished",
     is_flag=True,
     default=False,
@@ -88,8 +97,12 @@ async def store():
     help=_("Whether to include unpublished adapters."),
 )
 @run_async
-async def list_(include_unpublished: bool = False):
-    adapters = await list_adapters(include_unpublished=include_unpublished)
+async def list_(installed: bool = False, include_unpublished: bool = False):
+    adapters = (
+        await list_installed_adapters()
+        if installed
+        else await list_adapters(include_unpublished=include_unpublished)
+    )
     if include_unpublished:
         click.secho(_("WARNING: Unpublished adapters may be included."), fg="yellow")
     click.echo(format_package_results(adapters))
@@ -143,12 +156,22 @@ async def install(
     include_unpublished: bool = False,
 ):
     try:
+        _installed = {
+            (a.project_link, a.module_name) for a in await list_installed_adapters()
+        }
         adapter = await find_exact_package(
             _("Adapter name to install:"),
             name,
-            await list_adapters(include_unpublished=include_unpublished),
+            [
+                a
+                for a in await list_adapters(include_unpublished=include_unpublished)
+                if (a.project_link, a.module_name) not in _installed
+            ],
         )
     except CancelledError:
+        return
+    except NoSelectablePackageError:
+        click.echo(_("No available adapter found to install."))
         return
 
     if include_unpublished:
@@ -216,9 +239,12 @@ async def update(
         adapter = await find_exact_package(
             _("Adapter name to update:"),
             name,
-            await list_adapters(include_unpublished=include_unpublished),
+            await list_installed_adapters(),
         )
     except CancelledError:
+        return
+    except NoSelectablePackageError:
+        click.echo(_("No installed adapter found to update."))
         return
 
     if include_unpublished:
@@ -263,11 +289,12 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         adapter = await find_exact_package(
             _("Adapter name to uninstall:"),
             name,
-            await list_adapters(
-                include_unpublished=True  # unpublished modules are always removable
-            ),
+            await list_installed_adapters(),
         )
     except CancelledError:
+        return
+    except NoSelectablePackageError:
+        click.echo(_("No installed adapter found to uninstall."))
         return
 
     try:
