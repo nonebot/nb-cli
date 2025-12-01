@@ -19,22 +19,24 @@ from nb_cli.config import (
 from . import templates
 from .process import create_process, create_process_shell
 
-try:
-    from pyfiglet import figlet_format
-except ModuleNotFoundError as e:
-    if e.name == "pkg_resources":
-        raise ModuleNotFoundError("Please install setuptools to use pyfiglet") from e
-    raise
-
 R = TypeVar("R")
 P = ParamSpec("P")
 
 DEFAULT_PYTHON = ("python3", "python")
 WINDOWS_DEFAULT_PYTHON = ("python",)
 
+_LOGO = """
+d8b   db  .d88b.  d8b   db d88888b d8888b.  .d88b.  d888888b
+888o  88 .8P  Y8. 888o  88 88'     88  `8D .8P  Y8. `~~88~~'
+88V8o 88 88    88 88V8o 88 88ooooo 88oooY' 88    88    88
+88 V8o88 88    88 88 V8o88 88~~~~~ 88~~~b. 88    88    88
+88  V888 `8b  d8' 88  V888 88.     88   8D `8b  d8'    88
+VP   V8P  `Y88P'  VP   V8P Y88888P Y8888P'  `Y88P'     YP
+"""
+
 
 def draw_logo() -> str:
-    return figlet_format("NoneBot", font="basic").strip()
+    return _LOGO.strip()
 
 
 def get_config_manager(cwd: Path | None = None) -> ConfigManager:
