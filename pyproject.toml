@@ -28,7 +28,6 @@ dependencies = [
   "virtualenv ~=20.21",
   "cashews >=6.0, <8.0",
   "typing-extensions ~=4.4",
-  "pyfiglet >=1.0.1, <2.0.0",
   "noneprompt >=0.1.10, <1.0.0",
   "pydantic >=1.10.0, <3.0.0, !=2.5.0, !=2.5.1",
   "nonestorage>=0.1.0",
