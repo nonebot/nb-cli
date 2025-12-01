@@ -87,7 +87,7 @@ async def store():
     is_flag=True,
     default=False,
     flag_value=True,
-    help=_("Whether to list installed plugins in current project."),
+    help=_("Whether to list installed plugins only in current project."),
 )
 @click.option(
     "--include-unpublished",

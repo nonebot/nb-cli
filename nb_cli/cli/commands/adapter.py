@@ -87,7 +87,7 @@ async def store():
     is_flag=True,
     default=False,
     flag_value=True,
-    help=_("Whether to list only installed adapters."),
+    help=_("Whether to list installed adapters only in current project."),
 )
 @click.option(
     "--include-unpublished",
