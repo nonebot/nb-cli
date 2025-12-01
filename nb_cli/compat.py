@@ -56,7 +56,7 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
     DEFAULT_CONFIG = ConfigDict(extra="allow", arbitrary_types_allowed=True)
     """Default config for validations"""
 
-    class FieldInfo(BaseFieldInfo):
+    class FieldInfo(BaseFieldInfo):  # pyright: ignore[reportGeneralTypeIssues]
         """FieldInfo class with extra property for compatibility with pydantic v1"""
 
         # make default can be positional argument
