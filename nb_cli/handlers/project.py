@@ -8,7 +8,6 @@ from cookiecutter.main import cookiecutter
 
 from nb_cli import _
 from nb_cli.config import (
-    GLOBAL_CONFIG,
     SimpleInfo,
     PackageInfo,
     NoneBotConfig,
@@ -23,6 +22,7 @@ from .process import create_process
 from .meta import (
     get_project_root,
     requires_nonebot,
+    get_config_manager,
     get_default_python,
     get_nonebot_config,
     requires_project_root,
@@ -127,8 +127,8 @@ def _index_by_module_name(data: Iterable[T_info]) -> dict[str, T_info]:
 
 
 @requires_project_root
-async def upgrade_project_format() -> None:
-    bot_config = get_nonebot_config()
+async def upgrade_project_format(*, cwd: Path | None = None) -> None:
+    bot_config = get_nonebot_config(cwd)
     if isinstance(bot_config, NoneBotConfig):
         click.echo(_("Current format is already the new format."))
         return
@@ -178,13 +178,14 @@ async def upgrade_project_format() -> None:
         builtin_plugins=bot_config.builtin_plugins,
     )
 
-    GLOBAL_CONFIG.update_nonebot_config(new_config)
-    GLOBAL_CONFIG.update_dependency(nonebot_pkg, *packages)
+    manager = get_config_manager(cwd)
+    manager.update_nonebot_config(new_config)
+    manager.update_dependency(nonebot_pkg, *packages)
 
 
 @requires_project_root
-async def downgrade_project_format() -> None:
-    bot_config = get_nonebot_config()
+async def downgrade_project_format(*, cwd: Path | None = None) -> None:
+    bot_config = get_nonebot_config(cwd)
     if isinstance(bot_config, LegacyNoneBotConfig):
         click.echo(_("Current format is already the old format."))
         return
@@ -196,4 +197,5 @@ async def downgrade_project_format() -> None:
         builtin_plugins=bot_config.builtin_plugins,
     )
 
-    GLOBAL_CONFIG.update_nonebot_config(old_config)
+    manager = get_config_manager(cwd)
+    manager.update_nonebot_config(old_config)

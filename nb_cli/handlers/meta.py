@@ -37,12 +37,17 @@ def draw_logo() -> str:
     return figlet_format("NoneBot", font="basic").strip()
 
 
-def get_nonebot_config() -> NoneBotConfig | LegacyNoneBotConfig:
-    return GLOBAL_CONFIG.get_nonebot_config()
+def get_config_manager(cwd: Path | None = None) -> ConfigManager:
+    return ConfigManager(working_dir=cwd) if cwd is not None else GLOBAL_CONFIG
+
+
+def get_nonebot_config(cwd: Path | None = None) -> NoneBotConfig | LegacyNoneBotConfig:
+    config = get_config_manager(cwd)
+    return config.get_nonebot_config()
 
 
 def get_project_root(cwd: Path | None = None) -> Path:
-    config = ConfigManager(working_dir=cwd) if cwd is not None else GLOBAL_CONFIG
+    config = get_config_manager(cwd)
     return config.project_root
 
 
@@ -90,7 +95,7 @@ else:
 
 
 async def get_default_python(cwd: Path | None = None) -> str:
-    config = ConfigManager(working_dir=cwd) if cwd is not None else GLOBAL_CONFIG
+    config = get_config_manager(cwd)
     if config.python_path is not None:
         return config.python_path
 
