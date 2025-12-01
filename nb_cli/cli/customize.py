@@ -1,4 +1,3 @@
-from typing import Optional
 from functools import partial
 from collections import Counter
 
@@ -14,7 +13,7 @@ from .utils import run_async
 class ClickAliasedCommand(click.Command):
     def __init__(self, *args, **kwargs) -> None:
         aliases = kwargs.pop("aliases", None)
-        self._aliases: Optional[list[str]] = aliases
+        self._aliases: list[str] | None = aliases
         super().__init__(*args, **kwargs)
 
 
@@ -29,7 +28,7 @@ class ClickAliasedGroup(click.Group):
         return super().command(*args, cls=cls, **kwargs)
 
     def group(self, *args, **kwargs):
-        aliases: Optional[list[str]] = kwargs.pop("aliases", None)
+        aliases: list[str] | None = kwargs.pop("aliases", None)
         decorator = super().group(*args, **kwargs)
         if not aliases:
             return decorator
@@ -50,8 +49,8 @@ class ClickAliasedGroup(click.Group):
     def resolve_alias(self, cmd_name):
         return self._aliases[cmd_name] if cmd_name in self._aliases else cmd_name
 
-    def add_command(self, cmd: click.Command, name: Optional[str] = None) -> None:
-        aliases: Optional[list[str]] = getattr(cmd, "_aliases", None)
+    def add_command(self, cmd: click.Command, name: str | None = None) -> None:
+        aliases: list[str] | None = getattr(cmd, "_aliases", None)
         if aliases and isinstance(cmd, ClickAliasedCommand) and cmd.name:
             self.add_aliases(cmd.name, aliases)
         return super().add_command(cmd, name=name)
@@ -142,7 +141,7 @@ class CLIMainGroup(ClickAliasedGroup):
             )
         return [self._build_script_command(script) for script in scripts]
 
-    def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
         if command := super().get_command(ctx, cmd_name):
             return command
         scripts: list[click.Command] = self._load_scripts(ctx)

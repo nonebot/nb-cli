@@ -4,7 +4,7 @@ import weakref
 import functools
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
-from typing import Any, Union, Generic, TypeVar, ClassVar, Optional
+from typing import Any, Generic, TypeVar, ClassVar
 
 import click
 import tomlkit
@@ -27,7 +27,7 @@ _T_config = TypeVar("_T_config", NoneBotConfig, LegacyNoneBotConfig)
 
 
 @functools.lru_cache(maxsize=512)
-def _split_package_dependency(dep: str) -> tuple[str, Optional[str], Optional[str]]:
+def _split_package_dependency(dep: str) -> tuple[str, str | None, str | None]:
     pkg_delims = ("=", ">", "<", "!", "~", ";")
     sep = min(
         filter(lambda i: i != -1, (dep.find(ch) for ch in pkg_delims)), default=len(dep)
@@ -67,12 +67,12 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
 
     @staticmethod
     @abstractmethod
-    def add_adapter(ctx: Any, adapter: Union[PackageInfo, SimpleInfo]) -> None:
+    def add_adapter(ctx: Any, adapter: PackageInfo | SimpleInfo) -> None:
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def remove_adapter(ctx: Any, adapter: Union[PackageInfo, SimpleInfo]) -> bool:
+    def remove_adapter(ctx: Any, adapter: PackageInfo | SimpleInfo) -> bool:
         """
         删除适配器的文档体操作。
 
@@ -83,12 +83,12 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
 
     @staticmethod
     @abstractmethod
-    def add_plugin(ctx: Any, plugin: Union[PackageInfo, str]) -> None:
+    def add_plugin(ctx: Any, plugin: PackageInfo | str) -> None:
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    def remove_plugin(ctx: Any, plugin: Union[PackageInfo, str]) -> bool:
+    def remove_plugin(ctx: Any, plugin: PackageInfo | str) -> bool:
         """
         删除插件的文档体操作。
 
@@ -99,19 +99,19 @@ class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
 
 
 class ConfigManager:
-    _global_working_dir: ClassVar[Optional[Path]] = None
-    _global_python_path: ClassVar[Optional[str]] = None
+    _global_working_dir: ClassVar[Path | None] = None
+    _global_python_path: ClassVar[str | None] = None
     _global_use_venv: ClassVar[bool] = True
-    _path_venv_cache: ClassVar[dict[Path, Optional[str]]] = {}
+    _path_venv_cache: ClassVar[dict[Path, str | None]] = {}
     _policy: _ConfigPolicy[Any]
 
     def __init__(
         self,
         *,
-        working_dir: Optional[Path] = None,
-        python_path: Optional[str] = None,
-        use_venv: Optional[bool] = None,
-        logger: Optional[logging.Logger] = None,
+        working_dir: Path | None = None,
+        python_path: str | None = None,
+        use_venv: bool | None = None,
+        logger: logging.Logger | None = None,
     ):
         self._working_dir = working_dir
         self._python_path = python_path
@@ -139,7 +139,7 @@ class ConfigManager:
         raise ProjectInvalidError(_("Invalid project config format."))
 
     @staticmethod
-    def _locate_project_root(cwd: Optional[Path] = None) -> Path:
+    def _locate_project_root(cwd: Path | None = None) -> Path:
         cwd = (cwd or Path.cwd()).resolve()
         for dir in (cwd, *cwd.parents):
             if dir.joinpath(CONFIG_FILE).is_file():
@@ -159,7 +159,7 @@ class ConfigManager:
         return self.project_root.joinpath(CONFIG_FILE)
 
     @staticmethod
-    def _detect_virtual_env(cwd: Optional[Path] = None) -> Optional[str]:
+    def _detect_virtual_env(cwd: Path | None = None) -> str | None:
         cwd = (cwd or Path.cwd()).resolve()
         for venv_dir in cwd.iterdir():
             if venv_dir.is_dir() and (venv_dir / "pyvenv.cfg").is_file():
@@ -170,7 +170,7 @@ class ConfigManager:
                 )
 
     @property
-    def python_path(self) -> Optional[str]:
+    def python_path(self) -> str | None:
         if python := (self._python_path or self._global_python_path):
             return python
         elif self.use_venv:
@@ -206,11 +206,11 @@ class ConfigManager:
     def _get_nonebot_config(self, data: TOMLDocument) -> dict[str, Any]:
         return data.get("tool", {}).get("nonebot", {})
 
-    def get_nonebot_config(self) -> Union[NoneBotConfig, LegacyNoneBotConfig]:
+    def get_nonebot_config(self) -> NoneBotConfig | LegacyNoneBotConfig:
         return self.policy.get_nonebot_config()
 
     def update_nonebot_config(
-        self, config: Union[NoneBotConfig, LegacyNoneBotConfig]
+        self, config: NoneBotConfig | LegacyNoneBotConfig
     ) -> None:
         data = self._get_data()
         table: dict[str, Any] = data.setdefault("tool", {}).setdefault("nonebot", {})
@@ -236,7 +236,7 @@ class ConfigManager:
         self._write_data(data)
         self._policy = self._select_policy()  # update access policy
 
-    def add_dependency(self, *dependencies: Union[str, PackageInfo]) -> None:
+    def add_dependency(self, *dependencies: str | PackageInfo) -> None:
         if not dependencies:
             return
         data = self._get_data()
@@ -282,7 +282,7 @@ class ConfigManager:
 
         self._write_data(data)
 
-    def remove_dependency(self, *dependencies: Union[str, PackageInfo]) -> None:
+    def remove_dependency(self, *dependencies: str | PackageInfo) -> None:
         data = self._get_data()
         deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
 
@@ -381,7 +381,7 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
 
     @staticmethod
     def add_adapter(
-        ctx: dict[str, list[dict[str, str]]], adapter: Union[PackageInfo, SimpleInfo]
+        ctx: dict[str, list[dict[str, str]]], adapter: PackageInfo | SimpleInfo
     ) -> None:
         adapter_data = ctx.setdefault(
             adapter.project_link if isinstance(adapter, PackageInfo) else "@local", []
@@ -393,7 +393,7 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
 
     @staticmethod
     def remove_adapter(
-        ctx: dict[str, list[dict[str, str]]], adapter: Union[PackageInfo, SimpleInfo]
+        ctx: dict[str, list[dict[str, str]]], adapter: PackageInfo | SimpleInfo
     ) -> bool:
         if isinstance(adapter, PackageInfo) and adapter.project_link not in ctx:
             return True
@@ -417,7 +417,7 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
         return False
 
     @staticmethod
-    def add_plugin(ctx: dict[str, list[str]], plugin: Union[PackageInfo, str]) -> None:
+    def add_plugin(ctx: dict[str, list[str]], plugin: PackageInfo | str) -> None:
         plugin_data = ctx.setdefault(
             "@local" if isinstance(plugin, str) else plugin.project_link, []
         )
@@ -426,9 +426,7 @@ class DefaultConfigPolicy(_ConfigPolicy[NoneBotConfig]):
             plugin_data.append(name)
 
     @staticmethod
-    def remove_plugin(
-        ctx: dict[str, list[str]], plugin: Union[PackageInfo, str]
-    ) -> bool:
+    def remove_plugin(ctx: dict[str, list[str]], plugin: PackageInfo | str) -> bool:
         if isinstance(plugin, PackageInfo) and plugin.project_link not in ctx:
             return True
         plugin_data = ctx.setdefault(
@@ -489,13 +487,13 @@ class LegacyConfigPolicy(_ConfigPolicy[LegacyNoneBotConfig]):
         return True
 
     @staticmethod
-    def add_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> None:
+    def add_plugin(ctx: list[str], plugin: SimpleInfo | str) -> None:
         plugin_ = plugin if isinstance(plugin, str) else plugin.module_name
         if plugin_ not in ctx:
             ctx.append(plugin_)
 
     @staticmethod
-    def remove_plugin(ctx: list[str], plugin: Union[SimpleInfo, str]) -> bool:
+    def remove_plugin(ctx: list[str], plugin: SimpleInfo | str) -> bool:
         plugin_ = plugin if isinstance(plugin, str) else plugin.module_name
         if plugin_ in ctx:
             ctx.remove(plugin_)

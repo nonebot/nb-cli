@@ -1,6 +1,5 @@
 import operator
 import functools
-from typing import Optional
 from datetime import datetime
 
 from pydantic import BaseModel, field_serializer
@@ -42,7 +41,7 @@ class Adapter(PackageInfo):
     author: str
     homepage: str
     tags: list[Tag]
-    is_official: Optional[bool] = None
+    is_official: bool | None = None
 
 
 class Plugin(PackageInfo):
@@ -52,8 +51,8 @@ class Plugin(PackageInfo):
     author: str
     homepage: str
     tags: list[Tag]
-    is_official: Optional[bool] = None
-    valid: Optional[bool] = None
+    is_official: bool | None = None
+    valid: bool | None = None
     skip_test: bool = False
 
 
@@ -64,7 +63,7 @@ class Driver(PackageInfo):
     author: str
     homepage: str
     tags: list[Tag]
-    is_official: Optional[bool] = None
+    is_official: bool | None = None
 
 
 class NoneBotConfig(BaseModel):

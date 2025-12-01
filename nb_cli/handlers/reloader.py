@@ -1,8 +1,8 @@
 import asyncio
 import logging
+from typing import Any
 from pathlib import Path
-from collections.abc import Coroutine
-from typing import Any, Callable, Optional
+from collections.abc import Callable, Coroutine
 
 from watchfiles import awatch
 
@@ -13,7 +13,7 @@ from .signal import remove_signal_handler, register_signal_handler
 
 class FileFilter:
     def __init__(
-        self, includes: Optional[list[str]] = None, excludes: Optional[list[str]] = None
+        self, includes: list[str] | None = None, excludes: list[str] | None = None
     ):
         includes = includes or []
         excludes = excludes or []
@@ -67,15 +67,15 @@ class Reloader:
             [asyncio.subprocess.Process], Coroutine[Any, Any, None]
         ],
         *,
-        reload_dirs: Optional[list[Path]] = None,
-        file_filter: Optional[FileFilter] = None,
+        reload_dirs: list[Path] | None = None,
+        file_filter: FileFilter | None = None,
         reload_delay: float = 0.5,
-        cwd: Optional[Path] = None,
-        logger: Optional[logging.Logger] = None,
+        cwd: Path | None = None,
+        logger: logging.Logger | None = None,
     ) -> None:
         self.startup_func = startup_func
         self.shutdown_func = shutdown_func
-        self.process: Optional[asyncio.subprocess.Process] = None
+        self.process: asyncio.subprocess.Process | None = None
 
         self.cwd = (cwd or Path.cwd()).resolve()
         self.logger = logger
@@ -111,7 +111,7 @@ class Reloader:
     def __aiter__(self):
         return self
 
-    async def __anext__(self) -> Optional[list[Path]]:
+    async def __anext__(self) -> list[Path] | None:
         return await self.should_restart()
 
     async def run(self) -> None:
@@ -162,7 +162,7 @@ class Reloader:
         if self.logger:
             self.logger.info(_("Stopped reloader."))
 
-    async def should_restart(self) -> Optional[list[Path]]:
+    async def should_restart(self) -> list[Path] | None:
         changes = await self.watcher.__anext__()
         if changes:
             unique_paths = {Path(c[1]).resolve() for c in changes}

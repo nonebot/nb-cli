@@ -1,6 +1,6 @@
 import locale
 import signal
-from typing import Final, Optional
+from typing import Final
 from asyncio.subprocess import Process
 
 import rich
@@ -99,9 +99,7 @@ class LogConsole(ModalScreen):
             "\n".join(rich.text.Text.from_ansi(line).plain for line in log.lines)
         )
 
-    def check_action(
-        self, action: str, parameters: tuple[object, ...]
-    ) -> Optional[bool]:
+    def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
         return (
             self._ACTION_CHECK.get(action, True)
             if self.attached
