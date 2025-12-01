@@ -23,11 +23,15 @@ class ClickAliasedGroup(click.Group):
         self._commands: dict[str, list[str]] = {}
         self._aliases: dict[str, str] = {}
 
-    def command(self, *args, **kwargs):
+    def command(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, *args, **kwargs
+    ):
         cls = kwargs.pop("cls", ClickAliasedCommand)
         return super().command(*args, cls=cls, **kwargs)
 
-    def group(self, *args, **kwargs):
+    def group(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, *args, **kwargs
+    ):
         aliases: list[str] | None = kwargs.pop("aliases", None)
         decorator = super().group(*args, **kwargs)
         if not aliases:
