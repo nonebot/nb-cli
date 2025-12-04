@@ -5,8 +5,9 @@ import shlex
 from pathlib import Path
 from logging import Logger
 from functools import partial
+from typing_extensions import Required
+from typing import TypeAlias, TypedDict
 from dataclasses import field, dataclass
-from typing import Required, TypeAlias, TypedDict
 from collections.abc import Sequence, MutableMapping
 
 import click
