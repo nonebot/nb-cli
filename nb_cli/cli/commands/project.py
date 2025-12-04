@@ -2,11 +2,12 @@ import re
 import sys
 import json
 import shlex
-from typing import Any
 from pathlib import Path
 from logging import Logger
 from functools import partial
 from dataclasses import field, dataclass
+from typing import Required, TypeAlias, TypedDict
+from collections.abc import Sequence, MutableMapping
 
 import click
 import nonestorage
@@ -52,6 +53,18 @@ TEMPLATE_DESCRIPTION = {
 }
 
 BLACKLISTED_PROJECT_NAME.update(sys.stdlib_module_names)
+SerializedJSON: TypeAlias = str
+
+
+class ProjectTemplateProps(TypedDict):
+    """项目模板渲染变量字典集"""
+
+    project_name: Required[str]
+    adapters: SerializedJSON
+    drivers: SerializedJSON
+    environment: MutableMapping[str, str]
+    use_src: bool
+    devtools: Sequence[str]
 
 
 @dataclass
@@ -63,7 +76,9 @@ class ProjectContext:
         packages: 项目需要安装的包
     """
 
-    variables: dict[str, Any] = field(default_factory=dict)
+    variables: ProjectTemplateProps = field(  # pyright: ignore[reportAssignmentType]
+        default_factory=dict
+    )
     packages: list[str] = field(default_factory=list)
 
 
