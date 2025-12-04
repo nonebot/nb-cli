@@ -7,12 +7,7 @@ import click
 from cookiecutter.main import cookiecutter
 
 from nb_cli import _
-from nb_cli.config import (
-    SimpleInfo,
-    PackageInfo,
-    NoneBotConfig,
-    LegacyNoneBotConfig,
-)
+from nb_cli.config import SimpleInfo, PackageInfo, NoneBotConfig, LegacyNoneBotConfig
 
 from . import templates
 from .driver import list_drivers
