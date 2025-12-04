@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-01 15:03+0000\n"
+"POT-Creation-Date: 2025-12-04 11:11+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -562,224 +562,232 @@ msgstr "插件名称:"
 msgid "Use nested plugin?"
 msgstr "使用嵌套插件?"
 
-#: nb_cli/cli/commands/plugin.py:363 nb_cli/cli/commands/project.py:206
+#: nb_cli/cli/commands/plugin.py:363 nb_cli/cli/commands/project.py:242
 msgid "Where to store the plugin?"
 msgstr "请输入插件存储位置:"
 
-#: nb_cli/cli/commands/project.py:50
+#: nb_cli/cli/commands/project.py:51
 msgid "bootstrap (for beginner or user)"
 msgstr "bootstrap (初学者或用户)"
 
-#: nb_cli/cli/commands/project.py:51
+#: nb_cli/cli/commands/project.py:52
 msgid "simple (for plugin developer)"
 msgstr "simple (插件开发者)"
 
-#: nb_cli/cli/commands/project.py:83
+#: nb_cli/cli/commands/project.py:100
 msgid "Loading adapters..."
 msgstr "正在加载适配器..."
 
-#: nb_cli/cli/commands/project.py:85
+#: nb_cli/cli/commands/project.py:102
 msgid "Loading drivers..."
 msgstr "正在加载驱动器..."
 
-#: nb_cli/cli/commands/project.py:90
+#: nb_cli/cli/commands/project.py:107
 msgid "Project Name:"
 msgstr "项目名称:"
 
-#: nb_cli/cli/commands/project.py:92
+#: nb_cli/cli/commands/project.py:109 nb_cli/cli/commands/project.py:117
 msgid "Invalid project name!"
 msgstr "无效的项目名称!"
 
-#: nb_cli/cli/commands/project.py:100
+#: nb_cli/cli/commands/project.py:124
+msgid "Current folder is not empty. Overwrite existing files?"
+msgstr "当前文件夹非空，是否要覆盖现有文件?"
+
+#: nb_cli/cli/commands/project.py:127
+msgid "Stopped creating bot."
+msgstr "停止创建机器人."
+
+#: nb_cli/cli/commands/project.py:136
 msgid "Which adapter(s) would you like to use?"
 msgstr "要使用哪些适配器?"
 
-#: nb_cli/cli/commands/project.py:110
+#: nb_cli/cli/commands/project.py:146
 msgid "You haven't chosen any adapter! Please confirm."
 msgstr "你没有选择任何适配器! 请确认."
 
-#: nb_cli/cli/commands/project.py:124
+#: nb_cli/cli/commands/project.py:160
 msgid "Which driver(s) would you like to use?"
 msgstr "要使用哪些驱动器?"
 
-#: nb_cli/cli/commands/project.py:132
+#: nb_cli/cli/commands/project.py:168
 msgid "Chosen drivers is not valid!"
 msgstr "选择的驱动器不合法!"
 
-#: nb_cli/cli/commands/project.py:146
+#: nb_cli/cli/commands/project.py:182
 msgid "User global (default, suitable for single instance in single user)"
 msgstr "用户全局 (默认, 适用于单用户下单实例)"
 
-#: nb_cli/cli/commands/project.py:147
+#: nb_cli/cli/commands/project.py:183
 msgid "Current project (suitable for multiple/portable instances)"
 msgstr "当前项目 (适用于多实例/便携实例)"
 
-#: nb_cli/cli/commands/project.py:149
+#: nb_cli/cli/commands/project.py:185
 msgid ""
 "User global (isolate by project name, suitable for multiple instances in "
 "single user)"
 msgstr "用户全局 (按项目名称隔离, 适用于单用户下多实例)"
 
-#: nb_cli/cli/commands/project.py:152
+#: nb_cli/cli/commands/project.py:188
 msgid "Custom storage location (for advanced users)"
 msgstr "自定义存储位置 (高级用户)"
 
-#: nb_cli/cli/commands/project.py:157
+#: nb_cli/cli/commands/project.py:193
 msgid "Which strategy of local storage would you like to use?"
 msgstr "要使用什么本地存储策略?"
 
-#: nb_cli/cli/commands/project.py:180
+#: nb_cli/cli/commands/project.py:216
 msgid "Cache directory to use:"
 msgstr "要使用的缓存目录:"
 
-#: nb_cli/cli/commands/project.py:185
+#: nb_cli/cli/commands/project.py:221
 msgid "Data directory to use:"
 msgstr "要使用的数据目录:"
 
-#: nb_cli/cli/commands/project.py:190
+#: nb_cli/cli/commands/project.py:226
 msgid "Config directory to use:"
 msgstr "要使用的配置目录:"
 
-#: nb_cli/cli/commands/project.py:202
+#: nb_cli/cli/commands/project.py:238
 #, python-brace-format
 msgid "1) In a \"{dir_name}\" folder"
 msgstr "1) 在 \"{dir_name}\" 文件夹中"
 
-#: nb_cli/cli/commands/project.py:203
+#: nb_cli/cli/commands/project.py:239
 msgid "2) In a \"src\" folder"
 msgstr "2) 在 \"src\" 文件夹中"
 
-#: nb_cli/cli/commands/project.py:213
+#: nb_cli/cli/commands/project.py:249
 msgid "Which developer tool(s) would you like to use?"
 msgstr "要使用哪些开发工具?"
 
-#: nb_cli/cli/commands/project.py:215 nb_cli/cli/commands/project.py:216
+#: nb_cli/cli/commands/project.py:251 nb_cli/cli/commands/project.py:252
 msgid " (Recommended)"
 msgstr " (推荐)"
 
-#: nb_cli/cli/commands/project.py:218
+#: nb_cli/cli/commands/project.py:254
 msgid " (Advanced user)"
 msgstr " (高级用户)"
 
-#: nb_cli/cli/commands/project.py:223
+#: nb_cli/cli/commands/project.py:259
 msgid "Cannot choose 'Pylance/Pyright' and 'BasedPyright' at the same time."
 msgstr "不能同时选择 'Pylance/Pyright' 和 'BasedPyright'."
 
-#: nb_cli/cli/commands/project.py:240
+#: nb_cli/cli/commands/project.py:276
 msgid "Create a NoneBot project."
 msgstr "创建一个 NoneBot 项目."
 
-#: nb_cli/cli/commands/project.py:248
+#: nb_cli/cli/commands/project.py:284
 msgid "The project template to use."
 msgstr "使用的项目模板."
 
-#: nb_cli/cli/commands/project.py:253
+#: nb_cli/cli/commands/project.py:289
 msgid "The python interpreter virtualenv is installed into."
 msgstr "虚拟环境使用的 Python 解释器."
 
-#: nb_cli/cli/commands/project.py:270
+#: nb_cli/cli/commands/project.py:306
 msgid "Select a template to use:"
 msgstr "选择一个要使用的模板:"
 
-#: nb_cli/cli/commands/project.py:292
+#: nb_cli/cli/commands/project.py:328
 msgid "Install dependencies now?"
 msgstr "立即安装依赖?"
 
-#: nb_cli/cli/commands/project.py:305
+#: nb_cli/cli/commands/project.py:343
 msgid "Create virtual environment?"
 msgstr "创建虚拟环境?"
 
-#: nb_cli/cli/commands/project.py:312
+#: nb_cli/cli/commands/project.py:350
 #, python-brace-format
 msgid "Creating virtual environment in {venv_dir} ..."
 msgstr "在 {venv_dir} 中创建虚拟环境..."
 
-#: nb_cli/cli/commands/project.py:338
+#: nb_cli/cli/commands/project.py:376
 msgid "Which builtin plugin(s) would you like to use?"
 msgstr "要使用哪些内置插件?"
 
-#: nb_cli/cli/commands/project.py:351
+#: nb_cli/cli/commands/project.py:389
 #, python-brace-format
 msgid "Failed to add builtin plugins {builtin_plugins} to config: {e}"
 msgstr "添加内置插件 {builtin_plugins} 到配置文件失败: {e}"
 
-#: nb_cli/cli/commands/project.py:359
+#: nb_cli/cli/commands/project.py:397
 msgid ""
 "Failed to install dependencies! You should install the dependencies "
 "manually."
 msgstr "安装依赖失败! 请手动安装依赖."
 
-#: nb_cli/cli/commands/project.py:365
+#: nb_cli/cli/commands/project.py:403
 msgid "Done!"
 msgstr "完成!"
 
-#: nb_cli/cli/commands/project.py:368
+#: nb_cli/cli/commands/project.py:406
 msgid ""
 "Add following packages to your project using dependency manager like "
 "poetry or pdm:"
 msgstr "使用 poetry 或 pdm 等依赖管理工具添加以下包:"
 
-#: nb_cli/cli/commands/project.py:374
+#: nb_cli/cli/commands/project.py:412
 msgid "Run the following command to start your bot:"
 msgstr "运行以下命令来启动你的机器人:"
 
-#: nb_cli/cli/commands/project.py:380
+#: nb_cli/cli/commands/project.py:418
 msgid "Generate entry file of your bot."
 msgstr "生成机器人的入口文件."
 
-#: nb_cli/cli/commands/project.py:386
+#: nb_cli/cli/commands/project.py:424
 msgid "The file script saved to."
 msgstr "脚本文件保存路径."
 
-#: nb_cli/cli/commands/project.py:395
+#: nb_cli/cli/commands/project.py:433
 msgid "Run the bot in current folder."
 msgstr "在当前文件夹中运行机器人."
 
-#: nb_cli/cli/commands/project.py:402
+#: nb_cli/cli/commands/project.py:440
 msgid "Exist entry file of your bot."
 msgstr "存在的机器人入口文件."
 
-#: nb_cli/cli/commands/project.py:409
+#: nb_cli/cli/commands/project.py:447
 msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
-#: nb_cli/cli/commands/project.py:415
+#: nb_cli/cli/commands/project.py:453
 msgid "Paths to watch for changes."
 msgstr "要监视变化的路径."
 
-#: nb_cli/cli/commands/project.py:421
+#: nb_cli/cli/commands/project.py:459
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:427
+#: nb_cli/cli/commands/project.py:465
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
-#: nb_cli/cli/commands/project.py:434
+#: nb_cli/cli/commands/project.py:472
 msgid "Delay time for reloading in seconds."
 msgstr "重新加载的延迟时间(秒)."
 
-#: nb_cli/cli/commands/project.py:467
+#: nb_cli/cli/commands/project.py:505
 msgid "Upgrade the project format of your bot."
 msgstr "升级机器人的项目格式."
 
-#: nb_cli/cli/commands/project.py:472
+#: nb_cli/cli/commands/project.py:510
 msgid "Are you sure to upgrade the project format?"
 msgstr "你确定要升级项目格式吗?"
 
-#: nb_cli/cli/commands/project.py:475
+#: nb_cli/cli/commands/project.py:513
 msgid "Successfully upgraded project format."
 msgstr "成功升级项目格式."
 
-#: nb_cli/cli/commands/project.py:479
+#: nb_cli/cli/commands/project.py:517
 msgid "Downgrade the project format of your bot."
 msgstr "降级机器人的项目格式."
 
-#: nb_cli/cli/commands/project.py:484
+#: nb_cli/cli/commands/project.py:522
 msgid "Are you sure to downgrade the project format?"
 msgstr "你确定要降级项目格式吗?"
 
-#: nb_cli/cli/commands/project.py:487
+#: nb_cli/cli/commands/project.py:525
 msgid "Successfully downgraded project format."
 msgstr "成功降级项目格式."
 
@@ -833,51 +841,51 @@ msgstr ""
 "警告: 检测到旧的项目格式.\n"
 "*** 使用 `nb upgrade-format` 升级至新格式."
 
-#: nb_cli/handlers/meta.py:91
+#: nb_cli/handlers/meta.py:93
 msgid "Cannot find a valid Python interpreter."
 msgstr "无法找到可用的 Python 解释器."
 
-#: nb_cli/handlers/meta.py:132 nb_cli/handlers/meta.py:141
+#: nb_cli/handlers/meta.py:134 nb_cli/handlers/meta.py:143
 msgid "Failed to get Python version."
 msgstr "获取 Python 版本失败."
 
-#: nb_cli/handlers/meta.py:133 nb_cli/handlers/meta.py:196
-#: nb_cli/handlers/meta.py:255
+#: nb_cli/handlers/meta.py:135 nb_cli/handlers/meta.py:198
+#: nb_cli/handlers/meta.py:257
 #, python-brace-format
 msgid "Exit code {code}"
 msgstr "退出码 {code}"
 
-#: nb_cli/handlers/meta.py:160
+#: nb_cli/handlers/meta.py:162
 #, python-brace-format
 msgid "Python {major}.{minor} is not supported."
 msgstr "Python {major}.{minor} 不受支持."
 
-#: nb_cli/handlers/meta.py:195 nb_cli/handlers/meta.py:204
+#: nb_cli/handlers/meta.py:197 nb_cli/handlers/meta.py:206
 msgid "Failed to get NoneBot version."
 msgstr "获取 NoneBot 版本失败."
 
-#: nb_cli/handlers/meta.py:222
+#: nb_cli/handlers/meta.py:224
 msgid "NoneBot is not installed."
 msgstr "NoneBot 未安装."
 
-#: nb_cli/handlers/meta.py:254 nb_cli/handlers/meta.py:263
+#: nb_cli/handlers/meta.py:256 nb_cli/handlers/meta.py:265
 msgid "Failed to get pip version."
 msgstr "获取 pip 版本失败."
 
-#: nb_cli/handlers/meta.py:281
+#: nb_cli/handlers/meta.py:283
 msgid "pip is not installed."
 msgstr "pip 未安装."
 
-#: nb_cli/handlers/project.py:133
+#: nb_cli/handlers/project.py:129
 msgid "Current format is already the new format."
 msgstr "当前格式已为新格式."
 
-#: nb_cli/handlers/project.py:153
+#: nb_cli/handlers/project.py:149
 #, python-brace-format
 msgid "WARNING: Inconsistent adapter name info: {old!r} -> {new!r}"
 msgstr "警告: 适配器名称信息不一致: {old!r} -> {new!r}"
 
-#: nb_cli/handlers/project.py:190
+#: nb_cli/handlers/project.py:186
 msgid "Current format is already the old format."
 msgstr "当前格式已为旧格式."
 
