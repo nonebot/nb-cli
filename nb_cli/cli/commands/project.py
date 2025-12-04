@@ -51,15 +51,17 @@ TEMPLATE_DESCRIPTION = {
     "bootstrap": _("bootstrap (for beginner or user)"),
     "simple": _("simple (for plugin developer)"),
 }
+HIDDEN_FILE_OVERRIDES = {".env", ".env.dev", ".env.prod", ".gitignore", ".vscode"}
+SerializedJSON: TypeAlias = str
 
 BLACKLISTED_PROJECT_NAME.update(sys.stdlib_module_names)
-SerializedJSON: TypeAlias = str
 
 
 class ProjectTemplateProps(TypedDict):
     """项目模板渲染变量字典集"""
 
     project_name: Required[str]
+    inplace: bool
     adapters: SerializedJSON
     drivers: SerializedJSON
     environment: MutableMapping[str, str]
@@ -83,7 +85,7 @@ class ProjectContext:
 
 
 def project_name_validator(name: str) -> bool:
-    return (
+    return name == "." or (
         bool(re.match(VALID_PROJECT_NAME, name))
         and name not in BLACKLISTED_PROJECT_NAME
     )
@@ -107,6 +109,25 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         error_message=_("Invalid project name!"),
     ).prompt_async(style=CLI_DEFAULT_STYLE)
     context.variables["project_name"] = project_name
+    context.variables["inplace"] = False
+
+    if project_name == ".":
+        _parent_dirname = Path(".").absolute().name
+        if not project_name_validator(_parent_dirname):
+            click.secho(_("Invalid project name!"), fg="red")
+            raise CancelledError
+        if any(
+            (f.name in HIDDEN_FILE_OVERRIDES or not f.name.startswith("."))
+            for f in Path(project_name).iterdir()
+        ):
+            if not await ConfirmPrompt(
+                _("Current folder is not empty. Overwrite existing files?"),
+                False,
+            ).prompt_async(style=CLI_DEFAULT_STYLE):
+                click.echo(_("Stopped creating bot."))
+                raise CancelledError
+        project_name = context.variables["project_name"] = _parent_dirname
+        context.variables["inplace"] = True
 
     confirm = False
     adapters = []
@@ -312,7 +333,9 @@ async def create(
     use_venv = False
     project_dir_name = context.variables["project_name"].replace(" ", "-")
     project_dir = Path(output_dir or ".") / project_dir_name
-    venv_dir = project_dir / ".venv"
+    venv_dir = (
+        Path("./.venv") if context.variables["inplace"] else project_dir / ".venv"
+    )
 
     if install_dependencies:
         try:

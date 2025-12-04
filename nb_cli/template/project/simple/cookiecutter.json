@@ -7,7 +7,7 @@
     "use_src": false
   },
   "computed": {
-    "project_slug": "{{ cookiecutter.nonebot.project_name|replace(' ', '-') }}",
+    "project_slug": "{{ '.' if cookiecutter.nonebot.inplace else cookiecutter.nonebot.project_name|replace(' ', '-') }}",
     "project_desc": "{{ cookiecutter.nonebot.project_name }}"
   },
   "custom": {

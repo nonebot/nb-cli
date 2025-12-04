@@ -46,6 +46,7 @@ def create_project(
         no_input=no_input,
         extra_context=context,
         output_dir=output_dir or ".",
+        overwrite_if_exists=True,
     )
 
 
