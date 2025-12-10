@@ -55,6 +55,10 @@ ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
         (v.lower() in (t.label.lower() for t in x.tags))
         for v in value.strip().split(",")
     ),
+    "type:": lambda x, *, value: not value.strip()
+    or not isinstance(x, Plugin)
+    or value.strip() in "unknown"
+    or (x.type is not None and value.strip() in x.type),
 }
 
 

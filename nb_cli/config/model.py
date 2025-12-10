@@ -51,6 +51,7 @@ class Plugin(PackageInfo):
     author: str
     homepage: str
     tags: list[Tag]
+    type: str | None = None
     is_official: bool | None = None
     valid: bool | None = None
     skip_test: bool = False
