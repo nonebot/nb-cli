@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-10 06:17+0000\n"
+"POT-Creation-Date: 2025-12-10 07:07+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -733,63 +733,63 @@ msgstr "完成!"
 msgid "Run the following command to start your bot:"
 msgstr "运行以下命令来启动你的机器人:"
 
-#: nb_cli/cli/commands/project.py:446
+#: nb_cli/cli/commands/project.py:447
 msgid "Generate entry file of your bot."
 msgstr "生成机器人的入口文件."
 
-#: nb_cli/cli/commands/project.py:452
+#: nb_cli/cli/commands/project.py:453
 msgid "The file script saved to."
 msgstr "脚本文件保存路径."
 
-#: nb_cli/cli/commands/project.py:461
+#: nb_cli/cli/commands/project.py:462
 msgid "Run the bot in current folder."
 msgstr "在当前文件夹中运行机器人."
 
-#: nb_cli/cli/commands/project.py:468
+#: nb_cli/cli/commands/project.py:469
 msgid "Exist entry file of your bot."
 msgstr "存在的机器人入口文件."
 
-#: nb_cli/cli/commands/project.py:475
+#: nb_cli/cli/commands/project.py:476
 msgid "Reload the bot when file changed."
 msgstr "当文件发生变化时重新加载机器人."
 
-#: nb_cli/cli/commands/project.py:481
+#: nb_cli/cli/commands/project.py:482
 msgid "Paths to watch for changes."
 msgstr "要监视变化的路径."
 
-#: nb_cli/cli/commands/project.py:487
+#: nb_cli/cli/commands/project.py:488
 msgid "Files to watch for changes."
 msgstr "要监视变化的文件."
 
-#: nb_cli/cli/commands/project.py:493
+#: nb_cli/cli/commands/project.py:494
 msgid "Files to ignore for changes."
 msgstr "要忽略变化的文件."
 
-#: nb_cli/cli/commands/project.py:500
+#: nb_cli/cli/commands/project.py:501
 msgid "Delay time for reloading in seconds."
 msgstr "重新加载的延迟时间(秒)."
 
-#: nb_cli/cli/commands/project.py:533
+#: nb_cli/cli/commands/project.py:534
 msgid "Upgrade the project format of your bot."
 msgstr "升级机器人的项目格式."
 
-#: nb_cli/cli/commands/project.py:538
+#: nb_cli/cli/commands/project.py:539
 msgid "Are you sure to upgrade the project format?"
 msgstr "你确定要升级项目格式吗?"
 
-#: nb_cli/cli/commands/project.py:541
+#: nb_cli/cli/commands/project.py:542
 msgid "Successfully upgraded project format."
 msgstr "成功升级项目格式."
 
-#: nb_cli/cli/commands/project.py:545
+#: nb_cli/cli/commands/project.py:546
 msgid "Downgrade the project format of your bot."
 msgstr "降级机器人的项目格式."
 
-#: nb_cli/cli/commands/project.py:550
+#: nb_cli/cli/commands/project.py:551
 msgid "Are you sure to downgrade the project format?"
 msgstr "你确定要降级项目格式吗?"
 
-#: nb_cli/cli/commands/project.py:553
+#: nb_cli/cli/commands/project.py:554
 msgid "Successfully downgraded project format."
 msgstr "成功降级项目格式."
 

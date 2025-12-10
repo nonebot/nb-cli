@@ -28,13 +28,13 @@ from nb_cli.config import ConfigManager
 from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.cli.utils import advanced_search
 from nb_cli.exceptions import ModuleLoadFailed
-from nb_cli.handlers.plugin import list_plugins
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
     FileFilter,
     run_project,
     list_drivers,
+    list_plugins,
     list_adapters,
     create_project,
     call_pip_install,
@@ -438,7 +438,8 @@ async def create(
 
     click.secho(_("Done!"), fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")
-    click.secho(f"  cd {project_dir}", fg="green")
+    if not context.variables["inplace"]:
+        click.secho(f"  cd {project_dir}", fg="green")
     click.secho("  nb run --reload", fg="green")
     ctx.exit()
 
