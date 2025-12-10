@@ -402,7 +402,7 @@ async def create(
                     for c in await CheckboxPrompt(
                         _("Which official plugins would you like to use?"),
                         [
-                            Choice(p.name, p)
+                            Choice(f"{p.name} ({p.desc})", p)
                             for p in advanced_search("#official", plugins)
                         ],
                     ).prompt_async(style=CLI_DEFAULT_STYLE)
