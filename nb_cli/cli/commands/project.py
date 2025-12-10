@@ -26,7 +26,9 @@ from nb_cli.log import ClickHandler
 from nb_cli.compat import model_dump
 from nb_cli.config import ConfigManager
 from nb_cli.consts import DEFAULT_DRIVER
+from nb_cli.cli.utils import advanced_search
 from nb_cli.exceptions import ModuleLoadFailed
+from nb_cli.handlers.plugin import list_plugins
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
@@ -392,6 +394,39 @@ async def create(
                     fg="red",
                 )
                 ctx.exit(1)
+
+            plugins = await list_plugins()
+            try:
+                pending_plugins = [
+                    c.data
+                    for c in await CheckboxPrompt(
+                        _("Which official plugins would you like to use?"),
+                        [
+                            Choice(p.name, p)
+                            for p in advanced_search("#official", plugins)
+                        ],
+                    ).prompt_async(style=CLI_DEFAULT_STYLE)
+                ]
+                if pending_plugins:
+                    proc = await call_pip_install(
+                        [p.as_dependency() for p in pending_plugins],
+                        pip_args,
+                        python_path=config_manager.python_path,
+                    )
+                await proc.wait()
+                if proc.returncode == 0:
+                    config_manager.add_dependency(*pending_plugins)
+                    config_manager.add_plugin(*pending_plugins)
+                else:
+                    click.secho(
+                        _(
+                            "Failed to install plugins! "
+                            "You should install the plugins manually."
+                        ),
+                        fg="red",
+                    )
+            except CancelledError:
+                return
         else:
             click.secho(
                 _(
@@ -402,14 +437,6 @@ async def create(
             )
 
     click.secho(_("Done!"), fg="green")
-    click.secho(
-        _(
-            "Add following packages to your project "
-            "using dependency manager like poetry or pdm:"
-        ),
-        fg="green",
-    )
-    click.secho(f"  {' '.join(set(context.packages))}", fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")
     click.secho(f"  cd {project_dir}", fg="green")
     click.secho("  nb run --reload", fg="green")
