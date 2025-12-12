@@ -174,6 +174,11 @@ async def install(
         click.echo(_("No available plugin found to install."))
         return
 
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     if include_unpublished:
         click.secho(
             _(
@@ -184,7 +189,7 @@ async def install(
         )
 
     proc = await call_pip_install(
-        plugin.as_dependency(not no_restrict_version), pip_args
+        plugin.as_dependency(extras=extras, versioned=not no_restrict_version), pip_args
     )
     if await proc.wait() != 0:
         click.secho(
@@ -208,7 +213,9 @@ async def install(
         )
 
     try:
-        GLOBAL_CONFIG.add_dependency(plugin)
+        GLOBAL_CONFIG.add_dependency(
+            plugin.as_dependency(extras=extras, versioned=not no_restrict_version)
+        )
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to dependencies: {e}").format(

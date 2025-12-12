@@ -183,8 +183,14 @@ async def install(
             fg="yellow",
         )
 
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     proc = await call_pip_install(
-        adapter.as_dependency(not no_restrict_version), pip_args
+        adapter.as_dependency(extras=extras, versioned=not no_restrict_version),
+        pip_args,
     )
     if await proc.wait() != 0:
         click.secho(
@@ -208,7 +214,9 @@ async def install(
         )
 
     try:
-        GLOBAL_CONFIG.add_dependency(adapter)
+        GLOBAL_CONFIG.add_dependency(
+            adapter.as_dependency(extras=extras, versioned=not no_restrict_version)
+        )
     except RuntimeError as e:
         click.echo(
             _("Failed to add adapter {adapter.name} to dependencies: {e}").format(
