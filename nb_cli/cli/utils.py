@@ -62,7 +62,9 @@ ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
 }
 
 
-async def find_exact_package(question: str, name: str | None, packages: list[T]) -> T:
+async def find_exact_package(
+    question: str, name: str | None, packages: list[T], *, no_extras: bool = False
+) -> T:
     if name is None:
         if not packages:
             raise NoSelectablePackageError("No packages available to select.")
@@ -81,6 +83,9 @@ async def find_exact_package(question: str, name: str | None, packages: list[T])
                 custom_filter=lambda input_, p: advanced_search_filter(input_, p.data),
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         ).data
+
+    if not no_extras and "[" in name:
+        name = name.split("[", 1)[0].strip()
 
     if exact_packages := [
         p for p in packages if name in {p.name, p.module_name, p.project_link}
