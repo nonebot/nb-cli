@@ -1,3 +1,4 @@
+import contextlib
 from typing import cast
 from pathlib import Path
 
@@ -155,19 +156,38 @@ async def install(
     pip_args: list[str] | None,
     include_unpublished: bool = False,
 ):
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     try:
-        _installed = {
-            (p.project_link, p.module_name) for p in await list_installed_plugins()
-        }
-        plugin = await find_exact_package(
-            _("Plugin name to install:"),
-            name,
-            [
-                p
-                for p in await list_plugins(include_unpublished=include_unpublished)
-                if (p.project_link, p.module_name) not in _installed
-            ],
-        )
+        _installed_plugins = await list_installed_plugins()
+        is_installed = False
+        plugin = None
+
+        if name is not None and extras is not None:
+            with contextlib.suppress(RuntimeError):
+                plugin = await find_exact_package(
+                    _("Plugin name to install:"),
+                    name,
+                    _installed_plugins,
+                )
+                is_installed = True
+
+        if not is_installed:
+            _installed = {(p.project_link, p.module_name) for p in _installed_plugins}
+            plugin = await find_exact_package(
+                _("Plugin name to install:"),
+                name,
+                [
+                    p
+                    for p in await list_plugins(include_unpublished=include_unpublished)
+                    if (p.project_link, p.module_name) not in _installed
+                ],
+            )
+
+        assert plugin is not None  # confirmed by above logic
     except CancelledError:
         return
     except NoSelectablePackageError:
@@ -184,7 +204,7 @@ async def install(
         )
 
     proc = await call_pip_install(
-        plugin.as_dependency(not no_restrict_version), pip_args
+        plugin.as_dependency(extras=extras, versioned=not no_restrict_version), pip_args
     )
     if await proc.wait() != 0:
         click.secho(
@@ -208,7 +228,9 @@ async def install(
         )
 
     try:
-        GLOBAL_CONFIG.add_dependency(plugin)
+        GLOBAL_CONFIG.add_dependency(
+            plugin.as_dependency(extras=extras, versioned=not no_restrict_version)
+        )
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to dependencies: {e}").format(
@@ -297,7 +319,15 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         click.echo(_("No installed plugin found to uninstall."))
         return
 
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     try:
+        if extras is not None:
+            if not GLOBAL_CONFIG.remove_dependency(plugin.as_dependency(extras=extras)):
+                return
         can_uninstall = GLOBAL_CONFIG.remove_plugin(plugin)
         if can_uninstall:
             GLOBAL_CONFIG.remove_dependency(plugin)

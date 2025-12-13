@@ -33,6 +33,7 @@ dependencies = [
   "nonestorage>=0.1.0",
   "rich>=14.1.0",
   "textual>=5.3.0",
+  "packaging>=25.0",
 ]
 
 [project.urls]

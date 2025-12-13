@@ -1,3 +1,4 @@
+import contextlib
 from typing import cast
 from pathlib import Path
 
@@ -155,19 +156,40 @@ async def install(
     pip_args: list[str] | None,
     include_unpublished: bool = False,
 ):
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     try:
-        _installed = {
-            (a.project_link, a.module_name) for a in await list_installed_adapters()
-        }
-        adapter = await find_exact_package(
-            _("Adapter name to install:"),
-            name,
-            [
-                a
-                for a in await list_adapters(include_unpublished=include_unpublished)
-                if (a.project_link, a.module_name) not in _installed
-            ],
-        )
+        _installed_adapters = await list_installed_adapters()
+        is_installed = False
+        adapter = None
+
+        if name is not None and extras is not None:
+            with contextlib.suppress(RuntimeError):
+                adapter = await find_exact_package(
+                    _("Adapter name to install:"),
+                    name,
+                    _installed_adapters,
+                )
+                is_installed = True
+
+        if not is_installed:
+            _installed = {(a.project_link, a.module_name) for a in _installed_adapters}
+            adapter = await find_exact_package(
+                _("Adapter name to install:"),
+                name,
+                [
+                    a
+                    for a in await list_adapters(
+                        include_unpublished=include_unpublished
+                    )
+                    if (a.project_link, a.module_name) not in _installed
+                ],
+            )
+
+        assert adapter is not None  # confirmed by above logic
     except CancelledError:
         return
     except NoSelectablePackageError:
@@ -184,7 +206,8 @@ async def install(
         )
 
     proc = await call_pip_install(
-        adapter.as_dependency(not no_restrict_version), pip_args
+        adapter.as_dependency(extras=extras, versioned=not no_restrict_version),
+        pip_args,
     )
     if await proc.wait() != 0:
         click.secho(
@@ -208,7 +231,9 @@ async def install(
         )
 
     try:
-        GLOBAL_CONFIG.add_dependency(adapter)
+        GLOBAL_CONFIG.add_dependency(
+            adapter.as_dependency(extras=extras, versioned=not no_restrict_version)
+        )
     except RuntimeError as e:
         click.echo(
             _("Failed to add adapter {adapter.name} to dependencies: {e}").format(
@@ -297,7 +322,17 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         click.echo(_("No installed adapter found to uninstall."))
         return
 
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     try:
+        if extras is not None:
+            if not GLOBAL_CONFIG.remove_dependency(
+                adapter.as_dependency(extras=extras)
+            ):
+                return
         can_uninstall = GLOBAL_CONFIG.remove_adapter(adapter)
         if can_uninstall:
             GLOBAL_CONFIG.remove_dependency(adapter)

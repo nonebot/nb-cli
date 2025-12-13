@@ -3,11 +3,16 @@ import logging
 import weakref
 import functools
 from pathlib import Path
+from collections.abc import Generator
 from abc import ABCMeta, abstractmethod
-from typing import Any, Generic, TypeVar, ClassVar
+from typing import Any, Generic, TypeVar, ClassVar, overload
+from contextlib import AbstractContextManager, contextmanager
 
 import click
 import tomlkit
+import tomlkit.items
+import tomlkit.container
+from packaging.requirements import Requirement
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli import _
@@ -24,21 +29,46 @@ CONFIG_FILE_ENCODING = "utf-8"
 VALID_PACKAGE_NAME_CHARS = string.ascii_letters + string.digits + "-_"
 
 _T_config = TypeVar("_T_config", NoneBotConfig, LegacyNoneBotConfig)
+_T = TypeVar("_T")
+_U = TypeVar("_U")
 
 
-@functools.lru_cache(maxsize=512)
-def _split_package_dependency(dep: str) -> tuple[str, str | None, str | None]:
-    pkg_delims = ("=", ">", "<", "!", "~", ";")
-    sep = min(
-        filter(lambda i: i != -1, (dep.find(ch) for ch in pkg_delims)), default=len(dep)
-    )
-    cons = dep[sep:]
-    ver, env = cons.split(";", maxsplit=1) if ";" in cons else (cons, None)
-    return (
-        dep[:sep].strip(),
-        ver.strip() or None,
-        env.strip() if env is not None else None,
-    )
+def _merge_package_requirements(
+    base: Requirement, override: Requirement
+) -> Requirement:
+    assert base.name == override.name, "Cannot merge different package requirements."
+    name = base.name
+    specs = override.specifier if override.specifier else base.specifier
+    extras = sorted(base.extras | override.extras)
+    marker = override.marker or base.marker
+    new_req_str = name
+    if extras:
+        new_req_str += "[" + ",".join(extras) + "]"
+    if specs:
+        new_req_str += "".join(str(s) for s in specs)
+    if marker:
+        new_req_str += f"; {marker}"
+    return Requirement(new_req_str)
+
+
+def _remove_package_requirements(
+    base: Requirement, remove: Requirement
+) -> Requirement | None:
+    assert base.name == remove.name, "Cannot remove different package requirements."
+    if not remove.extras:
+        return None
+    name = base.name
+    specs = base.specifier
+    extras = base.extras - remove.extras
+    marker = base.marker
+    new_req_str = name
+    if extras:
+        new_req_str += "[" + ",".join(sorted(extras)) + "]"
+    if specs:
+        new_req_str += "".join(str(s) for s in specs)
+    if marker:
+        new_req_str += f"; {marker}"
+    return Requirement(new_req_str)
 
 
 class _ConfigPolicy(Generic[_T_config], metaclass=ABCMeta):
@@ -203,6 +233,64 @@ class ConfigManager:
     def _write_data(self, data: TOMLDocument) -> None:
         self.config_file.write_text(tomlkit.dumps(data), encoding=CONFIG_FILE_ENCODING)
 
+    @overload
+    def _data_context(
+        self, domain: str, default_: Any, subdomain: str, sub_default: _U
+    ) -> AbstractContextManager[_U, None]: ...
+
+    @overload
+    def _data_context(
+        self, domain: str, default_: Any, subdomain: str, sub_default: None = None
+    ) -> AbstractContextManager[
+        tomlkit.items.Item | tomlkit.container.Container, None
+    ]: ...
+
+    @overload
+    def _data_context(
+        self, domain: str, default_: _T, subdomain: None = None
+    ) -> AbstractContextManager[_T, None]: ...
+
+    @overload
+    def _data_context(
+        self, domain: str, default_: None = None, subdomain: None = None
+    ) -> AbstractContextManager[
+        tomlkit.items.Item | tomlkit.container.Container, None
+    ]: ...
+
+    @overload
+    def _data_context(
+        self, domain: None = None
+    ) -> AbstractContextManager[TOMLDocument, None]: ...
+
+    @contextmanager
+    def _data_context(
+        self,
+        domain: str | None = None,
+        default_: _T | None = None,
+        subdomain: str | None = None,
+        sub_default: _U | None = None,
+    ) -> Generator[
+        _T | _U | TOMLDocument | tomlkit.items.Item | tomlkit.container.Container,
+        Any,
+        None,
+    ]:
+        table = self._get_data()
+
+        if domain is None:
+            yield table
+        elif default_ is None:
+            yield table[domain]
+        else:
+            data = table.setdefault(domain, default_)
+            if subdomain is None:
+                yield data
+            elif sub_default is None:
+                yield data[subdomain]
+            else:
+                yield data.setdefault(subdomain, sub_default)
+
+        self._write_data(table)
+
     def _get_nonebot_config(self, data: TOMLDocument) -> dict[str, Any]:
         return data.get("tool", {}).get("nonebot", {})
 
@@ -236,71 +324,107 @@ class ConfigManager:
         self._write_data(data)
         self._policy = self._select_policy()  # update access policy
 
+    def get_dependencies(self) -> list[Requirement]:
+        data = self._get_data()
+        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        return [Requirement(d) for d in deps]
+
     def add_dependency(self, *dependencies: str | PackageInfo) -> None:
         if not dependencies:
             return
-        data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
 
-        for dependency in dependencies:
-            dep_str = (
-                dependency if isinstance(dependency, str) else dependency.project_link
-            )
+        deps = self.get_dependencies()
+        with self._data_context("project", dict[str, Any]()) as project:
+            for dependency in dependencies:
+                depinfo = Requirement(
+                    dependency
+                    if isinstance(dependency, str)
+                    else dependency.as_dependency(versioned=False)
+                )
+                matches = [i for i, d in enumerate(deps) if d.name == depinfo.name]
 
-            if not any(
-                _split_package_dependency(d)[0] == _split_package_dependency(dep_str)[0]
-                for d in deps
-            ):
-                if isinstance(dependency, str):
-                    deps.append(dep_str)
+                if matches:
+                    idx = matches[0]
+                    deps[idx] = functools.reduce(
+                        _merge_package_requirements, (deps[i] for i in matches)
+                    )
+
+                    for i in sorted(matches[1:], reverse=True):
+                        del deps[i]
+
+                    deps[idx] = _merge_package_requirements(deps[idx], depinfo)
                 else:
-                    deps.append(f"{dep_str}>={dependency.version}")
+                    depinfo = Requirement(
+                        dependency
+                        if isinstance(dependency, str)
+                        else dependency.as_dependency(versioned=True)
+                    )
+                    deps.append(depinfo)
 
-        self._write_data(data)
+            project["dependencies"] = tomlkit.array().multiline(True)
+            project["dependencies"].extend(str(d) for d in deps)
 
     def update_dependency(self, *dependencies: PackageInfo) -> None:
-        data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        if not dependencies:
+            return
 
-        for dependency in dependencies:
-            dep_str = dependency.project_link
-            matches = [
-                (i, d)
-                for i, d in enumerate(deps)
-                if _split_package_dependency(d)[0]
-                == _split_package_dependency(dep_str)[0]
-            ]
+        deps = self.get_dependencies()
+        with self._data_context("project", dict[str, Any]()) as project:
+            for dependency in dependencies:
+                depinfo = Requirement(dependency.as_dependency(versioned=True))
+                matches = [i for i, d in enumerate(deps) if d.name == depinfo.name]
 
-            if matches:
-                idx, _ = matches[0]
-                deps[idx] = f"{dep_str}>={dependency.version}"
+                if matches:
+                    idx = matches[0]
+                    deps[idx] = functools.reduce(
+                        _merge_package_requirements, (deps[i] for i in matches)
+                    )
 
-                for i, _ in sorted(matches[1:], reverse=True):
-                    del deps[i]
-            else:
-                deps.append(f"{dep_str}>={dependency.version}")
+                    for i in sorted(matches[1:], reverse=True):
+                        del deps[i]
 
-        self._write_data(data)
+                    deps[idx] = _merge_package_requirements(deps[idx], depinfo)
+                else:
+                    deps.append(depinfo)
 
-    def remove_dependency(self, *dependencies: str | PackageInfo) -> None:
-        data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+            project["dependencies"] = tomlkit.array().multiline(True)
+            project["dependencies"].extend(str(d) for d in deps)
 
-        for dependency in dependencies:
-            dep_str = (
-                dependency if isinstance(dependency, str) else dependency.project_link
-            )
-            indices_to_remove = [
-                i
-                for i, d in enumerate(deps)
-                if _split_package_dependency(d)[0]
-                == _split_package_dependency(dep_str)[0]
-            ]
+    def remove_dependency(self, *dependencies: str | PackageInfo) -> bool:
+        """
+        删除依赖记录操作。
 
-            for i in sorted(indices_to_remove, reverse=True):
-                del deps[i]
+        Returns:
+            bool: 表示相关依赖是否全部被成功移除。
+        """
+        if not dependencies:
+            return False
 
-        self._write_data(data)
+        status = True
+
+        deps = self.get_dependencies()
+        with self._data_context("project", dict[str, Any]()) as project:
+            for dependency in dependencies:
+                depinfo = Requirement(
+                    dependency
+                    if isinstance(dependency, str)
+                    else dependency.as_dependency(versioned=False)
+                )
+
+                def _convert(d: Requirement) -> Requirement | None:
+                    nonlocal status
+                    if d.name != depinfo.name:
+                        return d
+                    res = _remove_package_requirements(d, depinfo)
+                    status *= res is None
+                    return res
+
+                deps = [d for d in (_convert(d) for d in deps) if d is not None]
+
+            project["dependencies"] = tomlkit.array().multiline(True)
+            project["dependencies"].extend(str(d) for d in deps)
+
+        return status
 
     def add_adapter(self, *adapters: PackageInfo) -> None:
         if not adapters:

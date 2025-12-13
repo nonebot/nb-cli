@@ -28,7 +28,17 @@ class PackageInfo(SimpleInfo):
     def time_serializer(self, dt: datetime):
         return dt.isoformat()
 
-    def as_dependency(self, versioned: bool = True) -> str:
+    def as_dependency(
+        self, *, extras: str | None = None, versioned: bool = True
+    ) -> str:
+        if extras:
+            if "[" in self.project_link:
+                raise ValueError("Project link already contains extras.")
+            return (
+                f"{self.project_link}[{extras}]>={self.version}"
+                if versioned
+                else f"{self.project_link}[{extras}]"
+            )
         return (
             f"{self.project_link}>={self.version}" if versioned else self.project_link
         )

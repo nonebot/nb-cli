@@ -139,6 +139,7 @@ async def install(
             _("Driver name to install:"),
             name,
             await list_drivers(include_unpublished=include_unpublished),
+            no_extras=True,
         )
     except CancelledError:
         return
