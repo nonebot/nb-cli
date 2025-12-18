@@ -19,7 +19,7 @@ function RunCLI({
       mockPackages={[
         {
           name: "watchfiles",
-          version: "0.999.0",
+          version: "1.999.0",
           modules: new Map([
             ["watchfiles", "async def awatch(*args, **kwargs): ..."],
           ]),
