@@ -1,8 +1,9 @@
 import operator
 import functools
+from typing import ClassVar
 from datetime import datetime
 
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel
 
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
 
@@ -24,9 +25,17 @@ class PackageInfo(SimpleInfo):
     time: datetime
     version: str
 
-    @field_serializer("time")
-    def time_serializer(self, dt: datetime):
-        return dt.isoformat()
+    if PYDANTIC_V2:  # pragma: pydantic-v2
+        from pydantic import field_serializer
+
+        @field_serializer("time")
+        def time_serializer(self, dt: datetime):
+            return dt.isoformat()
+
+    else:  # pragma: pydantic-v1
+
+        class Config(ConfigDict):
+            json_encoders: ClassVar = {datetime: lambda v: v.isoformat()}
 
     def as_dependency(
         self, *, extras: str | None = None, versioned: bool = True
