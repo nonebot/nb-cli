@@ -24,6 +24,10 @@ function RunCLI({
             ["watchfiles", "async def awatch(*args, **kwargs): ..."],
           ]),
         },
+        {
+          name: "packaging",
+          version: "25.999",
+        },
       ]}
       className={className}
     />
