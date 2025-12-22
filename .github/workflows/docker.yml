@@ -10,7 +10,7 @@ on:
       - completed
 
 env:
-  LATEST_PYTHON_VERSION: "3.12"
+  LATEST_PYTHON_VERSION: "3.14"
 
 jobs:
   metadata:
@@ -52,10 +52,11 @@ jobs:
       fail-fast: true
       matrix:
         python_version:
-          - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
+          - "3.13"
+          - "3.14"
         python_variant:
           - ""
           - "-slim"
@@ -130,9 +131,11 @@ jobs:
     strategy:
       matrix:
         python_version:
-          - "3.9"
           - "3.10"
           - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
         python_variant:
           - ""
           - "-slim"
