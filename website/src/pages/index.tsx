@@ -1,12 +1,17 @@
-import clsx from "clsx";
 import React from "react";
+
+import clsx from "clsx";
 
 import CodeBlock from "@theme/CodeBlock";
 import Layout from "@theme/Layout";
 
 import { Hero, HeroFeature } from "../components/Hero";
+
 import type { Feature } from "../components/Hero";
-import styles from "../css/index.module.css";
+
+import styles from "./index.module.css";
+
+import "@theme/Page" // TODO: remove this when nonepress 3.5.1 is ready
 
 export default function Home() {
   const firstFeature: Feature = {

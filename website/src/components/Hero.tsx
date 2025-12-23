@@ -1,11 +1,13 @@
-import React, { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
+import React from "react";
 
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import Logo from "@theme/Logo";
 
-export function Hero(): JSX.Element {
+export function Hero(): React.ReactNode {
   const { siteConfig } = useDocusaurusContext();
 
   return (
@@ -47,7 +49,7 @@ export type Feature = {
   readonly annotaion?: string;
 };
 
-export function HeroFeature(props: PropsWithChildren<Feature>): JSX.Element {
+export function HeroFeature(props: PropsWithChildren<Feature>): React.ReactNode {
   const { title, tagline, description, annotaion, children } = props;
 
   return (
@@ -67,7 +69,7 @@ export function HeroFeature(props: PropsWithChildren<Feature>): JSX.Element {
 
 export function HeroFeatureSingle(
   props: PropsWithChildren<Feature>
-): JSX.Element {
+): React.ReactNode {
   return (
     <div className="max-w-7xl mx-auto py-16 px-4 text-center md:px-16">
       <HeroFeature {...props} />
@@ -77,13 +79,14 @@ export function HeroFeatureSingle(
 
 export function HeroFeatureDouble(
   props: PropsWithChildren<{ features: [Feature, Feature] }>
-): JSX.Element {
+): React.ReactNode {
   const {
     features: [feature1, feature2],
     children,
   } = props;
 
-  let children1, children2;
+  let children1;
+  let children2;
   if (Array.isArray(children) && children.length === 2) {
     [children1, children2] = children;
   }

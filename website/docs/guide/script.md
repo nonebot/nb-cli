@@ -4,8 +4,8 @@ description: 项目脚本配置
 
 options:
   menu:
-    weight: 70
-    category: guide
+    - category: guide
+      weight: 70
 ---
 
 # 项目脚本配置
