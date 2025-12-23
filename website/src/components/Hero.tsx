@@ -49,7 +49,9 @@ export type Feature = {
   readonly annotaion?: string;
 };
 
-export function HeroFeature(props: PropsWithChildren<Feature>): React.ReactNode {
+export function HeroFeature(
+  props: PropsWithChildren<Feature>
+): React.ReactNode {
   const { title, tagline, description, annotaion, children } = props;
 
   return (

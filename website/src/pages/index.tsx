@@ -11,7 +11,7 @@ import type { Feature } from "../components/Hero";
 
 import styles from "./index.module.css";
 
-import "@theme/Page" // TODO: remove this when nonepress 3.5.1 is ready
+import "@theme/Page"; // TODO: remove this when nonepress 3.5.1 is ready
 
 export default function Home() {
   const firstFeature: Feature = {
