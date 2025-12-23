@@ -28,3 +28,7 @@ class LocalCacheExpired(RuntimeError):
 
 class NoSelectablePackageError(RuntimeError):
     """Raised when there is no selectable package."""
+
+
+class ProcessExecutionError(RuntimeError):
+    """Raised when a subprocess execution fails."""
