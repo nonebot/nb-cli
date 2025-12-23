@@ -109,7 +109,7 @@ function HomeFeatures(): React.ReactNode {
             `plugin_name = "cli_plugin.plugin:install"`,
             "[project.entry-points.nb_scripts]",
             `foo = "awesome_bot.module:function"`,
-            " "
+            " ",
           ].join("\n")}
         </CodeBlock>
         <CodeBlock title="" language="python" className="home-codeblock">
