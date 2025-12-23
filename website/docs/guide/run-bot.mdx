@@ -28,6 +28,33 @@ nb run
 对于目录下已有 `bot.py` 的项目，CLI 会使用该脚本运行 bot。
 :::
 
+```shell
+$ nb run --help
+Usage: nb run [OPTIONS]
+
+  在当前文件夹中运行机器人.
+
+Options:
+  -f, --file TEXT         存在的机器人入口文件.  [default: bot.py]
+  -r, --reload            当文件发生变化时重新加载机器人.
+  --reload-dirs TEXT      要监视变化的路径.
+  --reload-includes TEXT  要监视变化的文件.
+  --reload-excludes TEXT  要忽略变化的文件.
+  --reload-delay FLOAT    重新加载的延迟时间(秒).  [default: 0.5]
+  -h, --help              Show this message and exit.
+```
+
 ## 生成启动脚本
 
 运行以下命令在当前执行目录下生成启动脚本，一般用于 docker 部署。
+
+```shell
+$ nb generate --help
+Usage: nb generate [OPTIONS]
+
+  生成机器人的入口文件.
+
+Options:
+  -f, --file TEXT  脚本文件保存路径.  [default: bot.py]
+  -h, --help       Show this message and exit.
+```
