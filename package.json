@@ -1,20 +1,41 @@
 {
-  "name": "nb-cli",
+  "name": "root",
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "workspaces": [
     "website"
   ],
   "scripts": {
-    "archive": "yarn workspace website docusaurus docs:version",
-    "build": "yarn workspace website build",
-    "build:plugin": "cross-env BASE_URL='/docs/' yarn workspace website build",
-    "start": "yarn workspace website start",
-    "serve": "yarn workspace website serve",
-    "clear": "yarn workspace website clear",
-    "prettier": "prettier --config ./.prettierrc --write \"./website/**/*.md\""
+    "archive": "yarn workspace nb-cli docusaurus docs:version",
+    "build": "yarn workspace nb-cli build",
+    "build:plugin": "cross-env BASE_URL='/website/' yarn workspace nb-cli build",
+    "start": "yarn workspace nb-cli start",
+    "serve": "yarn workspace nb-cli serve",
+    "clear": "yarn workspace nb-cli clear",
+    "prettier": "prettier --config ./.prettierrc --write \"./website/\"",
+    "lint": "yarn lint:js && yarn lint:style",
+    "lint:js": "eslint --cache --report-unused-disable-directives \"**/*.{js,jsx,ts,tsx,mjs}\"",
+    "lint:js:fix": "eslint --cache --report-unused-disable-directives --fix \"**/*.{js,jsx,ts,tsx,mjs}\"",
+    "lint:style": "stylelint \"**/*.css\"",
+    "lint:style:fix": "stylelint --fix \"**/*.css\"",
+    "pyright": "pyright"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "cross-env": "^7.0.3",
-    "prettier": "^2.5.0"
+    "eslint": "^8.48.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-regexp": "^1.15.0",
+    "prettier": "^3.0.3",
+    "pyright": "1.1.393",
+    "stylelint": "^15.10.3",
+    "stylelint-config-standard": "^34.0.0",
+    "stylelint-prettier": "^4.0.2"
   }
 }

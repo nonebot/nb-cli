@@ -4,14 +4,11 @@ description: 创建 NoneBot 项目
 
 options:
   menu:
-    weight: 20
-    category: guide
+    - category: guide
+      weight: 20
 ---
 
 # 创建项目
-
-import RunCLI from "@site/src/components/RunCLI";
-import CreateHelpSource from "!!raw-loader!@site/src/scripts/nb_create.py";
 
 运行以下命令来创建一个新项目：
 
@@ -29,8 +26,15 @@ nb create
 
 CLI 所创建的项目目录结构可参考 [NoneBot 文档](https://nonebot.dev/docs/tutorial/create-project#%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84)
 
-<RunCLI
-  code={CreateHelpSource}
-  placeholder="正在加载 Python 模块..."
-  className="language-shell"
-/>
+```shell
+$ nb create --help
+Usage: nb create [OPTIONS] [PIP_ARGS]...
+
+  创建一个 NoneBot 项目.
+
+Options:
+  -o, --output-dir DIRECTORY
+  -t, --template TEXT            使用的项目模板.
+  -p, --python-interpreter TEXT  虚拟环境使用的 Python 解释器.
+  -h, --help                     Show this message and exit.
+```

@@ -4,8 +4,8 @@ description: 安装 NoneBot CLI
 
 options:
   menu:
-    weight: 10
-    category: guide
+    - category: guide
+      weight: 10
 ---
 
 # 安装

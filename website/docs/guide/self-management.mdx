@@ -4,24 +4,32 @@ description: CLI 自身管理
 
 options:
   menu:
-    weight: 60
-    category: guide
+    - category: guide
+      weight: 60
 ---
 
 # CLI 自身管理
-
-import RunCLI from "@site/src/components/RunCLI";
-import SelfHelpSource from "!!raw-loader!@site/src/scripts/nb_self.py";
 
 CLI 处于独立的虚拟环境中运行，由外界直接管理 CLI 的环境在不使用 pipx 的情况下较为困难。
 
 因此，CLI 向外提供了以下的命令，便于外界对 CLI 自身的环境进行操作。
 
-<RunCLI
-  code={SelfHelpSource}
-  placeholder="正在加载 Python 模块..."
-  className="language-shell"
-/>
+```shell
+$ nb self --help
+Usage: nb self [OPTIONS] COMMAND [ARGS]...
+
+  管理 NB CLI.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  install (add)       在 cli 虚拟环境中安装包.
+  update              更新 cli.
+  uninstall (remove)  从 cli 虚拟环境中卸载包.
+  list                列出 cli 虚拟环境中已安装的包.
+  cache               管理 CLI 数据缓存.
+```
 
 :::warning 注意
 在一般情况下，CLI 的内部环境不需要额外的手动干预。

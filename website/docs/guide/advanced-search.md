@@ -4,8 +4,8 @@ description: 高级搜索
 
 options:
   menu:
-    weight: 50
-    category: guide
+    - category: guide
+      weight: 50
 ---
 
 # 高级搜索

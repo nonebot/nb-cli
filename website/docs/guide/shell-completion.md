@@ -4,8 +4,8 @@ description: Shell 自动补全
 
 options:
   menu:
-    weight: 90
-    category: guide
+    - category: guide
+      weight: 90
 ---
 
 # Shell 自动补全

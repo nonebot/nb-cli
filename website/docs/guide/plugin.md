@@ -4,8 +4,8 @@ description: CLI 插件配置
 
 options:
   menu:
-    weight: 80
-    category: guide
+    - category: guide
+      weight: 80
 ---
 
 # CLI 插件配置
