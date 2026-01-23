@@ -175,7 +175,7 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
                 click.secho(
                     _(
                         "Warning: The current project uses {current!r} "
-                        "but the available manager is {name}."
+                        "but the available manager is {name!r}."
                     ).format(current=current, name=name),
                     fg="yellow",
                 )
