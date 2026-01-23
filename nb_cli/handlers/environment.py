@@ -44,7 +44,7 @@ def probe_environment_manager(*, cwd: Path | None = None) -> tuple[str, str]:
         "pip",
     )
 
-    available = next(iter(m for m in [current, *_manager_exec] if which(m) is not None))
+    available = next(iter(m for m in [current, "pip"] if which(m) is not None))
 
     return current, available
 
