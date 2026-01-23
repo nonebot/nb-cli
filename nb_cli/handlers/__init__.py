@@ -50,6 +50,12 @@ from .process import ensure_process_terminated as ensure_process_terminated
 
 # isort: split
 
+from .environment import EnvironmentExecutor as EnvironmentExecutor
+from .environment import all_environment_managers as all_environment_managers
+from .environment import probe_environment_manager as probe_environment_manager
+
+# isort: split
+
 # pip
 from .pip import call_pip as call_pip
 from .pip import call_pip_list as call_pip_list
