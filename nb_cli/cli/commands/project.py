@@ -106,7 +106,6 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
     all_adapters = await list_adapters()
     click.secho(_("Loading drivers..."))
     all_drivers = await list_drivers()
-    click.clear()
 
     project_name = await InputPrompt(
         _("Project Name:"),
