@@ -7,8 +7,14 @@ from noneprompt import Choice, ListPrompt, InputPrompt, ConfirmPrompt, Cancelled
 
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
-from nb_cli.exceptions import NoSelectablePackageError
 from nb_cli.cli.utils import find_exact_package, format_package_results
+from nb_cli.exceptions import ProcessExecutionError, NoSelectablePackageError
+from nb_cli.handlers import (
+    EnvironmentExecutor,
+    list_plugins,
+    create_plugin,
+    list_installed_plugins,
+)
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
@@ -16,14 +22,6 @@ from nb_cli.cli import (
     exit_,
     run_sync,
     run_async,
-)
-from nb_cli.handlers import (
-    list_plugins,
-    create_plugin,
-    call_pip_update,
-    call_pip_install,
-    call_pip_uninstall,
-    list_installed_plugins,
 )
 
 
@@ -203,10 +201,13 @@ async def install(
             fg="yellow",
         )
 
-    proc = await call_pip_install(
-        plugin.as_dependency(extras=extras, versioned=not no_restrict_version), pip_args
-    )
-    if await proc.wait() != 0:
+    executor = await EnvironmentExecutor.get()
+    try:
+        await executor.install(
+            plugin.as_requirement(extras=extras, versioned=not no_restrict_version),
+            extra_args=pip_args or (),
+        )
+    except ProcessExecutionError:
         click.secho(
             _(
                 "Errors occurred in installing plugin {plugin.name}\n"
@@ -215,25 +216,13 @@ async def install(
             ).format(plugin=plugin),
             fg="red",
         )
-        assert proc.returncode
-        ctx.exit(proc.returncode)
+        ctx.exit(1)
 
     try:
         GLOBAL_CONFIG.add_plugin(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to add plugin {plugin.name} to config: {e}").format(
-                plugin=plugin, e=e
-            )
-        )
-
-    try:
-        GLOBAL_CONFIG.add_dependency(
-            plugin.as_dependency(extras=extras, versioned=not no_restrict_version)
-        )
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to add plugin {plugin.name} to dependencies: {e}").format(
                 plugin=plugin, e=e
             )
         )
@@ -278,8 +267,10 @@ async def update(
             fg="yellow",
         )
 
-    proc = await call_pip_update(plugin.project_link, pip_args)
-    if await proc.wait() != 0:
+    executor = await EnvironmentExecutor.get()
+    try:
+        await executor.update(plugin.as_requirement(), extra_args=pip_args or ())
+    except ProcessExecutionError:
         click.secho(
             _("Errors occurred in updating plugin {plugin.name}. Aborted.").format(
                 plugin=plugin
@@ -287,15 +278,6 @@ async def update(
             fg="red",
         )
         return
-
-    try:
-        GLOBAL_CONFIG.update_dependency(plugin)
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to update plugin {plugin.name} to dependencies: {e}").format(
-                plugin=plugin, e=e
-            )
-        )
 
 
 @plugin.command(
@@ -307,6 +289,11 @@ async def update(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def uninstall(name: str | None, pip_args: list[str] | None):
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     try:
         plugin = await find_exact_package(
             _("Plugin name to uninstall:"),
@@ -319,18 +306,8 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         click.echo(_("No installed plugin found to uninstall."))
         return
 
-    extras: str | None = None
-    if name and "[" in name:
-        name, extras = name.split("[", 1)
-        extras = extras.rstrip("]")
-
     try:
-        if extras is not None:
-            if not GLOBAL_CONFIG.remove_dependency(plugin.as_dependency(extras=extras)):
-                return
         can_uninstall = GLOBAL_CONFIG.remove_plugin(plugin)
-        if can_uninstall:
-            GLOBAL_CONFIG.remove_dependency(plugin)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove plugin {plugin.name} from config: {e}").format(
@@ -340,8 +317,11 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         return
 
     if can_uninstall:
-        proc = await call_pip_uninstall(plugin.project_link, pip_args)
-        await proc.wait()
+        executor = await EnvironmentExecutor.get()
+        await executor.uninstall(
+            plugin.as_requirement(extras=extras, versioned=False),
+            extra_args=pip_args or (),
+        )
 
 
 @plugin.command(aliases=["new"], help=_("Create a new nonebot plugin."))

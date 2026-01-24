@@ -324,22 +324,37 @@ class ConfigManager:
         self._write_data(data)
         self._policy = self._select_policy()  # update access policy
 
-    def get_dependencies(self) -> list[Requirement]:
+    def get_dependencies(self, *, group: str | None = None) -> list[Requirement]:
         data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        if group is None:
+            deps: list[str] = data.setdefault("project", {}).setdefault(
+                "dependencies", []
+            )
+        else:
+            deps: list[str] = (
+                data.setdefault("project", {})
+                .setdefault("dependency-groups", {})
+                .setdefault(group, [])
+            )
         return [Requirement(d) for d in deps]
 
-    def add_dependency(self, *dependencies: str | PackageInfo) -> None:
+    def add_dependency(
+        self, *dependencies: str | PackageInfo | Requirement, group: str | None = None
+    ) -> None:
         if not dependencies:
             return
 
-        deps = self.get_dependencies()
+        deps = self.get_dependencies(group=group)
         with self._data_context("project", dict[str, Any]()) as project:
             for dependency in dependencies:
-                depinfo = Requirement(
-                    dependency
-                    if isinstance(dependency, str)
-                    else dependency.as_dependency(versioned=False)
+                depinfo = (
+                    Requirement(
+                        dependency
+                        if isinstance(dependency, str)
+                        else dependency.as_dependency(versioned=False)
+                    )
+                    if isinstance(dependency, (str, PackageInfo))
+                    else dependency
                 )
                 matches = [i for i, d in enumerate(deps) if d.name == depinfo.name]
 
@@ -354,24 +369,38 @@ class ConfigManager:
 
                     deps[idx] = _merge_package_requirements(deps[idx], depinfo)
                 else:
-                    depinfo = Requirement(
-                        dependency
-                        if isinstance(dependency, str)
-                        else dependency.as_dependency(versioned=True)
+                    depinfo = (
+                        Requirement(
+                            dependency
+                            if isinstance(dependency, str)
+                            else dependency.as_dependency(versioned=True)
+                        )
+                        if isinstance(dependency, (str, PackageInfo))
+                        else dependency
                     )
                     deps.append(depinfo)
 
-            project["dependencies"] = tomlkit.array().multiline(True)
-            project["dependencies"].extend(str(d) for d in deps)
+            if group is None:
+                project["dependencies"] = tomlkit.array().multiline(True)
+                project["dependencies"].extend(str(d) for d in deps)
+            else:
+                project["dependency-groups"] = tomlkit.table()
+                gdep = tomlkit.array().multiline(True)
+                gdep.extend(str(d) for d in deps)
+                project["dependency-groups"].add(group, gdep)
 
-    def update_dependency(self, *dependencies: PackageInfo) -> None:
+    def update_dependency(self, *dependencies: PackageInfo | Requirement) -> None:
         if not dependencies:
             return
 
         deps = self.get_dependencies()
         with self._data_context("project", dict[str, Any]()) as project:
             for dependency in dependencies:
-                depinfo = Requirement(dependency.as_dependency(versioned=True))
+                depinfo = (
+                    Requirement(dependency.as_dependency(versioned=True))
+                    if isinstance(dependency, PackageInfo)
+                    else dependency
+                )
                 matches = [i for i, d in enumerate(deps) if d.name == depinfo.name]
 
                 if matches:
@@ -390,25 +419,32 @@ class ConfigManager:
             project["dependencies"] = tomlkit.array().multiline(True)
             project["dependencies"].extend(str(d) for d in deps)
 
-    def remove_dependency(self, *dependencies: str | PackageInfo) -> bool:
+    def remove_dependency(
+        self, *dependencies: str | PackageInfo | Requirement
+    ) -> list[Requirement]:
         """
         删除依赖记录操作。
 
         Returns:
-            bool: 表示相关依赖是否全部被成功移除。
+            list[Requirement]: 成功完整移除的相关依赖。
         """
         if not dependencies:
-            return False
+            return []
 
-        status = True
+        removables: list[Requirement] = []
 
         deps = self.get_dependencies()
         with self._data_context("project", dict[str, Any]()) as project:
             for dependency in dependencies:
-                depinfo = Requirement(
-                    dependency
-                    if isinstance(dependency, str)
-                    else dependency.as_dependency(versioned=False)
+                status = True
+                depinfo = (
+                    Requirement(
+                        dependency
+                        if isinstance(dependency, str)
+                        else dependency.as_dependency(versioned=False)
+                    )
+                    if isinstance(dependency, (str, PackageInfo))
+                    else dependency
                 )
 
                 def _convert(d: Requirement) -> Requirement | None:
@@ -420,11 +456,13 @@ class ConfigManager:
                     return res
 
                 deps = [d for d in (_convert(d) for d in deps) if d is not None]
+                if status:
+                    removables.append(depinfo)
 
             project["dependencies"] = tomlkit.array().multiline(True)
             project["dependencies"].extend(str(d) for d in deps)
 
-        return status
+        return removables
 
     def add_adapter(self, *adapters: PackageInfo) -> None:
         if not adapters:

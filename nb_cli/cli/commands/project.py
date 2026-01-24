@@ -12,6 +12,7 @@ from collections.abc import Sequence, MutableMapping
 
 import click
 import nonestorage
+from packaging.requirements import Requirement
 from noneprompt import (
     Choice,
     ListPrompt,
@@ -27,17 +28,17 @@ from nb_cli.compat import model_dump
 from nb_cli.config import ConfigManager
 from nb_cli.consts import DEFAULT_DRIVER
 from nb_cli.cli.utils import advanced_search
-from nb_cli.exceptions import ModuleLoadFailed
+from nb_cli.exceptions import ModuleLoadFailed, ProcessExecutionError
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
     FileFilter,
+    EnvironmentExecutor,
     run_project,
     list_drivers,
     list_plugins,
     list_adapters,
     create_project,
-    call_pip_install,
     get_project_root,
     create_virtualenv,
     terminate_process,
@@ -45,6 +46,7 @@ from nb_cli.handlers import (
     list_builtin_plugins,
     list_project_templates,
     upgrade_project_format,
+    all_environment_managers,
     downgrade_project_format,
 )
 
@@ -342,11 +344,22 @@ async def create(
 
     if install_dependencies:
         try:
-            use_venv = await ConfirmPrompt(
-                _("Create virtual environment?"), default_choice=True
+            manager = await ListPrompt(
+                _("Which project manager would you like to use?"),
+                choices=[Choice(mgr, mgr) for mgr in await all_environment_managers()],
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
             return
+
+        if manager.data == "pip":
+            try:
+                use_venv = await ConfirmPrompt(
+                    _("Create virtual environment?"), default_choice=True
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+            except CancelledError:
+                return
+        else:
+            use_venv = True
 
         if use_venv:
             click.secho(
@@ -361,28 +374,59 @@ async def create(
 
         config_manager = ConfigManager(working_dir=project_dir, use_venv=use_venv)
 
-        proc = await call_pip_install(
-            ["nonebot2", *set(context.packages)],
-            pip_args,
-            python_path=config_manager.python_path,
+        executor = await EnvironmentExecutor.get(
+            manager.data,
+            toml_manager=config_manager,
+            cwd=project_dir,
+            executable=config_manager.python_path,
         )
-        await proc.wait()
-
-        if proc.returncode == 0:
-            builtin_plugins = await list_builtin_plugins(
-                python_path=config_manager.python_path
+        try:
+            await executor.install(
+                *(Requirement(pkg) for pkg in ["nonebot2", *set(context.packages)]),
+                extra_args=pip_args or (),
             )
-            try:
-                loaded_builtin_plugins = [
-                    c.data
-                    for c in await CheckboxPrompt(
-                        _("Which builtin plugin(s) would you like to use?"),
-                        [Choice(p, p) for p in builtin_plugins],
-                    ).prompt_async(style=CLI_DEFAULT_STYLE)
-                ]
-            except CancelledError:
-                return
+        except ProcessExecutionError:
+            click.secho(
+                _(
+                    "Failed to install dependencies! "
+                    "You should install the dependencies manually."
+                ),
+                fg="red",
+            )
+            ctx.exit(1)
 
+        try:
+            if context.variables.get("devtools"):
+                if await ConfirmPrompt(
+                    _("Install developer dependencies?"), default_choice=True
+                ).prompt_async(style=CLI_DEFAULT_STYLE):
+                    await executor.install(
+                        *(Requirement(pkg) for pkg in context.variables["devtools"]),
+                        extra_args=pip_args or (),
+                        dev=True,
+                    )
+        except CancelledError:
+            pass
+        except ProcessExecutionError:
+            click.secho(
+                _(
+                    "Failed to install developer dependencies! "
+                    "You may install them manually."
+                ),
+                fg="red",
+            )
+
+        builtin_plugins = await list_builtin_plugins(
+            python_path=config_manager.python_path
+        )
+        try:
+            loaded_builtin_plugins = [
+                c.data
+                for c in await CheckboxPrompt(
+                    _("Which builtin plugin(s) would you like to use?"),
+                    [Choice(p, p) for p in builtin_plugins],
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+            ]
             try:
                 for plugin in loaded_builtin_plugins:
                     config_manager.add_builtin_plugin(plugin)
@@ -393,48 +437,38 @@ async def create(
                     ).format(builtin_plugin=loaded_builtin_plugins, e=e),
                     fg="red",
                 )
-                ctx.exit(1)
+        except CancelledError:
+            pass
 
-            plugins = await list_plugins()
-            try:
-                pending_plugins = [
-                    c.data
-                    for c in await CheckboxPrompt(
-                        _("Which official plugins would you like to use?"),
-                        [
-                            Choice(f"{p.name} ({p.desc})", p)
-                            for p in advanced_search("#official", plugins)
-                        ],
-                    ).prompt_async(style=CLI_DEFAULT_STYLE)
-                ]
-                if pending_plugins:
-                    proc = await call_pip_install(
-                        [p.as_dependency() for p in pending_plugins],
-                        pip_args,
-                        python_path=config_manager.python_path,
+        plugins = await list_plugins()
+        try:
+            pending_plugins = [
+                c.data
+                for c in await CheckboxPrompt(
+                    _("Which official plugins would you like to use?"),
+                    [
+                        Choice(f"{p.name} ({p.desc})", p)
+                        for p in advanced_search("#official", plugins)
+                    ],
+                ).prompt_async(style=CLI_DEFAULT_STYLE)
+            ]
+            if pending_plugins:
+                try:
+                    await executor.install(
+                        *(p.as_requirement() for p in pending_plugins),
+                        extra_args=pip_args or (),
                     )
-                await proc.wait()
-                if proc.returncode == 0:
-                    config_manager.add_dependency(*pending_plugins)
                     config_manager.add_plugin(*pending_plugins)
-                else:
+                except ProcessExecutionError:
                     click.secho(
                         _(
                             "Failed to install plugins! "
-                            "You should install the plugins manually."
+                            "You may install the plugins manually."
                         ),
                         fg="red",
                     )
-            except CancelledError:
-                return
-        else:
-            click.secho(
-                _(
-                    "Failed to install dependencies! "
-                    "You should install the dependencies manually."
-                ),
-                fg="red",
-            )
+        except CancelledError:
+            pass
 
     click.secho(_("Done!"), fg="green")
     click.secho(_("Run the following command to start your bot:"), fg="green")

@@ -1,17 +1,13 @@
 from typing import cast
 
 import click
+from packaging.requirements import Requirement
 from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
-from nb_cli.config import GLOBAL_CONFIG
+from nb_cli.exceptions import ProcessExecutionError
+from nb_cli.handlers import EnvironmentExecutor, list_drivers
 from nb_cli.cli.utils import find_exact_package, format_package_results
-from nb_cli.handlers import (
-    list_drivers,
-    call_pip_update,
-    call_pip_install,
-    call_pip_uninstall,
-)
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
@@ -153,25 +149,20 @@ async def install(
             fg="yellow",
         )
 
-    if driver.project_link:
-        proc = await call_pip_install(driver.project_link, pip_args)
-        if await proc.wait() != 0:
-            click.secho(
-                _(
-                    "Errors occurred in installing driver {driver.name}. Aborted."
-                ).format(driver=driver),
-                fg="red",
-            )
-            return
-
+    executor = await EnvironmentExecutor.get()
     try:
-        GLOBAL_CONFIG.add_dependency(driver)
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to add driver {driver.name} to dependencies: {e}").format(
-                driver=driver, e=e
-            )
+        await executor.install(
+            driver.as_requirement() if driver.project_link else Requirement("nonebot2"),
+            extra_args=pip_args or (),
         )
+    except ProcessExecutionError:
+        click.secho(
+            _("Errors occurred in installing driver {driver.name}. Aborted.").format(
+                driver=driver
+            ),
+            fg="red",
+        )
+        return
 
 
 @driver.command(
@@ -210,25 +201,20 @@ async def update(
             fg="yellow",
         )
 
-    if driver.project_link:
-        proc = await call_pip_update(driver.project_link, pip_args)
-        if await proc.wait() != 0:
-            click.secho(
-                _("Errors occurred in updating driver {driver.name}. Aborted.").format(
-                    driver=driver
-                ),
-                fg="red",
-            )
-            return
-
+    executor = await EnvironmentExecutor.get()
     try:
-        GLOBAL_CONFIG.update_dependency(driver)
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to update driver {driver.name} to dependencies: {e}").format(
-                driver=driver, e=e
-            )
+        await executor.install(
+            driver.as_requirement() if driver.project_link else Requirement("nonebot2"),
+            extra_args=pip_args or (),
         )
+    except ProcessExecutionError:
+        click.secho(
+            _("Errors occurred in updating driver {driver.name}. Aborted.").format(
+                driver=driver
+            ),
+            fg="red",
+        )
+        return
 
 
 @driver.command(
@@ -251,19 +237,9 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
     except CancelledError:
         return
 
-    try:
-        GLOBAL_CONFIG.remove_dependency(driver)
-        GLOBAL_CONFIG.add_dependency("nonebot2")  # hold a nonebot2 package
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to remove driver {driver.name} from dependencies: {e}").format(
-                driver=driver, e=e
-            )
+    if driver.project_link:
+        executor = await EnvironmentExecutor.get()
+        await executor.uninstall(
+            driver.as_requirement(versioned=False), extra_args=pip_args or ()
         )
-
-    if package := driver.project_link:
-        if package.startswith("nonebot2[") and package.endswith("]"):
-            package = package[9:-1]
-
-        proc = await call_pip_uninstall(package, pip_args)
-        await proc.wait()
+        await executor.install(Requirement("nonebot2"), extra_args=pip_args or ())

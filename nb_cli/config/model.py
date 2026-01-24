@@ -4,6 +4,7 @@ from typing import ClassVar
 from datetime import datetime
 
 from pydantic import BaseModel
+from packaging.requirements import Requirement
 
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
 
@@ -51,6 +52,11 @@ class PackageInfo(SimpleInfo):
         return (
             f"{self.project_link}>={self.version}" if versioned else self.project_link
         )
+
+    def as_requirement(
+        self, *, extras: str | None = None, versioned: bool = True
+    ) -> Requirement:
+        return Requirement(self.as_dependency(extras=extras, versioned=versioned))
 
 
 class Adapter(PackageInfo):

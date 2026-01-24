@@ -7,8 +7,8 @@ from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
 
 from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG
-from nb_cli.exceptions import NoSelectablePackageError
 from nb_cli.cli.utils import find_exact_package, format_package_results
+from nb_cli.exceptions import ProcessExecutionError, NoSelectablePackageError
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
@@ -18,11 +18,9 @@ from nb_cli.cli import (
     run_async,
 )
 from nb_cli.handlers import (
+    EnvironmentExecutor,
     list_adapters,
     create_adapter,
-    call_pip_update,
-    call_pip_install,
-    call_pip_uninstall,
     list_installed_adapters,
 )
 
@@ -205,11 +203,13 @@ async def install(
             fg="yellow",
         )
 
-    proc = await call_pip_install(
-        adapter.as_dependency(extras=extras, versioned=not no_restrict_version),
-        pip_args,
-    )
-    if await proc.wait() != 0:
+    executor = await EnvironmentExecutor.get()
+    try:
+        await executor.install(
+            adapter.as_requirement(extras=extras, versioned=not no_restrict_version),
+            extra_args=pip_args or (),
+        )
+    except ProcessExecutionError:
         click.secho(
             _(
                 "Errors occurred in installing adapter {adapter.name}\n"
@@ -218,25 +218,13 @@ async def install(
             ).format(adapter=adapter),
             fg="red",
         )
-        assert proc.returncode
-        ctx.exit(proc.returncode)
+        ctx.exit(1)
 
     try:
         GLOBAL_CONFIG.add_adapter(adapter)
     except RuntimeError as e:
         click.echo(
             _("Failed to add adapter {adapter.name} to config: {e}").format(
-                adapter=adapter, e=e
-            )
-        )
-
-    try:
-        GLOBAL_CONFIG.add_dependency(
-            adapter.as_dependency(extras=extras, versioned=not no_restrict_version)
-        )
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to add adapter {adapter.name} to dependencies: {e}").format(
                 adapter=adapter, e=e
             )
         )
@@ -281,8 +269,13 @@ async def update(
             fg="yellow",
         )
 
-    proc = await call_pip_update(adapter.project_link, pip_args)
-    if await proc.wait() != 0:
+    executor = await EnvironmentExecutor.get()
+    try:
+        await executor.install(
+            adapter.as_requirement(versioned=False),
+            extra_args=pip_args or (),
+        )
+    except ProcessExecutionError:
         click.secho(
             _("Errors occurred in updating adapter {adapter.name}. Aborted.").format(
                 adapter=adapter
@@ -290,15 +283,6 @@ async def update(
             fg="red",
         )
         return
-
-    try:
-        GLOBAL_CONFIG.update_dependency(adapter)
-    except RuntimeError as e:
-        click.echo(
-            _("Failed to update adapter {adapter.name} to dependencies: {e}").format(
-                adapter=adapter, e=e
-            )
-        )
 
 
 @adapter.command(
@@ -310,6 +294,11 @@ async def update(
 @click.argument("pip_args", nargs=-1, default=None)
 @run_async
 async def uninstall(name: str | None, pip_args: list[str] | None):
+    extras: str | None = None
+    if name and "[" in name:
+        name, extras = name.split("[", 1)
+        extras = extras.rstrip("]")
+
     try:
         adapter = await find_exact_package(
             _("Adapter name to uninstall:"),
@@ -322,20 +311,8 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         click.echo(_("No installed adapter found to uninstall."))
         return
 
-    extras: str | None = None
-    if name and "[" in name:
-        name, extras = name.split("[", 1)
-        extras = extras.rstrip("]")
-
     try:
-        if extras is not None:
-            if not GLOBAL_CONFIG.remove_dependency(
-                adapter.as_dependency(extras=extras)
-            ):
-                return
         can_uninstall = GLOBAL_CONFIG.remove_adapter(adapter)
-        if can_uninstall:
-            GLOBAL_CONFIG.remove_dependency(adapter)
     except RuntimeError as e:
         click.echo(
             _("Failed to remove adapter {adapter.name} from config: {e}").format(
@@ -345,8 +322,11 @@ async def uninstall(name: str | None, pip_args: list[str] | None):
         return
 
     if can_uninstall:
-        proc = await call_pip_uninstall(adapter.project_link, pip_args)
-        await proc.wait()
+        executor = await EnvironmentExecutor.get()
+        await executor.uninstall(
+            adapter.as_requirement(extras=extras, versioned=False),
+            extra_args=pip_args or (),
+        )
 
 
 @adapter.command(aliases=["new"], help=_("Create a new nonebot adapter."))
