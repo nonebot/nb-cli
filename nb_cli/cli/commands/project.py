@@ -345,7 +345,7 @@ async def create(
     if install_dependencies:
         try:
             manager = await ListPrompt(
-                _("Which environment manager would you like to use?"),
+                _("Which project manager would you like to use?"),
                 choices=[Choice(mgr, mgr) for mgr in await all_environment_managers()],
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         except CancelledError:
