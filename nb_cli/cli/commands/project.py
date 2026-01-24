@@ -574,6 +574,13 @@ async def upgrade_format():
         await upgrade_project_format()
         click.echo(_("Successfully upgraded project format."))
 
+    if await ConfirmPrompt(
+        _("Do you want to install missing dependencies?"), True
+    ).prompt_async(style=CLI_DEFAULT_STYLE):
+        manager = await EnvironmentExecutor.get(cwd=get_project_root())
+        await manager.lock()
+        await manager.sync()
+
 
 @click.command(
     cls=ClickAliasedCommand, help=_("Downgrade the project format of your bot.")

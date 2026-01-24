@@ -176,7 +176,7 @@ async def upgrade_project_format(*, cwd: Path | None = None) -> None:
 
     manager = get_config_manager(cwd)
     manager.update_nonebot_config(new_config)
-    manager.update_dependency(nonebot_pkg, *packages)
+    manager.add_dependency(nonebot_pkg, *packages)
 
 
 @requires_project_root
