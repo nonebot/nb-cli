@@ -324,16 +324,27 @@ class ConfigManager:
         self._write_data(data)
         self._policy = self._select_policy()  # update access policy
 
-    def get_dependencies(self) -> list[Requirement]:
+    def get_dependencies(self, *, group: str | None = None) -> list[Requirement]:
         data = self._get_data()
-        deps: list[str] = data.setdefault("project", {}).setdefault("dependencies", [])
+        if group is None:
+            deps: list[str] = data.setdefault("project", {}).setdefault(
+                "dependencies", []
+            )
+        else:
+            deps: list[str] = (
+                data.setdefault("project", {})
+                .setdefault("dependency-groups", {})
+                .setdefault(group, [])
+            )
         return [Requirement(d) for d in deps]
 
-    def add_dependency(self, *dependencies: str | PackageInfo | Requirement) -> None:
+    def add_dependency(
+        self, *dependencies: str | PackageInfo | Requirement, group: str | None = None
+    ) -> None:
         if not dependencies:
             return
 
-        deps = self.get_dependencies()
+        deps = self.get_dependencies(group=group)
         with self._data_context("project", dict[str, Any]()) as project:
             for dependency in dependencies:
                 depinfo = (
@@ -369,8 +380,14 @@ class ConfigManager:
                     )
                     deps.append(depinfo)
 
-            project["dependencies"] = tomlkit.array().multiline(True)
-            project["dependencies"].extend(str(d) for d in deps)
+            if group is None:
+                project["dependencies"] = tomlkit.array().multiline(True)
+                project["dependencies"].extend(str(d) for d in deps)
+            else:
+                project["dependency-groups"] = tomlkit.table()
+                gdep = tomlkit.array().multiline(True)
+                gdep.extend(str(d) for d in deps)
+                project["dependency-groups"].add(group, gdep)
 
     def update_dependency(self, *dependencies: PackageInfo | Requirement) -> None:
         if not dependencies:
