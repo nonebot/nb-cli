@@ -98,9 +98,9 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
         self.executable = executable or self._executable
         self.env = env
 
-    def __init_subclass__(cls, /, *, name: str, **kwargs) -> None:
-        cls._executors[name] = cls
-        cls._executable = which(name) or name
+    def __init_subclass__(cls, /, *, manager_name: str, **kwargs) -> None:
+        cls._executors[manager_name] = cls
+        cls._executable = which(manager_name) or manager_name
 
     async def run(
         self, *args: Union[str, bytes, "os.PathLike[str]", "os.PathLike[bytes]"]
@@ -253,7 +253,7 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
         )
 
 
-class UvEnvironmentExecutor(EnvironmentExecutor, name="uv"):
+class UvEnvironmentExecutor(EnvironmentExecutor, manager_name="uv"):
     """Environment executor for Uv environment manager."""
 
     def __init__(
@@ -311,7 +311,7 @@ class UvEnvironmentExecutor(EnvironmentExecutor, name="uv"):
             )
 
 
-class PdmEnvironmentExecutor(EnvironmentExecutor, name="pdm"):
+class PdmEnvironmentExecutor(EnvironmentExecutor, manager_name="pdm"):
     """Environment executor for PDM environment manager."""
 
     def __init__(
@@ -369,7 +369,7 @@ class PdmEnvironmentExecutor(EnvironmentExecutor, name="pdm"):
             )
 
 
-class PoetryEnvironmentExecutor(EnvironmentExecutor, name="poetry"):
+class PoetryEnvironmentExecutor(EnvironmentExecutor, manager_name="poetry"):
     """Environment executor for Poetry environment manager."""
 
     def __init__(
@@ -429,7 +429,7 @@ class PoetryEnvironmentExecutor(EnvironmentExecutor, name="poetry"):
             )
 
 
-class PipEnvironmentExecutor(EnvironmentExecutor, name="pip"):
+class PipEnvironmentExecutor(EnvironmentExecutor, manager_name="pip"):
     """Environment executor for Pip environment manager."""
 
     toml_manager: ConfigManager
