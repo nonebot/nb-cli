@@ -40,10 +40,16 @@ uv (by Astral) 是一个飞快的 Python 包与项目管理器，使用 Rust 语
 
 ```shell title="直接运行最新 NoneBot CLI"
 uvx --from nb-cli@latest nb
+
+# 指定 Python 版本（如 3.12）
+uvx -p 3.12 --from nb-cli@latest nb
 ```
 
 ```shell title="安装 NoneBot CLI"
 uv tool install nb-cli@latest
+
+# 指定 Python 版本（如 3.12）
+uv tool install -p 3.12 nb-cli@latest
 ```
 
 ```shell title="运行已安装的 NoneBot CLI"
