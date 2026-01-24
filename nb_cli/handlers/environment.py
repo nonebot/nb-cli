@@ -284,8 +284,10 @@ class UvEnvironmentExecutor(EnvironmentExecutor, name="uv"):
             raise ProcessExecutionError("Failed to sync Uv environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = (), dev: bool = False
     ) -> None:
+        if dev:
+            extra_args = (*extra_args, "--dev")
         proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to install packages in Uv environment.")
@@ -340,8 +342,10 @@ class PdmEnvironmentExecutor(EnvironmentExecutor, name="pdm"):
             raise ProcessExecutionError("Failed to sync PDM environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = (), dev: bool = False
     ) -> None:
+        if dev:
+            extra_args = (*extra_args, "--dev")
         proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError(
@@ -396,8 +400,10 @@ class PoetryEnvironmentExecutor(EnvironmentExecutor, name="poetry"):
             raise ProcessExecutionError("Failed to sync Poetry environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = (), dev: bool = False
     ) -> None:
+        if dev:
+            extra_args = (*extra_args, "--dev")
         proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError(
@@ -455,7 +461,7 @@ class PipEnvironmentExecutor(EnvironmentExecutor, name="pip"):
             raise ProcessExecutionError("Failed to sync Pip environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = (), dev: bool = False
     ) -> None:
         proc = await self.run(
             "-m", "pip", "install", *(str(pkg) for pkg in packages), *extra_args
@@ -464,7 +470,7 @@ class PipEnvironmentExecutor(EnvironmentExecutor, name="pip"):
             raise ProcessExecutionError(
                 "Failed to install packages in Pip environment."
             )
-        self.toml_manager.add_dependency(*packages)
+        self.toml_manager.add_dependency(*packages, group="dev" if dev else None)
 
     async def update(
         self, *packages: Requirement, extra_args: Sequence[str] = ()
