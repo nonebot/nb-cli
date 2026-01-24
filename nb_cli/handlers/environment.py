@@ -165,7 +165,11 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
         Args:
             name: The name of the environment manager.
             cwd: The current working directory for the executor.
-            **kwargs: Additional keyword arguments to pass to the executor constructor.
+            stdin: The standard input for the executor.
+            stdout: The standard output for the executor.
+            stderr: The standard error for the executor.
+            env: The environment variables for the executor.
+            executable: The executable path for the environment manager.
         Returns:
             An instance of the executor corresponding to the given name.
         """
@@ -198,23 +202,23 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
         )
 
     @abc.abstractmethod
-    async def init(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def init(self, extra_args: Sequence[str] = ()) -> None:
         """Initialize the environment."""
         raise NotImplementedError("Init method is not implemented for this manager.")
 
     @abc.abstractmethod
-    async def lock(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def lock(self, extra_args: Sequence[str] = ()) -> None:
         """Generate or update the lock file for the environment."""
         raise NotImplementedError("Lock method is not implemented for this manager.")
 
     @abc.abstractmethod
-    async def sync(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def sync(self, extra_args: Sequence[str] = ()) -> None:
         """Synchronize the environment with the lock file or configuration."""
         raise NotImplementedError("Sync method is not implemented for this manager.")
 
     @abc.abstractmethod
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = (), dev: bool = False
     ) -> None:
         """Install packages into the environment.
 
@@ -225,7 +229,7 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     async def update(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         """Update packages in the environment.
 
@@ -237,7 +241,7 @@ class EnvironmentExecutor(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     async def uninstall(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         """Uninstall packages from the environment.
 
@@ -264,37 +268,39 @@ class UvEnvironmentExecutor(EnvironmentExecutor, name="uv"):
     ) -> None:
         super().__init__(cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, env=env)
 
-    async def init(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def init(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("init", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to initialize Uv environment.")
 
-    async def lock(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def lock(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("lock", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to lock Uv environment.")
 
-    async def sync(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def sync(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("sync", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to sync Uv environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to install packages in Uv environment.")
 
     async def update(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
-        proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
+        proc = await self.run(
+            "add", "--upgrade", *(str(pkg) for pkg in packages), *extra_args
+        )
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to update packages in Uv environment.")
 
     async def uninstall(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("remove", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
@@ -318,23 +324,23 @@ class PdmEnvironmentExecutor(EnvironmentExecutor, name="pdm"):
     ) -> None:
         super().__init__(cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, env=env)
 
-    async def init(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def init(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("init", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to initialize PDM environment.")
 
-    async def lock(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def lock(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("lock", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to lock PDM environment.")
 
-    async def sync(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def sync(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("sync", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to sync PDM environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
@@ -343,7 +349,7 @@ class PdmEnvironmentExecutor(EnvironmentExecutor, name="pdm"):
             )
 
     async def update(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("update", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
@@ -374,23 +380,23 @@ class PoetryEnvironmentExecutor(EnvironmentExecutor, name="poetry"):
     ) -> None:
         super().__init__(cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, env=env)
 
-    async def init(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def init(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("init", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to initialize Poetry environment.")
 
-    async def lock(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def lock(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("lock", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to lock Poetry environment.")
 
-    async def sync(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def sync(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("install", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to sync Poetry environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("add", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
@@ -399,7 +405,7 @@ class PoetryEnvironmentExecutor(EnvironmentExecutor, name="poetry"):
             )
 
     async def update(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("update", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
@@ -408,7 +414,7 @@ class PoetryEnvironmentExecutor(EnvironmentExecutor, name="poetry"):
             )
 
     async def uninstall(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run("remove", *(str(pkg) for pkg in packages), *extra_args)
         if await proc.wait() != 0:
@@ -437,19 +443,19 @@ class PipEnvironmentExecutor(EnvironmentExecutor, name="pip"):
         self.executable = executable
         self.toml_manager = toml_manager
 
-    async def init(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def init(self, extra_args: Sequence[str] = ()) -> None:
         pass  # Pip does not require initialization.
 
-    async def lock(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def lock(self, extra_args: Sequence[str] = ()) -> None:
         pass  # Pip does not have a lock mechanism.
 
-    async def sync(self, extra_args: Sequence[str | bytes] = ()) -> None:
+    async def sync(self, extra_args: Sequence[str] = ()) -> None:
         proc = await self.run("-m", "pip", "install", "-e", ".", *extra_args)
         if await proc.wait() != 0:
             raise ProcessExecutionError("Failed to sync Pip environment.")
 
     async def install(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run(
             "-m", "pip", "install", *(str(pkg) for pkg in packages), *extra_args
@@ -461,7 +467,7 @@ class PipEnvironmentExecutor(EnvironmentExecutor, name="pip"):
         self.toml_manager.add_dependency(*packages)
 
     async def update(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         proc = await self.run(
             "-m",
@@ -476,7 +482,7 @@ class PipEnvironmentExecutor(EnvironmentExecutor, name="pip"):
         self.toml_manager.update_dependency(*packages)
 
     async def uninstall(
-        self, *packages: Requirement, extra_args: Sequence[str | bytes] = ()
+        self, *packages: Requirement, extra_args: Sequence[str] = ()
     ) -> None:
         free_packages = self.toml_manager.remove_dependency(*packages)
         if not free_packages:
