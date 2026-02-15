@@ -53,6 +53,10 @@ uv tool install -p 3.12 nb-cli@latest
 ```
 
 ```shell title="运行已安装的 NoneBot CLI"
+# 更新环境变量允许调用 uv tool 安装的工具
+uv tool update-shell
+nb
+# 或
 uvx --from nb-cli nb
 # 或
 uv tool run --from nb-cli nb
