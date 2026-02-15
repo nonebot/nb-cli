@@ -22,8 +22,8 @@ _✨ NoneBot2 命令行工具 ✨_
   <a href="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml">
     <img src="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml/badge.svg?branch=master&event=push" alt="site"/>
   </a>
-  <a href="https://results.pre-commit.ci/latest/github/nonebot/nb-cli/master">
-    <img src="https://results.pre-commit.ci/badge/github/nonebot/nb-cli/master.svg" alt="pre-commit" />
+  <a href="https://github.com/j178/prek">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json" alt="prek">
   </a>
   <br />
   <a href="https://jq.qq.com/?_wv=1027&k=5OFifDh">
