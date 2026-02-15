@@ -31,3 +31,34 @@ pipx upgrade nb-cli
 ```shell title="卸载 NoneBot CLI"
 pipx uninstall nb-cli
 ```
+
+## 通过 uv tool 安装
+
+uv (by Astral) 是一个飞快的 Python 包与项目管理器，使用 Rust 语言编写。其也拥有工具集成管理的功能。
+
+请参考 [uv 文档](https://docs.astral.sh/uv/getting-started/installation/) 来安装 uv。
+
+```shell title="直接运行最新 NoneBot CLI"
+uvx --from nb-cli@latest nb
+
+# 指定 Python 版本（如 3.12）
+uvx -p 3.12 --from nb-cli@latest nb
+```
+
+```shell title="安装 NoneBot CLI"
+uv tool install nb-cli@latest
+
+# 指定 Python 版本（如 3.12）
+uv tool install -p 3.12 nb-cli@latest
+
+# 更新环境变量允许调用 uv tool 安装的工具
+uv tool update-shell
+```
+
+```shell title="升级 NoneBot CLI"
+uv tool upgrade nb-cli
+```
+
+```shell title="卸载 NoneBot CLI"
+uv tool uninstall nb-cli
+```
