@@ -78,6 +78,7 @@ pipx install nb-cli
 
 ```shell
 uv tool install nb-cli@latest
+uv tool update-shell
 ```
 
 其中 `latest` 可以更改为指定的 CLI 版本
@@ -118,8 +119,6 @@ nb --help
 
 ```shell
 uvx --from nb-cli@latest nb --help
-# 或
-uv tool run --from nb-cli nb --help
 ```
 
 #### Docker 镜像使用
