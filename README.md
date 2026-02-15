@@ -22,9 +22,6 @@ _✨ NoneBot2 命令行工具 ✨_
   <a href="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml">
     <img src="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml/badge.svg?branch=master&event=push" alt="site"/>
   </a>
-  <a href="https://results.pre-commit.ci/latest/github/nonebot/nb-cli/master">
-    <img src="https://results.pre-commit.ci/badge/github/nonebot/nb-cli/master.svg" alt="pre-commit" />
-  </a>
   <br />
   <a href="https://jq.qq.com/?_wv=1027&k=5OFifDh">
     <img src="https://img.shields.io/badge/QQ%E7%BE%A4-768887710-orange?style=flat-square" alt="QQ Chat Group">
