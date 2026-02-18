@@ -45,6 +45,7 @@ dev = [
     "black >=22.3.0",
     "nonemoji ~=0.1",
     "prek>=0.3.2",
+    "basedpyright>=1.38.1",
 ]
 docs = ["nb-autodoc >=1.0.3"]
 
@@ -55,11 +56,12 @@ repository = "https://github.com/nonebot/nb-cli"
 [project.scripts]
 nb = "nb_cli.__main__:main"
 
-[tool.pyright]
-typeCheckingMode = "standard"
+[tool.basedpyright]
+typeCheckingMode = "recommended"
 pythonPlatform = "All"
-reportPrivateImportUsage = false
-reportShadowedImports = false
+reportImplicitStringConcatenation = false
+# reportPrivateImportUsage = false
+# reportShadowedImports = false
 executionEnvironments = [
   { root = "./website", pythonVersion = "3.10" },
   { root = "./", pythonVersion = "3.10" },

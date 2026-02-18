@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "i18n"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:d4b9b4734aa7f505935b536859bae8b34235d7a17453f9c9291a237a1b1abdd3"
+content_hash = "sha256:24c3532cbbb53db6fb5fb26cee06da730272b4e7d34e187c8cdf16a052047db2"
 
 [[metadata.targets]]
 requires_python = "~=3.10"
@@ -68,6 +68,20 @@ dependencies = [
 files = [
     {file = "babel-2.18.0-py3-none-any.whl", hash = "sha256:e2b422b277c2b9a9630c1d7903c2a00d0830c409c59ac8cae9081c92f1aeba35"},
     {file = "babel-2.18.0.tar.gz", hash = "sha256:b80b99a14bd085fcacfa15c9165f651fbb3406e66cc603abf11c5750937c992d"},
+]
+
+[[package]]
+name = "basedpyright"
+version = "1.38.1"
+requires_python = ">=3.8"
+summary = "static type checking for Python (but based)"
+groups = ["dev"]
+dependencies = [
+    "nodejs-wheel-binaries>=20.13.1",
+]
+files = [
+    {file = "basedpyright-1.38.1-py3-none-any.whl", hash = "sha256:24f21661d2754687b64f3bc35efcc78781e11b08c8b2310312ed92bf178ea627"},
+    {file = "basedpyright-1.38.1.tar.gz", hash = "sha256:e4876aa3ef7c76569ffdcd908d4e260b8d1a1deaa8838f2486f91a10b60d68d6"},
 ]
 
 [[package]]
@@ -596,6 +610,27 @@ dependencies = [
 files = [
     {file = "nb_autodoc-1.0.3-py3-none-any.whl", hash = "sha256:6b5d1d244ee5c5ae896e0c6683193df64e47497986beceaeed2a76ae7235c06b"},
     {file = "nb_autodoc-1.0.3.tar.gz", hash = "sha256:8bb90a20820280adf12a0aad1b94603e9f0c65750d81af8378c6dd6cfb0be400"},
+]
+
+[[package]]
+name = "nodejs-wheel-binaries"
+version = "24.13.1"
+requires_python = ">=3.7"
+summary = "unoffical Node.js package"
+groups = ["dev"]
+dependencies = [
+    "typing-extensions; python_version < \"3.8\"",
+]
+files = [
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-macosx_13_0_arm64.whl", hash = "sha256:360ac9382c651de294c23c4933a02358c4e11331294983f3cf50ca1ac32666b1"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-macosx_13_0_x86_64.whl", hash = "sha256:035b718946793986762cdd50deee7f5f1a8f1b0bad0f0cfd57cad5492f5ea018"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:f795e9238438c4225f76fbd01e2b8e1a322116bbd0dc15a7dbd585a3ad97961e"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:978328e3ad522571eb163b042dfbd7518187a13968fe372738f90fdfe8a46afc"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:e1dc893df85299420cd2a5feea0c3f8482a719b5f7f82d5977d58718b8b78b5f"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:0e581ae219a39073dcadd398a2eb648f0707b0f5d68c565586139f919c91cbe9"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-win_amd64.whl", hash = "sha256:d4c969ea0bcb8c8b20bc6a7b4ad2796146d820278f17d4dc20229b088c833e22"},
+    {file = "nodejs_wheel_binaries-24.13.1-py2.py3-none-win_arm64.whl", hash = "sha256:caec398cb9e94c560bacdcba56b3828df22a355749eb291f47431af88cbf26dc"},
+    {file = "nodejs_wheel_binaries-24.13.1.tar.gz", hash = "sha256:512659a67449a038231e2e972d49e77049d2cf789ae27db39eff4ab1ca52ac57"},
 ]
 
 [[package]]

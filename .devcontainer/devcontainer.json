@@ -3,7 +3,8 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers-extra/features/pdm:2": {},
-    "ghcr.io/meaningful-ooo/devcontainer-features/fish:2": {}
+    "ghcr.io/meaningful-ooo/devcontainer-features/fish:2": {},
+    "ghcr.io/devcontainers/features/node:1": {}
   },
   "postCreateCommand": "pdm config venv.in_project true && pdm config venv.with_pip true && pdm sync && pdm run prek install && pdm run compile && yarn install",
   "customizations": {
@@ -43,6 +44,7 @@
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "detachhead.basedpyright",
         "ms-python.isort",
         "ms-python.black-formatter",
         "EditorConfig.EditorConfig",
