@@ -18,12 +18,15 @@ _✨ NoneBot2 命令行工具 ✨_
   <a href="https://pypi.python.org/pypi/nb-cli">
     <img src="https://img.shields.io/pypi/v/nb-cli" alt="pypi">
   </a>
-  <img src="https://img.shields.io/badge/python-3.9+-blue" alt="python">
+  <img src="https://img.shields.io/badge/python-3.10+-blue" alt="python">
   <a href="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml">
     <img src="https://github.com/nonebot/nb-cli/actions/workflows/website-deploy.yml/badge.svg?branch=master&event=push" alt="site"/>
   </a>
   <a href="https://github.com/j178/prek">
     <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json" alt="prek">
+  </a>
+  <a href="https://docs.basedpyright.com">
+    <img src="https://img.shields.io/badge/basedpyright-checked-green?style=flat&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCBmaWxsPSIjZmZjMTA1IiB4PSIxIiB5PSI2IiB3aWR0aD0iNCIgaGVpZ2h0PSI0Ii8%2BPHJlY3QgZmlsbD0iI2ZmYzEwNSIgeD0iMTEiIHk9IjYiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiLz48cmVjdCBmaWxsPSIjZmZjMTA1IiB4PSI2IiB5PSI2IiB3aWR0aD0iNCIgaGVpZ2h0PSI0Ii8%2BPC9zdmc%2B&labelColor=%23111&link=https%3A%2F%2Fdocs.basedpyright.com%2Flatest%2F" alt="basedpyright checked">
   </a>
   <br />
   <a href="https://jq.qq.com/?_wv=1027&k=5OFifDh">
