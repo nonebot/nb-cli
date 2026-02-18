@@ -2,7 +2,7 @@ name: BasedPyright checks
 on: [push, pull_request]
 
 jobs:
-  prek:
+  basedpyright:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
