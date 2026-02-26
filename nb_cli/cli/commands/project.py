@@ -342,15 +342,22 @@ async def create(
     )
 
     if install_dependencies:
-        try:
-            manager = await ListPrompt(
-                _("Which project manager would you like to use?"),
-                choices=[Choice(mgr, mgr) for mgr in await all_environment_managers()],
-            ).prompt_async(style=CLI_DEFAULT_STYLE)
-        except CancelledError:
-            return
+        managers = await all_environment_managers()
+        if len(managers) > 1:
+            try:
+                manager = (
+                    await ListPrompt(
+                        _("Which project manager would you like to use?"),
+                        choices=[Choice(mgr, mgr) for mgr in managers],
+                    ).prompt_async(style=CLI_DEFAULT_STYLE)
+                ).data
+            except CancelledError:
+                return
+        else:
+            assert len(managers) == 1
+            manager = managers[0]
 
-        if manager.data == "pip":
+        if manager == "pip":
             try:
                 use_venv = await ConfirmPrompt(
                     _("Create virtual environment?"), default_choice=True
@@ -374,7 +381,7 @@ async def create(
         config_manager = ConfigManager(working_dir=project_dir, use_venv=use_venv)
 
         executor = await EnvironmentExecutor.get(
-            manager.data,
+            manager,
             toml_manager=config_manager,
             cwd=project_dir,
             executable=config_manager.python_path,

@@ -31,7 +31,6 @@ _manager_features: dict[str, str] = {
     "pdm": "pdm.lock",
     "poetry": "poetry.lock",
 }
-_manager_exec = [*_manager_features.keys(), "pip"]
 
 FdFile: TypeAlias = int | IO[bytes] | IO[str]
 
@@ -62,10 +61,12 @@ def probe_environment_manager(*, cwd: Path | None = None) -> tuple[str, str]:
 def all_environment_managers() -> list[str]:
     """Get all available environment managers on the system.
 
+    'pip' is also included as a fallback option.
+
     Returns:
         A list of available environment manager names.
     """
-    return [m for m in _manager_exec if which(m) is not None]
+    return [*(m for m in _manager_features if which(m) is not None), "pip"]
 
 
 class EnvironmentExecutor(metaclass=abc.ABCMeta):

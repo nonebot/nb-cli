@@ -4442,14 +4442,6 @@
                     "endColumn": 44,
                     "lineCount": 1
                 }
-            },
-            {
-                "code": "reportUnknownMemberType",
-                "range": {
-                    "startColumn": 11,
-                    "endColumn": 29,
-                    "lineCount": 1
-                }
             }
         ],
         "./nb_cli/i18n.py": [
