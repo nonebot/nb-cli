@@ -6,12 +6,12 @@ from collections.abc import Mapping, Sequence
 from typing import IO, TYPE_CHECKING, Any, Union, Literal, ClassVar, TypeAlias, overload
 
 import click
-from nb_cli.consts import WINDOWS
-from nb_cli.cli.utils import run_sync
 from packaging.requirements import Requirement
-from nb_cli.exceptions import ProcessExecutionError
 
 from nb_cli import _
+from nb_cli.consts import WINDOWS
+from nb_cli.cli.utils import run_sync
+from nb_cli.exceptions import ProcessExecutionError
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager
 
 from .process import create_process
