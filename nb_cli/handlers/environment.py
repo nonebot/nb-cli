@@ -6,12 +6,12 @@ from collections.abc import Mapping, Sequence
 from typing import IO, TYPE_CHECKING, Any, Union, Literal, ClassVar, TypeAlias, overload
 
 import click
-from packaging.requirements import Requirement
-
-from nb_cli import _
 from nb_cli.consts import WINDOWS
 from nb_cli.cli.utils import run_sync
+from packaging.requirements import Requirement
 from nb_cli.exceptions import ProcessExecutionError
+
+from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager
 
 from .process import create_process
@@ -31,7 +31,6 @@ _manager_features: dict[str, str] = {
     "pdm": "pdm.lock",
     "poetry": "poetry.lock",
 }
-_manager_exec = [*_manager_features.keys(), "pip"]
 
 FdFile: TypeAlias = int | IO[bytes] | IO[str]
 
@@ -62,10 +61,12 @@ def probe_environment_manager(*, cwd: Path | None = None) -> tuple[str, str]:
 def all_environment_managers() -> list[str]:
     """Get all available environment managers on the system.
 
+    'pip' is also included as a fallback option.
+
     Returns:
         A list of available environment manager names.
     """
-    return [m for m in _manager_exec if which(m) is not None]
+    return [*(m for m in _manager_features if which(m) is not None), "pip"]
 
 
 class EnvironmentExecutor(metaclass=abc.ABCMeta):
