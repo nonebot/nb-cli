@@ -12,11 +12,7 @@ from collections.abc import Sequence, MutableMapping
 
 import click
 import nonestorage
-from nb_cli.compat import model_dump
-from nb_cli.consts import DEFAULT_DRIVER
-from nb_cli.cli.utils import advanced_search
 from packaging.requirements import Requirement
-from nb_cli.exceptions import ModuleLoadFailed, ProcessExecutionError
 from noneprompt import (
     Choice,
     ListPrompt,
@@ -28,7 +24,11 @@ from noneprompt import (
 
 from nb_cli import _
 from nb_cli.log import ClickHandler
+from nb_cli.compat import model_dump
 from nb_cli.config import ConfigManager
+from nb_cli.consts import DEFAULT_DRIVER
+from nb_cli.cli.utils import advanced_search
+from nb_cli.exceptions import ModuleLoadFailed, ProcessExecutionError
 from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
     Reloader,
