@@ -6,12 +6,12 @@ from collections.abc import Mapping, Sequence
 from typing import IO, TYPE_CHECKING, Any, Union, Literal, ClassVar, TypeAlias, overload
 
 import click
-from packaging.requirements import Requirement
-
-from nb_cli import _
 from nb_cli.consts import WINDOWS
 from nb_cli.cli.utils import run_sync
+from packaging.requirements import Requirement
 from nb_cli.exceptions import ProcessExecutionError
+
+from nb_cli import _
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager
 
 from .process import create_process
@@ -52,7 +52,7 @@ def probe_environment_manager(*, cwd: Path | None = None) -> tuple[str, str]:
         "pip",
     )
 
-    available = next(iter(m for m in [current, "pip"] if which(m) is not None))
+    available = current if which(current) is not None else "pip"
 
     return current, available
 
