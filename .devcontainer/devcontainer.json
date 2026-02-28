@@ -11,6 +11,7 @@
     "vscode": {
       "settings": {
         "python.analysis.diagnosticMode": "workspace",
+        "python.languageServer": "None",
         "python.analysis.typeCheckingMode": "standard",
         "[python]": {
           "editor.defaultFormatter": "charliermarsh.ruff",
@@ -40,7 +41,8 @@
         "files.watcherExclude": {
           "**/target/**": true,
           "**/__pycache__": true
-        }
+        },
+        "basedpyright.analysis.useTypingExtensions": true
       },
       "extensions": [
         "ms-python.python",
