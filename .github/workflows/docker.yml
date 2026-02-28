@@ -118,7 +118,7 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.image.outputs.ARTIFACT }}
           path: /tmp/digests/*
@@ -147,7 +147,7 @@ jobs:
           ref: ${{ needs.metadata.outputs.LATEST_RELEASE }}
 
       - name: Download digests
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/artifacts
           pattern: "*-digests"
