@@ -1,4 +1,4 @@
-name: BasedPyright checks
+name: Lints and Checks
 on: [push, pull_request]
 
 jobs:
@@ -12,3 +12,14 @@ jobs:
 
       - name: Run BasedPyright
         run: pdm run basedpyright
+
+  prek:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Python Environment
+        uses: ./.github/actions/setup-python
+
+      - name: Run Prek
+        uses: j178/prek-action@v1
