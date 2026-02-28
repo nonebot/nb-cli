@@ -1,11 +1,11 @@
-from functools import partial
 from collections import Counter
+from functools import partial
 
 import click
 
 from nb_cli import _, cache
 from nb_cli.exceptions import ProjectNotFoundError
-from nb_cli.handlers import run_script, list_scripts
+from nb_cli.handlers import list_scripts, run_script
 
 from .utils import run_async
 

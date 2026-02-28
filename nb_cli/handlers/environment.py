@@ -1,27 +1,36 @@
 import abc
-from pathlib import Path
-from shutil import which
 from asyncio.subprocess import Process
 from collections.abc import Mapping, Sequence
-from typing import IO, TYPE_CHECKING, Any, Union, Literal, ClassVar, TypeAlias, overload
+from pathlib import Path
+from shutil import which
+from typing import (
+    IO,
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Literal,
+    TypeAlias,
+    Union,  # pyright: ignore[reportDeprecated]
+    overload,
+)
 
 import click
-from nb_cli.consts import WINDOWS
-from nb_cli.cli.utils import run_sync
 from packaging.requirements import Requirement
-from nb_cli.exceptions import ProcessExecutionError
 
 from nb_cli import _
+from nb_cli.cli.utils import run_sync
 from nb_cli.config import GLOBAL_CONFIG, ConfigManager
+from nb_cli.consts import WINDOWS
+from nb_cli.exceptions import ProcessExecutionError
 
-from .process import create_process
 from .meta import (
     DEFAULT_PYTHON,
     WINDOWS_DEFAULT_PYTHON,
-    get_project_root,
     get_default_python,
+    get_project_root,
     requires_project_root,
 )
+from .process import create_process
 
 if TYPE_CHECKING:
     import os

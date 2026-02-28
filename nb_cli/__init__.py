@@ -1,4 +1,4 @@
-from importlib.metadata import EntryPoint, version, entry_points
+from importlib.metadata import EntryPoint, entry_points, version
 
 from cashews import Cache
 
@@ -12,8 +12,8 @@ except Exception:
 cache = Cache("nb")
 cache.setup("mem://")
 
-from .cli import run_sync
 from .cli import cli as cli_sync
+from .cli import run_sync
 from .consts import PLUGINS_GROUP
 from .handlers import install_signal_handler
 

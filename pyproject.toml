@@ -58,6 +58,7 @@ nb = "nb_cli.__main__:main"
 typeCheckingMode = "recommended"
 pythonPlatform = "All"
 reportImplicitStringConcatenation = false
+reportImportCycles = "hint"
 # reportPrivateImportUsage = false
 # reportShadowedImports = false
 executionEnvironments = [

@@ -1,14 +1,14 @@
 import asyncio
-import logging
-from typing import Any
-from pathlib import Path
 from collections.abc import Callable, Coroutine
+import logging
+from pathlib import Path
+from typing import Any
 
 from watchfiles import awatch
 
 from nb_cli import _
 
-from .signal import remove_signal_handler, register_signal_handler
+from .signal import register_signal_handler, remove_signal_handler
 
 
 class FileFilter:

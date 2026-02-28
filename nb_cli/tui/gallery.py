@@ -1,18 +1,18 @@
 from functools import partial
-from typing import Generic, TypeVar, ClassVar
+from typing import ClassVar, Generic, TypeVar
 
-from textual.timer import Timer
-from textual.reactive import var
-from textual.widget import Widget
 from textual.app import App, ComposeResult
-from textual.widgets import Input, Footer, Header
 from textual.containers import ItemGrid, Vertical, VerticalScroll
+from textual.reactive import var
+from textual.timer import Timer
+from textual.widget import Widget
+from textual.widgets import Footer, Header, Input
 
 from nb_cli import _
+from nb_cli.cli.utils import advanced_search_filter
+from nb_cli.config.model import Adapter, Driver, Plugin
 from nb_cli.tui.card import Card
 from nb_cli.tui.console import LogConsole
-from nb_cli.cli.utils import advanced_search_filter
-from nb_cli.config.model import Driver, Plugin, Adapter
 
 T_widget = TypeVar("T_widget", bound=Widget)
 T_module = TypeVar("T_module", Adapter, Driver, Plugin)

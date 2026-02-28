@@ -4,7 +4,7 @@ import virtualenv
 
 from nb_cli.config import ConfigManager
 
-from .meta import requires_python, get_default_python
+from .meta import get_default_python, requires_python
 
 
 def detect_virtualenv(cwd: Path | None = None) -> str | None:

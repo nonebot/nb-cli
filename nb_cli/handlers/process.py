@@ -1,17 +1,17 @@
-import os
-import signal
 import asyncio
-import subprocess
-from pathlib import Path
-from functools import wraps
-from typing import IO, Any, Union
+from collections.abc import Callable, Coroutine, Mapping
 from contextlib import nullcontext
+from functools import wraps
+import os
+from pathlib import Path
+import signal
+import subprocess
+from typing import IO, Any, Union
 from typing_extensions import ParamSpec
-from collections.abc import Mapping, Callable, Coroutine
 
 from nb_cli.consts import WINDOWS
 
-from .signal import shield_signals, remove_signal_handler, register_signal_handler
+from .signal import register_signal_handler, remove_signal_handler, shield_signals
 
 P = ParamSpec("P")
 

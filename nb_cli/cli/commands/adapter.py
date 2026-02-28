@@ -1,26 +1,26 @@
 import contextlib
-from typing import cast
 from pathlib import Path
+from typing import cast
 
 import click
-from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
+from noneprompt import CancelledError, Choice, InputPrompt, ListPrompt
 
 from nb_cli import _
-from nb_cli.config import GLOBAL_CONFIG
-from nb_cli.cli.utils import find_exact_package, format_package_results
-from nb_cli.exceptions import ProcessExecutionError, NoSelectablePackageError
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
     back_,
     exit_,
-    run_sync,
     run_async,
+    run_sync,
 )
+from nb_cli.cli.utils import find_exact_package, format_package_results
+from nb_cli.config import GLOBAL_CONFIG
+from nb_cli.exceptions import NoSelectablePackageError, ProcessExecutionError
 from nb_cli.handlers import (
     EnvironmentExecutor,
-    list_adapters,
     create_adapter,
+    list_adapters,
     list_installed_adapters,
 )
 

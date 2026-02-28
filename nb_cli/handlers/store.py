@@ -1,7 +1,7 @@
+from asyncio import as_completed, create_task
+from datetime import datetime, timedelta
 import json
 import typing
-from datetime import datetime, timedelta
-from asyncio import create_task, as_completed
 from typing import TYPE_CHECKING, Literal, TypeVar, overload
 
 import anyio
@@ -9,10 +9,10 @@ import click
 import httpx
 
 from nb_cli import _, cache
-from nb_cli.handlers.data import CACHE_DIR
-from nb_cli.config import Driver, Plugin, Adapter
-from nb_cli.exceptions import ModuleLoadFailed, LocalCacheExpired
 from nb_cli.compat import model_dump, type_validate_json, type_validate_python
+from nb_cli.config import Adapter, Driver, Plugin
+from nb_cli.exceptions import LocalCacheExpired, ModuleLoadFailed
+from nb_cli.handlers.data import CACHE_DIR
 
 T = TypeVar("T", Adapter, Plugin, Driver)
 

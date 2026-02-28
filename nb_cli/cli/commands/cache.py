@@ -3,21 +3,21 @@ from pathlib import Path
 from typing import Literal, cast
 
 import click
-from noneprompt import Choice, ListPrompt, ConfirmPrompt, CancelledError
+from noneprompt import CancelledError, Choice, ConfirmPrompt, ListPrompt
 
 from nb_cli import _
 from nb_cli import cache as cache_data
-from nb_cli.handlers.data import CACHE_DIR
-from nb_cli.cli.utils import humanize_data_size
-from nb_cli.handlers import download_module_data
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
     back_,
     exit_,
-    run_sync,
     run_async,
+    run_sync,
 )
+from nb_cli.cli.utils import humanize_data_size
+from nb_cli.handlers import download_module_data
+from nb_cli.handlers.data import CACHE_DIR
 
 
 @click.group(

@@ -1,19 +1,19 @@
-from typing import cast
 from pathlib import Path
+from typing import cast
 
 import click
-from noneprompt import Choice, ListPrompt, ConfirmPrompt, CancelledError
+from noneprompt import CancelledError, Choice, ConfirmPrompt, ListPrompt
 
 from nb_cli import _, __version__
-from nb_cli.handlers import draw_logo
 from nb_cli.config import ConfigManager
+from nb_cli.handlers import draw_logo
 
-from .utils import run_sync as run_sync
-from .utils import run_async as run_async
+from .customize import ClickAliasedCommand as ClickAliasedCommand
+from .customize import ClickAliasedGroup as ClickAliasedGroup
 from .customize import CLIMainGroup as CLIMainGroup
 from .utils import CLI_DEFAULT_STYLE as CLI_DEFAULT_STYLE
-from .customize import ClickAliasedGroup as ClickAliasedGroup
-from .customize import ClickAliasedCommand as ClickAliasedCommand
+from .utils import run_async as run_async
+from .utils import run_sync as run_sync
 
 
 @click.command  # this command only appears in interactive mode.
@@ -129,15 +129,15 @@ async def cli(ctx: click.Context):
 
 
 from .commands import (
+    adapter,
+    create,
+    downgrade_format,
+    driver,
+    generate,
+    plugin,
     run,
     self,
-    create,
-    driver,
-    plugin,
-    adapter,
-    generate,
     upgrade_format,
-    downgrade_format,
 )
 
 cli.add_command(create)

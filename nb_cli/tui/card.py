@@ -1,21 +1,21 @@
-import os
 import asyncio
+import os
 from typing import Final, Generic, TypeVar
 
 import textual
 from textual import markup
 from textual.app import ComposeResult
+from textual.containers import Grid, Horizontal, Vertical, VerticalScroll
 from textual.reactive import reactive
 from textual.screen import ModalScreen
 from textual.widgets import Button, Static
-from textual.containers import Grid, Vertical, Horizontal, VerticalScroll
 
 from nb_cli import _
 from nb_cli.cli.utils import cut_text
 from nb_cli.config import GLOBAL_CONFIG
-from nb_cli.tui.console import LogConsole
+from nb_cli.config.model import Adapter, Driver, Plugin, Tag
 from nb_cli.handlers.pip import call_pip_install
-from nb_cli.config.model import Tag, Driver, Plugin, Adapter
+from nb_cli.tui.console import LogConsole
 
 CARD_WIDTH = 49
 CARD_HEIGHT = 6

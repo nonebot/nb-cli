@@ -1,27 +1,27 @@
-import string
-import logging
-import weakref
-import functools
-from pathlib import Path
-from collections.abc import Generator
 from abc import ABCMeta, abstractmethod
-from typing import Any, Generic, TypeVar, ClassVar, overload
+from collections.abc import Generator
 from contextlib import AbstractContextManager, contextmanager
+import functools
+import logging
+from pathlib import Path
+import string
+from typing import Any, ClassVar, Generic, TypeVar, overload
+import weakref
 
 import click
-import tomlkit
-import tomlkit.items
-import tomlkit.container
 from packaging.requirements import Requirement
+import tomlkit
+import tomlkit.container
+import tomlkit.items
 from tomlkit.toml_document import TOMLDocument
 
 from nb_cli import _
-from nb_cli.log import SUCCESS
-from nb_cli.consts import WINDOWS
 from nb_cli.compat import model_dump, type_validate_python
+from nb_cli.consts import WINDOWS
 from nb_cli.exceptions import ProjectInvalidError, ProjectNotFoundError
+from nb_cli.log import SUCCESS
 
-from .model import SimpleInfo, PackageInfo, NoneBotConfig, LegacyNoneBotConfig
+from .model import LegacyNoneBotConfig, NoneBotConfig, PackageInfo, SimpleInfo
 
 CONFIG_FILE = "pyproject.toml"
 CONFIG_FILE_ENCODING = "utf-8"

@@ -1,27 +1,27 @@
 import asyncio
+from collections.abc import Iterable
 from pathlib import Path
 from typing import IO, Any, TypeVar
-from collections.abc import Iterable
 
 import click
 from cookiecutter.main import cookiecutter
 
 from nb_cli import _
-from nb_cli.config import SimpleInfo, PackageInfo, NoneBotConfig, LegacyNoneBotConfig
+from nb_cli.config import LegacyNoneBotConfig, NoneBotConfig, PackageInfo, SimpleInfo
 
 from . import templates
-from .driver import list_drivers
-from .plugin import list_plugins
 from .adapter import list_adapters
-from .process import create_process
+from .driver import list_drivers
 from .meta import (
-    get_project_root,
-    requires_nonebot,
     get_config_manager,
     get_default_python,
     get_nonebot_config,
+    get_project_root,
+    requires_nonebot,
     requires_project_root,
 )
+from .plugin import list_plugins
+from .process import create_process
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "project"
 

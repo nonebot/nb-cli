@@ -1,14 +1,14 @@
+from asyncio.subprocess import Process
 import locale
 import signal
 from typing import Final
-from asyncio.subprocess import Process
 
 import rich
 import rich.text
-from textual.reactive import var
 from textual.app import ComposeResult
+from textual.reactive import var
 from textual.screen import ModalScreen
-from textual.widgets import Log, Footer, Header
+from textual.widgets import Footer, Header, Log
 
 from nb_cli import _
 from nb_cli.consts import WINDOWS

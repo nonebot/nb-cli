@@ -1,9 +1,9 @@
-import signal
 import asyncio
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
+import signal
 import threading
 from types import FrameType
-from contextlib import contextmanager
-from collections.abc import Callable, Generator
 
 from nb_cli.consts import WINDOWS
 

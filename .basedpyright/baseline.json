@@ -2100,7 +2100,7 @@
                 "range": {
                     "startColumn": 4,
                     "endColumn": 40,
-                    "lineCount": 136
+                    "lineCount": 135
                 }
             }
         ],
@@ -3127,14 +3127,6 @@
             }
         ],
         "./nb_cli/handlers/environment.py": [
-            {
-                "code": "reportDeprecated",
-                "range": {
-                    "startColumn": 43,
-                    "endColumn": 48,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportUnknownParameterType",
                 "range": {

@@ -1,54 +1,54 @@
-import re
-import sys
-import json
-import shlex
-from pathlib import Path
-from logging import Logger
+from collections.abc import MutableMapping, Sequence
+from dataclasses import dataclass, field
 from functools import partial
-from typing_extensions import Required
+import json
+from logging import Logger
+from pathlib import Path
+import re
+import shlex
+import sys
 from typing import TypeAlias, TypedDict
-from dataclasses import field, dataclass
-from collections.abc import Sequence, MutableMapping
+from typing_extensions import Required
 
 import click
-import nonestorage
-from packaging.requirements import Requirement
 from noneprompt import (
-    Choice,
-    ListPrompt,
-    InputPrompt,
-    ConfirmPrompt,
     CancelledError,
     CheckboxPrompt,
+    Choice,
+    ConfirmPrompt,
+    InputPrompt,
+    ListPrompt,
 )
+import nonestorage
+from packaging.requirements import Requirement
 
 from nb_cli import _
-from nb_cli.log import ClickHandler
+from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
+from nb_cli.cli.utils import advanced_search
 from nb_cli.compat import model_dump
 from nb_cli.config import ConfigManager
 from nb_cli.consts import DEFAULT_DRIVER
-from nb_cli.cli.utils import advanced_search
 from nb_cli.exceptions import ModuleLoadFailed, ProcessExecutionError
-from nb_cli.cli import CLI_DEFAULT_STYLE, ClickAliasedCommand, run_async
 from nb_cli.handlers import (
-    Reloader,
-    FileFilter,
     EnvironmentExecutor,
-    run_project,
+    FileFilter,
+    Reloader,
+    all_environment_managers,
+    create_project,
+    create_virtualenv,
+    downgrade_project_format,
+    generate_run_script,
+    get_project_root,
+    list_adapters,
+    list_builtin_plugins,
     list_drivers,
     list_plugins,
-    list_adapters,
-    create_project,
-    get_project_root,
-    create_virtualenv,
-    terminate_process,
-    generate_run_script,
-    list_builtin_plugins,
     list_project_templates,
+    run_project,
+    terminate_process,
     upgrade_project_format,
-    all_environment_managers,
-    downgrade_project_format,
 )
+from nb_cli.log import ClickHandler
 
 VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
 BLACKLISTED_PROJECT_NAME = {"nonebot", "bot"}

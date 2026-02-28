@@ -1,20 +1,20 @@
-import json
 import asyncio
-from pathlib import Path
-from functools import wraps
-from typing_extensions import ParamSpec
 from collections.abc import Callable, Coroutine
+from functools import wraps
+import json
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing_extensions import ParamSpec
 
 from nb_cli import _, cache
-from nb_cli.consts import WINDOWS, REQUIRES_PYTHON
-from nb_cli.exceptions import PipError, NoneBotError, PythonInterpreterError
 from nb_cli.config import (
     GLOBAL_CONFIG,
     ConfigManager,
-    NoneBotConfig,
     LegacyNoneBotConfig,
+    NoneBotConfig,
 )
+from nb_cli.consts import REQUIRES_PYTHON, WINDOWS
+from nb_cli.exceptions import NoneBotError, PipError, PythonInterpreterError
 
 from . import templates
 from .process import create_process, create_process_shell

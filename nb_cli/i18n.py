@@ -1,6 +1,6 @@
-import locale
-import gettext
 import contextlib
+import gettext
+import locale
 from pathlib import Path
 
 from .consts import WINDOWS

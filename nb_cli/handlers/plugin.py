@@ -1,22 +1,22 @@
-import json
 import asyncio
+import json
 from pathlib import Path
 
 from cookiecutter.main import cookiecutter
 
 from nb_cli.compat import model_dump
+from nb_cli.config import LegacyNoneBotConfig, NoneBotConfig, Plugin
 from nb_cli.exceptions import ProjectInvalidError
-from nb_cli.config import Plugin, NoneBotConfig, LegacyNoneBotConfig
 
 from . import templates
-from .process import create_process
-from .store import load_module_data, load_unpublished_modules
 from .meta import (
-    requires_nonebot,
     get_default_python,
     get_nonebot_config,
+    requires_nonebot,
     requires_project_root,
 )
+from .process import create_process
+from .store import load_module_data, load_unpublished_modules
 
 TEMPLATE_ROOT = Path(__file__).parent.parent / "template" / "plugin"
 

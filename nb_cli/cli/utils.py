@@ -1,19 +1,19 @@
+from collections.abc import Callable, Coroutine, Iterable
+from functools import partial, wraps
 import shutil
 from statistics import median_high
-from functools import wraps, partial
+from typing import Any, Literal, Protocol, TypeVar
 from typing_extensions import ParamSpec
-from typing import Any, Literal, TypeVar, Protocol
-from collections.abc import Callable, Iterable, Coroutine
 
-import click
-import anyio.to_thread
 import anyio.from_thread
-from wcwidth import wcswidth
-from prompt_toolkit.styles import Style
+import anyio.to_thread
+import click
 from noneprompt import Choice, ListPrompt
+from prompt_toolkit.styles import Style
+from wcwidth import wcswidth
 
 from nb_cli import _
-from nb_cli.config import Driver, Plugin, Adapter
+from nb_cli.config import Adapter, Driver, Plugin
 from nb_cli.exceptions import NoSelectablePackageError
 
 T = TypeVar("T", Adapter, Plugin, Driver)

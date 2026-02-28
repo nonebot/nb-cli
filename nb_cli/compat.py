@@ -3,9 +3,9 @@
 为兼容 Pydantic V1 与 V2 版本，定义了一系列兼容函数与类供使用。
 """
 
-from typing_extensions import Self
 from dataclasses import dataclass, is_dataclass
-from typing import Any, TypeVar, Annotated, get_args, get_origin, is_typeddict
+from typing import Annotated, Any, TypeVar, get_args, get_origin, is_typeddict
+from typing_extensions import Self
 
 from pydantic import VERSION, BaseModel
 
@@ -189,9 +189,8 @@ if PYDANTIC_V2:  # pragma: pydantic-v2
         return TypeAdapter(type_).validate_json(data)
 
 else:  # pragma: pydantic-v1
-    from pydantic import Extra
-    from pydantic import parse_obj_as, parse_raw_as
     from pydantic import BaseConfig as PydanticConfig
+    from pydantic import Extra, parse_obj_as, parse_raw_as
     from pydantic.fields import FieldInfo as BaseFieldInfo
     from pydantic.fields import ModelField as BaseModelField
     from pydantic.schema import get_annotation_from_field_info

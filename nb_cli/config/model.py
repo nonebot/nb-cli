@@ -1,10 +1,10 @@
-import operator
-import functools
-from typing import ClassVar
 from datetime import datetime
+import functools
+import operator
+from typing import ClassVar
 
-from pydantic import BaseModel
 from packaging.requirements import Requirement
+from pydantic import BaseModel
 
 from nb_cli.compat import PYDANTIC_V2, ConfigDict
 

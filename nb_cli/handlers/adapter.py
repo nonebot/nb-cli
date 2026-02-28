@@ -3,8 +3,8 @@ from pathlib import Path
 from cookiecutter.main import cookiecutter
 
 from nb_cli.compat import model_dump
+from nb_cli.config import Adapter, LegacyNoneBotConfig, NoneBotConfig
 from nb_cli.exceptions import ProjectInvalidError
-from nb_cli.config import Adapter, NoneBotConfig, LegacyNoneBotConfig
 
 from .meta import get_nonebot_config, requires_project_root
 from .store import load_module_data, load_unpublished_modules

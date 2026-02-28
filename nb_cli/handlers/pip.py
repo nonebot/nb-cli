@@ -1,9 +1,9 @@
 import asyncio
-from typing import IO, Any
 from collections.abc import Mapping
+from typing import IO, Any
 
+from .meta import get_default_python, requires_pip
 from .process import create_process
-from .meta import requires_pip, get_default_python
 
 
 @requires_pip

@@ -2,23 +2,23 @@ import sys
 from typing import cast
 
 import click
-from noneprompt import Choice, ListPrompt, InputPrompt, CancelledError
+from noneprompt import CancelledError, Choice, InputPrompt, ListPrompt
 
 from nb_cli import _
-from nb_cli.cli.commands.cache import cache
-from nb_cli.handlers import (
-    call_pip_list,
-    call_pip_update,
-    call_pip_install,
-    call_pip_uninstall,
-)
 from nb_cli.cli import (
     CLI_DEFAULT_STYLE,
     ClickAliasedGroup,
     back_,
     exit_,
-    run_sync,
     run_async,
+    run_sync,
+)
+from nb_cli.cli.commands.cache import cache
+from nb_cli.handlers import (
+    call_pip_install,
+    call_pip_list,
+    call_pip_uninstall,
+    call_pip_update,
 )
 
 

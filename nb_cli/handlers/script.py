@@ -1,20 +1,20 @@
-import json
 import asyncio
+import json
 from pathlib import Path
 from typing import IO, Any
 
 from nb_cli.config import SimpleInfo
 
 from . import templates
-from .process import create_process
 from .meta import (
-    requires_python,
-    get_project_root,
-    requires_nonebot,
     get_default_python,
     get_nonebot_config,
+    get_project_root,
+    requires_nonebot,
     requires_project_root,
+    requires_python,
 )
+from .process import create_process
 
 
 @requires_project_root
