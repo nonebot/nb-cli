@@ -13,18 +13,6 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
         stages: [pre-commit]
 
-  - repo: https://github.com/pycqa/isort
-    rev: 7.0.0
-    hooks:
-      - id: isort
-        stages: [pre-commit]
-
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 26.1.0
-    hooks:
-      - id: black
-        stages: [pre-commit]
-
   - repo: https://github.com/nonebot/nonemoji
     rev: v0.1.4
     hooks:

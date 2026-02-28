@@ -41,8 +41,6 @@ dependencies = [
 i18n = ["babel ~=2.11"]
 dev = [
     "ruff ~=0.14",
-    "isort ~=5.10",
-    "black >=22.3.0",
     "nonemoji ~=0.1",
     "prek>=0.3.2",
     "basedpyright>=1.38.1",
@@ -68,24 +66,8 @@ executionEnvironments = [
 ]
 defineConstant = { PYDANTIC_V2 = true }
 
-[tool.black]
-line-length = 88
-extend-exclude = '''
-^nb_cli/template/
-'''
-
-[tool.isort]
-profile = "black"
-line_length = 88
-length_sort = true
-skip_gitignore = true
-force_sort_within_sections = true
-extra_standard_library = ["typing_extensions"]
-extend_skip = ["nb_cli/template/"]
-
 [tool.ruff]
 extend-exclude = ["nb_cli/template/"]
-
 line-length = 88
 target-version = "py310"
 
@@ -113,9 +95,17 @@ ignore = [
   "ASYNC240", # blocking-path-method-in-async-function
 ]
 
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["nonebot", "tests/*"]
+extra-standard-library = ["typing_extensions"]
+
 [tool.ruff.lint.flake8-pytest-style]
 fixture-parentheses = false
 mark-parentheses = false
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
 
 [tool.pdm.scripts]
 autodoc = { shell = "rm -rf ./website/docs/api/* && nb-autodoc nb_cli -s nb_cli.template && cp -r ./build/nb_cli/* ./website/docs/api/" }
