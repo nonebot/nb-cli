@@ -13,6 +13,12 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
         stages: [pre-commit]
 
+  - repo: https://github.com/DetachHead/basedpyright-prek-mirror
+    rev: 1.38.2
+    hooks:
+      - id: basedpyright
+        args: [--baselinemode=lock]
+
   - repo: https://github.com/nonebot/nonemoji
     rev: v0.1.4
     hooks:
