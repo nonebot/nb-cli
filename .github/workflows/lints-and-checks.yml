@@ -1,5 +1,9 @@
 name: Lints and Checks
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   basedpyright:
