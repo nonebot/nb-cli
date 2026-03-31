@@ -159,6 +159,8 @@ async def install(
         name, extras = name.split("[", 1)
         extras = extras.rstrip("]")
 
+    _all_adapters = await list_adapters(include_unpublished=include_unpublished)
+
     try:
         _installed_adapters = await list_installed_adapters()
         is_installed = False
@@ -180,9 +182,7 @@ async def install(
                 name,
                 [
                     a
-                    for a in await list_adapters(
-                        include_unpublished=include_unpublished
-                    )
+                    for a in _all_adapters
                     if (a.project_link, a.module_name) not in _installed
                 ],
             )
@@ -191,6 +191,24 @@ async def install(
     except CancelledError:
         return
     except NoSelectablePackageError:
+        with contextlib.suppress(NoSelectablePackageError):
+            _adapter = await find_exact_package(
+                _("Adapter name to install:"), name, _all_adapters
+            )
+            click.secho(
+                _("ERROR: Adapter {name} is already installed.").format(
+                    name=_adapter.project_link
+                ),
+                fg="red",
+            )
+            click.secho(
+                _(
+                    "To upgrade the adapter, run `nb adapter update {name}` instead."
+                ).format(name=_adapter.project_link),
+                fg="red",
+            )
+            return
+
         click.echo(_("No available adapter found to install."))
         return
 
