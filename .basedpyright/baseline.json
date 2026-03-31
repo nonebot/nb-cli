@@ -2,38 +2,6 @@
     "files": {
         "./nb_cli/__init__.py": [
             {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportUnusedCallResult",
                 "range": {
                     "startColumn": 0,
@@ -133,38 +101,6 @@
             }
         ],
         "./nb_cli/cli/__init__.py": [
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
             {
                 "code": "reportUnusedParameter",
                 "range": {
@@ -3024,30 +2960,6 @@
         ],
         "./nb_cli/handlers/__init__.py": [
             {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportImportCycles",
-                "range": {
-                    "startColumn": 0,
-                    "endColumn": 0,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportArgumentType",
                 "range": {
                     "startColumn": 0,
@@ -3062,14 +2974,6 @@
                 "range": {
                     "startColumn": 5,
                     "endColumn": 22,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 30,
-                    "endColumn": 42,
                     "lineCount": 1
                 }
             },
@@ -3678,14 +3582,6 @@
                 }
             },
             {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 30,
-                    "endColumn": 42,
-                    "lineCount": 1
-                }
-            },
-            {
                 "code": "reportAny",
                 "range": {
                     "startColumn": 11,
@@ -3974,14 +3870,6 @@
                 "range": {
                     "startColumn": 5,
                     "endColumn": 22,
-                    "lineCount": 1
-                }
-            },
-            {
-                "code": "reportUnknownVariableType",
-                "range": {
-                    "startColumn": 30,
-                    "endColumn": 42,
                     "lineCount": 1
                 }
             },

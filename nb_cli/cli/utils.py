@@ -63,7 +63,12 @@ ADVANCED_SEARCH_FILTERS_ARGS: dict[str, _ValueFilterFunction] = {
 
 
 async def find_exact_package(
-    question: str, name: str | None, packages: list[T], *, no_extras: bool = False
+    question: str,
+    name: str | None,
+    packages: list[T],
+    *,
+    no_extras: bool = False,
+    echo: bool = True,
 ) -> T:
     if name is None:
         if not packages:
@@ -99,9 +104,9 @@ async def find_exact_package(
     ]
     if len(packages) == 1:
         return packages[0]
-    elif len(packages) > 1:
+    elif echo and len(packages) > 1:
         click.echo(format_package_results(packages))
-    else:
+    elif echo:
         click.echo(_("Package {name} not found.").format(name=name))
         click.echo(
             _("*** You may check with `--include-unpublished` option if supported.")
