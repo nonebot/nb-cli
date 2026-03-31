@@ -185,31 +185,31 @@ async def install(
                     for p in _all_plugins
                     if (p.project_link, p.module_name) not in _installed
                 ],
+                echo=False,
             )
 
         assert plugin is not None  # confirmed by above logic
     except CancelledError:
         return
     except NoSelectablePackageError:
-        with contextlib.suppress(NoSelectablePackageError):
-            _plugin = await find_exact_package(
-                _("Plugin name to install:"), name, _all_plugins
-            )
-            click.secho(
-                _("ERROR: Plugin {name} is already installed.").format(
-                    name=_plugin.project_link
-                ),
-                fg="red",
-            )
-            click.secho(
-                _(
-                    "To upgrade the plugin, run `nb plugin update {name}` instead."
-                ).format(name=_plugin.project_link),
-                fg="red",
-            )
-            return
-
         click.echo(_("No available plugin found to install."))
+        return
+    except RuntimeError:
+        _plugin = await find_exact_package(
+            _("Plugin name to install:"), name, _all_plugins
+        )
+        click.secho(
+            _("ERROR: Plugin {name} is already installed.").format(
+                name=_plugin.project_link
+            ),
+            fg="red",
+        )
+        click.secho(
+            _("To upgrade the plugin, run `nb plugin update {name}` instead.").format(
+                name=_plugin.project_link
+            ),
+            fg="red",
+        )
         return
 
     if include_unpublished:

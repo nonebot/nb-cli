@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nb-cli 1.0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-31 05:16+0000\n"
+"POT-Creation-Date: 2026-03-31 14:19+0000\n"
 "PO-Revision-Date: 2023-01-11 08:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_Hans_CN\n"
@@ -62,12 +62,12 @@ msgstr "你想要进行什么操作?"
 msgid "Run script {script_name!r}"
 msgstr "运行脚本 {script_name!r}"
 
-#: nb_cli/cli/utils.py:105
+#: nb_cli/cli/utils.py:110
 #, python-brace-format
 msgid "Package {name} not found."
 msgstr "包 {name} 未找到."
 
-#: nb_cli/cli/utils.py:107
+#: nb_cli/cli/utils.py:112
 msgid "*** You may check with `--include-unpublished` option if supported."
 msgstr "*** 可以对支持的命令使用 `--include-unpublished` 选项来确认."
 
@@ -119,23 +119,23 @@ msgid "Install nonebot adapter to current project."
 msgstr "安装适配器到当前项目."
 
 #: nb_cli/cli/commands/adapter.py:172 nb_cli/cli/commands/adapter.py:181
-#: nb_cli/cli/commands/adapter.py:196
+#: nb_cli/cli/commands/adapter.py:199
 msgid "Adapter name to install:"
 msgstr "想要安装的适配器名称:"
 
-#: nb_cli/cli/commands/adapter.py:199
+#: nb_cli/cli/commands/adapter.py:195
+msgid "No available adapter found to install."
+msgstr "没有可供安装的适配器."
+
+#: nb_cli/cli/commands/adapter.py:202
 #, python-brace-format
 msgid "ERROR: Adapter {name} is already installed."
 msgstr "错误: 已安装 {name} 适配器."
 
-#: nb_cli/cli/commands/adapter.py:206
+#: nb_cli/cli/commands/adapter.py:208
 #, python-brace-format
 msgid "To upgrade the adapter, run `nb adapter update {name}` instead."
 msgstr "要更新适配器，请运行 `nb adapter update {name}`."
-
-#: nb_cli/cli/commands/adapter.py:212
-msgid "No available adapter found to install."
-msgstr "没有可供安装的适配器."
 
 #: nb_cli/cli/commands/adapter.py:218 nb_cli/cli/commands/adapter.py:284
 msgid ""
@@ -459,23 +459,23 @@ msgid "Install nonebot plugin to current project."
 msgstr "安装插件到当前项目."
 
 #: nb_cli/cli/commands/plugin.py:172 nb_cli/cli/commands/plugin.py:181
-#: nb_cli/cli/commands/plugin.py:196
+#: nb_cli/cli/commands/plugin.py:199
 msgid "Plugin name to install:"
 msgstr "想要安装的插件名称:"
 
-#: nb_cli/cli/commands/plugin.py:199
+#: nb_cli/cli/commands/plugin.py:195
+msgid "No available plugin found to install."
+msgstr "没有可供安装的插件."
+
+#: nb_cli/cli/commands/plugin.py:202
 #, python-brace-format
 msgid "ERROR: Plugin {name} is already installed."
 msgstr "错误: 已安装 {name} 插件"
 
-#: nb_cli/cli/commands/plugin.py:206
+#: nb_cli/cli/commands/plugin.py:208
 #, python-brace-format
 msgid "To upgrade the plugin, run `nb plugin update {name}` instead."
 msgstr "要更新插件，请运行 `nb plugin update {name}`."
-
-#: nb_cli/cli/commands/plugin.py:212
-msgid "No available plugin found to install."
-msgstr "没有可供安装的插件."
 
 #: nb_cli/cli/commands/plugin.py:218 nb_cli/cli/commands/plugin.py:284
 msgid ""

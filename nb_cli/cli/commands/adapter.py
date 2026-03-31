@@ -185,31 +185,31 @@ async def install(
                     for a in _all_adapters
                     if (a.project_link, a.module_name) not in _installed
                 ],
+                echo=False,
             )
 
         assert adapter is not None  # confirmed by above logic
     except CancelledError:
         return
     except NoSelectablePackageError:
-        with contextlib.suppress(NoSelectablePackageError):
-            _adapter = await find_exact_package(
-                _("Adapter name to install:"), name, _all_adapters
-            )
-            click.secho(
-                _("ERROR: Adapter {name} is already installed.").format(
-                    name=_adapter.project_link
-                ),
-                fg="red",
-            )
-            click.secho(
-                _(
-                    "To upgrade the adapter, run `nb adapter update {name}` instead."
-                ).format(name=_adapter.project_link),
-                fg="red",
-            )
-            return
-
         click.echo(_("No available adapter found to install."))
+        return
+    except RuntimeError:
+        _adapter = await find_exact_package(
+            _("Adapter name to install:"), name, _all_adapters
+        )
+        click.secho(
+            _("ERROR: Adapter {name} is already installed.").format(
+                name=_adapter.project_link
+            ),
+            fg="red",
+        )
+        click.secho(
+            _("To upgrade the adapter, run `nb adapter update {name}` instead.").format(
+                name=_adapter.project_link
+            ),
+            fg="red",
+        )
         return
 
     if include_unpublished:
