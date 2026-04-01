@@ -17,35 +17,39 @@ classifiers = [
 
 requires-python = ">=3.10, <4.0"
 dependencies = [
-  "click ~=8.1",
-  "httpx ~=0.18",
-  "jinja2 ~=3.0",
-  "wcwidth ~=0.2",
-  "tomlkit ~=0.10",
-  "watchfiles ~=1.0",
-  "anyio >=3.6, < 5.0",
-  "cookiecutter ~=2.2",
-  "virtualenv ~=20.21",
-  "cashews >=6.0, <8.0",
-  "typing-extensions ~=4.4",
-  "noneprompt >=0.1.10, <1.0.0",
-  "pydantic >=1.10.0, <3.0.0, !=2.5.0, !=2.5.1",
+  "click~=8.3",
+  "httpx~=0.28",
+  "jinja2~=3.1",
+  "wcwidth~=0.6",
+  "tomlkit~=0.14.0",
+  "watchfiles~=1.1",
+  "anyio>=4.13.0,<5.0",
+  "cookiecutter~=2.7",
+  "virtualenv~=21.2",
+  "cashews>=7.5.0,<8.0",
+  "typing-extensions~=4.15",
+  "noneprompt>=0.1.11,<1.0",
+  "pydantic>=1.10.0, <3.0.0, !=2.5.0, !=2.5.1",
   "nonestorage>=0.1.0",
-  "rich>=14.1.0",
-  "textual>=5.3.0",
-  "packaging>=25.0",
-  "pip>=25.3",
+  "rich>=14.3.3",
+  "textual>=8.2.1",
+  "packaging>=26.0",
+  "pip>=26.0.1",
 ]
 
 [dependency-groups]
-i18n = ["babel ~=2.11"]
-dev = [
-    "ruff ~=0.14",
-    "nonemoji ~=0.1",
-    "prek>=0.3.2",
-    "basedpyright>=1.38.1",
+i18n = [
+    "babel~=2.18",
 ]
-docs = ["nb-autodoc >=1.0.3"]
+dev = [
+    "ruff>=0.15.8",
+    "nonemoji>=0.1.4",
+    "prek>=0.3.8",
+    "basedpyright>=1.38.4",
+]
+docs = [
+    "nb-autodoc>=1.0.4",
+]
 
 [project.urls]
 homepage = "https://cli.nonebot.dev/"
