@@ -4,17 +4,7 @@ version = "0.1.0"
 description = "{{ cookiecutter.computed.project_desc }}"
 readme = "README.md"
 requires-python = ">=3.10, <4.0"
-{% set dependencies = [] -%}
-{% for driver in cookiecutter.nonebot.drivers.values() -%}
-{% if driver.project_link == "" -%}
-{% set driver_str = '"nonebot2>=%s"'|format(driver.version) -%}
-{%- else -%}
-{% set driver_str = '"%s>=%s"'|format(driver.project_link, driver.version) -%}
-{%- endif -%}
-{% if driver.project_link != "" or cookiecutter.nonebot.drivers|length == 1 -%}
-{% set _ = dependencies.append(driver_str) -%}
-{%- endif -%}
-{%- endfor -%}
+{% set dependencies = [cookiecutter.nonebot.driver_package] -%}
 {% for adapter in cookiecutter.nonebot.adapters.values() -%}
 {% set adapter_str = '"%s>=%s"'|format(adapter[0].project_link, adapter[0].version) -%}
 {% set _ = dependencies.append(adapter_str) -%}
