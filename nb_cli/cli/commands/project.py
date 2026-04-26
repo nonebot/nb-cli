@@ -7,7 +7,7 @@ from pathlib import Path
 import re
 import shlex
 import sys
-from typing import TypeAlias, TypedDict
+from typing import TYPE_CHECKING, TypeAlias, TypedDict
 from typing_extensions import Required
 
 import click
@@ -50,6 +50,9 @@ from nb_cli.handlers import (
 )
 from nb_cli.log import ClickHandler
 
+if TYPE_CHECKING:
+    from nb_cli.config import Adapter
+
 VALID_PROJECT_NAME = r"^[a-zA-Z][a-zA-Z0-9 _-]*$"
 BLACKLISTED_PROJECT_NAME = {"nonebot", "bot"}
 TEMPLATE_DESCRIPTION = {
@@ -69,6 +72,7 @@ class ProjectTemplateProps(TypedDict):
     inplace: bool
     adapters: SerializedJSON
     drivers: SerializedJSON
+    driver_package: str
     environment: MutableMapping[str, str]
     use_src: bool
     devtools: Sequence[str]
@@ -86,7 +90,7 @@ class ProjectContext:
     variables: ProjectTemplateProps = field(  # pyright: ignore[reportAssignmentType]
         default_factory=dict
     )
-    packages: list[str] = field(default_factory=list)
+    packages: list[Requirement] = field(default_factory=list)
 
 
 def project_name_validator(name: str) -> bool:
@@ -134,7 +138,7 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         context.variables["inplace"] = True
 
     confirm = False
-    adapters = []
+    adapters: tuple["Choice[Adapter]", ...] = ()
     while not confirm:
         adapters = await CheckboxPrompt(
             _("Which adapter(s) would you like to use?"),
@@ -152,12 +156,12 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
             ).prompt_async(style=CLI_DEFAULT_STYLE)
         )
 
-    _adapters = {}
+    _adapters: dict[str, list[dict[str, object]]] = {}
     for a in adapters:
         _adapters.setdefault(a.data.project_link, []).append(model_dump(a.data))
     context.variables["adapters"] = json.dumps(_adapters)
     context.packages.extend(
-        [f"{a.data.project_link}>={a.data.version}" for a in adapters]
+        [Requirement(f"{a.data.project_link}>={a.data.version}") for a in adapters]
     )
 
     drivers = await CheckboxPrompt(
@@ -171,16 +175,23 @@ async def prompt_common_context(context: ProjectContext) -> ProjectContext:
         validator=bool,
         error_message=_("Chosen drivers is not valid!"),
     ).prompt_async(style=CLI_DEFAULT_STYLE)
+    driver_pkg = Requirement(
+        "nonebot2[{extras}]>={version}".format(
+            extras=",".join(
+                x
+                for d in drivers
+                for x in Requirement(d.data.project_link or "nonebot2").extras
+            ),
+            version=drivers[0].data.version,
+        )
+        if drivers
+        else "nonebot2"
+    )
+    context.variables["driver_package"] = json.dumps(str(driver_pkg))
     context.variables["drivers"] = json.dumps(
         {d.data.project_link: model_dump(d.data) for d in drivers}
     )
-    context.packages.extend(
-        [
-            f"{d.data.project_link}>={d.data.version}"
-            for d in drivers
-            if d.data.project_link
-        ]
-    )
+    context.packages.insert(0, driver_pkg)
 
     localstore_mode_text = [
         _("User global (default, suitable for single instance in single user)"),
@@ -387,10 +398,7 @@ async def create(
             executable=config_manager.python_path,
         )
         try:
-            await executor.install(
-                *(Requirement(pkg) for pkg in ["nonebot2", *set(context.packages)]),
-                extra_args=pip_args or (),
-            )
+            await executor.install(*context.packages, extra_args=pip_args or ())
         except ProcessExecutionError:
             click.secho(
                 _(
