@@ -1,8 +1,10 @@
 {
   "nonebot": {
     "project_name": "AwesomeBot",
+    "inplace": false,
     "drivers": "",
-    "adapters": ""
+    "adapters": "",
+    "environments": {}
   },
   "computed": {
     "project_slug": "{{ '.' if cookiecutter.nonebot.inplace else cookiecutter.nonebot.project_name|replace(' ', '-') }}",
