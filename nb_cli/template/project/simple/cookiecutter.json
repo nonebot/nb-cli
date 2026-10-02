@@ -2,9 +2,12 @@
   "py": "py",
   "nonebot": {
     "project_name": "AwesomeBot",
+    "inplace": false,
     "drivers": "",
     "adapters": "",
-    "use_src": false
+    "use_src": false,
+    "environments": {},
+    "devtools": []
   },
   "computed": {
     "project_slug": "{{ '.' if cookiecutter.nonebot.inplace else cookiecutter.nonebot.project_name|replace(' ', '-') }}",
